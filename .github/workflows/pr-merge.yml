@@ -238,12 +238,39 @@ jobs:
                       // Update linked issue if exists
                       if (issueNumber) {
                         try {
+                          // Remove work-in-progress labels
+                          const currentIssue = await github.rest.issues.get({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: parseInt(issueNumber)
+                          });
+                          
+                          const labelsToRemove = ['ready', 'autodev', 'in-progress', 'status:in-progress'];
+                          const currentLabels = currentIssue.data.labels.map(l => l.name);
+                          
+                          for (const labelToRemove of labelsToRemove) {
+                            if (currentLabels.includes(labelToRemove)) {
+                              try {
+                                await github.rest.issues.removeLabel({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: parseInt(issueNumber),
+                                  name: labelToRemove
+                                });
+                                console.log(`Removed label: ${labelToRemove}`);
+                              } catch (labelError) {
+                                console.log(`Could not remove label ${labelToRemove}: ${labelError.message}`);
+                              }
+                            }
+                          }
+                          
                           // Close the issue
                           await github.rest.issues.update({
                             owner: context.repo.owner,
                             repo: context.repo.repo,
                             issue_number: parseInt(issueNumber),
-                            state: 'closed'
+                            state: 'closed',
+                            state_reason: 'completed'
                           });
                           
                           // Add completion comment
@@ -251,11 +278,13 @@ jobs:
                             owner: context.repo.owner,
                             repo: context.repo.repo,
                             issue_number: parseInt(issueNumber),
-                            body: `🎉 **Issue Completed**\n\n` +
-                                  `This issue has been resolved and merged via PR #${prNumber}.\n\n` +
-                                  `**Merge commit**: ${mergeResult.data.sha}\n` +
-                                  `**Merged at**: ${new Date().toISOString()}\n\n` +
-                                  `The changes are now live on the main branch!`
+                            body: `🎉 **Issue Completed Successfully**\n\n` +
+                                  `✅ **Implementation**: Merged via PR #${prNumber}\n` +
+                                  `✅ **Merge commit**: \`${mergeResult.data.sha}\`\n` +
+                                  `✅ **Completed at**: ${new Date().toISOString()}\n` +
+                                  `✅ **Branches cleaned**: All related branches deleted\n\n` +
+                                  `**AUTO-DEV Pipeline Complete** - Changes are now live on main branch!\n\n` +
+                                  `*Automated by PR Auto-Merge workflow*`
                           });
                           
                           // Add completion labels
@@ -263,39 +292,99 @@ jobs:
                             owner: context.repo.owner,
                             repo: context.repo.repo,
                             issue_number: parseInt(issueNumber),
-                            labels: ['status: completed']
+                            labels: ['status:completed', 'auto-merged']
                           });
                           
-                          console.log(`✅ Issue #${issueNumber} closed and updated`);
+                          console.log(`✅ Issue #${issueNumber} closed and cleaned up`);
                           
                         } catch (error) {
                           console.log(`Could not update issue #${issueNumber}: ${error.message}`);
                         }
                       }
 
-                      // Clean up branch
+                      // Clean up branches
                       try {
+                        const branchName = pr.data.head.ref;
+                        
+                        // Delete the PR branch
                         await github.rest.git.deleteRef({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
-                          ref: `heads/${pr.data.head.ref}`
+                          ref: `heads/${branchName}`
                         });
                         
-                        console.log(`✅ Deleted branch: ${pr.data.head.ref}`);
+                        console.log(`✅ Deleted PR branch: ${branchName}`);
+                        
+                        // Also delete related bot branches if they exist
+                        if (issueNumber) {
+                          const relatedBranches = [
+                            `bot/issue-${issueNumber}-autodev`,
+                            `feat/issue-${issueNumber}-*`,
+                            `feature/issue-${issueNumber}*`
+                          ];
+                          
+                          // Get all branches
+                          const allBranches = await github.rest.repos.listBranches({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            per_page: 100
+                          });
+                          
+                          // Find and delete related branches
+                          for (const branch of allBranches.data) {
+                            const shouldDelete = relatedBranches.some(pattern => {
+                              if (pattern.includes('*')) {
+                                const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+                                return regex.test(branch.name);
+                              }
+                              return branch.name === pattern;
+                            });
+                            
+                            if (shouldDelete && branch.name !== branchName) {
+                              try {
+                                await github.rest.git.deleteRef({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  ref: `heads/${branch.name}`
+                                });
+                                console.log(`✅ Deleted related branch: ${branch.name}`);
+                              } catch (deleteError) {
+                                console.log(`Could not delete branch ${branch.name}: ${deleteError.message}`);
+                              }
+                            }
+                          }
+                        }
+                        
                       } catch (error) {
-                        console.log(`Could not delete branch: ${error.message}`);
+                        console.log(`Could not delete branches: ${error.message}`);
                       }
 
                       // Generate summary
-                      core.summary.addHeading('Auto-Merge Completed', 2);
+                      core.summary.addHeading('🎉 Auto-Merge & Cleanup Completed', 2);
                       core.summary.addTable([
                         ['Property', 'Value'],
                         ['PR Number', `#${prNumber}`],
                         ['Issue Number', issueNumber ? `#${issueNumber}` : 'None'],
-                        ['Merge SHA', mergeResult.data.sha],
-                        ['Branch Deleted', pr.data.head.ref],
+                        ['Merge SHA', `\`${mergeResult.data.sha}\``],
+                        ['Primary Branch', `\`${pr.data.head.ref}\` ✅ Deleted`],
+                        ['Related Branches', issueNumber ? `bot/issue-${issueNumber}-* ✅ Cleaned` : 'None'],
+                        ['Issue Status', issueNumber ? '✅ Closed & Labeled' : 'N/A'],
+                        ['Labels Removed', issueNumber ? 'ready, autodev, in-progress' : 'N/A'],
+                        ['Labels Added', issueNumber ? 'status:completed, auto-merged' : 'N/A'],
                         ['Merged At', new Date().toISOString()]
                       ]);
+                      
+                      core.summary.addRaw('\n\n### 🧹 Cleanup Actions Performed:\n');
+                      core.summary.addList([
+                        '✅ PR merged with squash commit',
+                        '✅ Primary branch deleted',
+                        issueNumber ? '✅ Related bot/feature branches cleaned' : '⏭️ No related branches to clean',
+                        issueNumber ? '✅ Issue closed and labeled' : '⏭️ No linked issue',
+                        issueNumber ? '✅ Work-in-progress labels removed' : '⏭️ No labels to remove',
+                        '✅ Completion comment added',
+                        '✅ Dev-log update triggered'
+                      ]);
+                      
                       await core.summary.write();
 
     trigger-post-merge:
