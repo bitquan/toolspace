@@ -5,43 +5,34 @@ import '../../../lib/tools/time_convert/time_convert_screen.dart';
 void main() {
   group('TimeConvertScreen Widget Tests', () {
     testWidgets('renders screen with title', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Time Converter'), findsOneWidget);
     });
 
-    testWidgets('shows input field and result sections', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+    testWidgets('shows input field and result sections', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Input'), findsOneWidget);
       expect(find.text('Result'), findsOneWidget);
     });
 
     testWidgets('has "Now" button', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Now'), findsOneWidget);
-      expect(find.widgetWithIcon(ElevatedButton, Icons.access_time), findsOneWidget);
+      expect(
+        find.widgetWithIcon(ElevatedButton, Icons.access_time),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('clicking "Now" button sets input', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+    testWidgets('clicking "Now" button sets input', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Click the Now button
       await tester.tap(find.text('Now'));
@@ -52,12 +43,10 @@ void main() {
       expect(textField.controller?.text, 'now');
     });
 
-    testWidgets('displays quick example templates', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+    testWidgets('displays quick example templates', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Quick Examples'), findsOneWidget);
       expect(find.text('yesterday'), findsOneWidget);
@@ -65,22 +54,14 @@ void main() {
     });
 
     testWidgets('has timezone selector', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Timezone'), findsOneWidget);
       expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
     });
 
     testWidgets('has output format selector', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Output Format'), findsOneWidget);
       expect(find.text('ISO 8601'), findsOneWidget);
@@ -89,11 +70,7 @@ void main() {
     });
 
     testWidgets('entering text triggers parsing', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Enter "now" in the text field
       await tester.enterText(find.byType(TextField).first, 'now');
@@ -105,11 +82,7 @@ void main() {
     });
 
     testWidgets('shows error for invalid input', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Enter invalid text
       await tester.enterText(find.byType(TextField).first, 'invalid input xyz');
@@ -119,12 +92,10 @@ void main() {
       expect(find.textContaining('Unable to parse'), findsOneWidget);
     });
 
-    testWidgets('clicking quick template sets input', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+    testWidgets('clicking quick template sets input', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Find and tap the "yesterday" template
       await tester.tap(find.text('yesterday'));
@@ -136,11 +107,7 @@ void main() {
     });
 
     testWidgets('selecting format updates result', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Set input first
       await tester.enterText(find.byType(TextField).first, 'now');
@@ -156,11 +123,7 @@ void main() {
     });
 
     testWidgets('clear button clears input', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Set input
       await tester.enterText(find.byType(TextField).first, 'now');
@@ -176,22 +139,16 @@ void main() {
     });
 
     testWidgets('shows empty state when no input', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Enter a time to convert'), findsOneWidget);
       expect(find.byIcon(Icons.schedule), findsWidgets);
     });
 
-    testWidgets('result section shows multiple formats', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: TimeConvertScreen(),
-        ),
-      );
+    testWidgets('result section shows multiple formats', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       // Set input
       await tester.enterText(find.byType(TextField).first, 'now');

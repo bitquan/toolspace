@@ -2,7 +2,10 @@
 /// Handles epoch/human conversions, natural language parsing, and timezones
 class TimestampConverter {
   /// Parse natural language time inputs like "now", "yesterday", "5 minutes ago"
-  static DateTime? parseNaturalLanguage(String input, {String timezone = 'UTC'}) {
+  static DateTime? parseNaturalLanguage(
+    String input, {
+    String timezone = 'UTC',
+  }) {
     final normalized = input.trim().toLowerCase();
     final now = DateTime.now();
 
@@ -31,7 +34,7 @@ class TimestampConverter {
       final amount = int.tryParse(match.group(1) ?? '0') ?? 0;
       final unit = match.group(2) ?? '';
       final isAgo = normalized.contains('ago');
-      
+
       Duration duration;
       switch (unit) {
         case 'second':
@@ -118,7 +121,7 @@ class TimestampConverter {
     final year = dateTime.year.toString();
     final month = dateTime.month.toString().padLeft(2, '0');
     final day = dateTime.day.toString().padLeft(2, '0');
-    
+
     if (!includeTime) {
       return '$year-$month-$day';
     }

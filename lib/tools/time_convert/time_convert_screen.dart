@@ -16,7 +16,7 @@ class TimeConvertScreen extends StatefulWidget {
 class _TimeConvertScreenState extends State<TimeConvertScreen>
     with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
-  
+
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
 
@@ -51,7 +51,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
 
   void _onInputChanged() {
     final input = _inputController.text.trim();
-    
+
     if (input.isEmpty) {
       setState(() {
         _parsedDateTime = null;
@@ -74,7 +74,8 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
         _bounceController.forward().then((_) => _bounceController.reverse());
       } else {
         _parsedDateTime = null;
-        _errorMessage = 'Unable to parse input. Try "now", "yesterday", "5 minutes ago", ISO date, or Unix timestamp.';
+        _errorMessage =
+            'Unable to parse input. Try "now", "yesterday", "5 minutes ago", ISO date, or Unix timestamp.';
         _result = '';
       }
     });
@@ -87,7 +88,10 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
     }
 
     setState(() {
-      _result = TimestampConverter.formatCustom(_parsedDateTime!, _selectedFormat);
+      _result = TimestampConverter.formatCustom(
+        _parsedDateTime!,
+        _selectedFormat,
+      );
     });
   }
 
@@ -195,7 +199,8 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                       controller: _inputController,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        hintText: 'now, yesterday, 5 minutes ago, 1234567890, 2024-01-01...',
+                        hintText:
+                            'now, yesterday, 5 minutes ago, 1234567890, 2024-01-01...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -214,8 +219,9 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                             icon: const Icon(Icons.access_time),
                             label: const Text('Now'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFF9C27B0).withOpacity(0.1),
+                              backgroundColor: const Color(
+                                0xFF9C27B0,
+                              ).withOpacity(0.1),
                               foregroundColor: const Color(0xFF9C27B0),
                             ),
                           ),
@@ -280,10 +286,10 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                         ),
                       ),
                       items: TimestampConverter.commonTimezones
-                          .map((tz) => DropdownMenuItem(
-                                value: tz,
-                                child: Text(tz),
-                              ))
+                          .map(
+                            (tz) =>
+                                DropdownMenuItem(value: tz, child: Text(tz)),
+                          )
                           .toList(),
                       onChanged: (value) {
                         if (value != null) {
@@ -319,8 +325,9 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                               _updateResult();
                             });
                           },
-                          selectedColor:
-                              const Color(0xFF9C27B0).withOpacity(0.2),
+                          selectedColor: const Color(
+                            0xFF9C27B0,
+                          ).withOpacity(0.2),
                           checkmarkColor: const Color(0xFF9C27B0),
                         );
                       }).toList(),
@@ -386,21 +393,23 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF9C27B0)
-                                          .withOpacity(0.1),
+                                      color: const Color(
+                                        0xFF9C27B0,
+                                      ).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                        color: const Color(0xFF9C27B0)
-                                            .withOpacity(0.3),
+                                        color: const Color(
+                                          0xFF9C27B0,
+                                        ).withOpacity(0.3),
                                       ),
                                     ),
                                     child: SelectableText(
                                       _result,
                                       style: theme.textTheme.titleMedium
                                           ?.copyWith(
-                                        fontFamily: 'monospace',
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                            fontFamily: 'monospace',
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                   ),
                                 );
@@ -421,19 +430,20 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                             ...TimeFormat.values
                                 .where((f) => f != _selectedFormat)
                                 .map((format) {
-                              final formatted = TimestampConverter.formatCustom(
-                                _parsedDateTime!,
-                                format,
-                              );
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _buildFormatItem(
-                                  _getFormatLabel(format),
-                                  formatted,
-                                  theme,
-                                ),
-                              );
-                            }),
+                                  final formatted =
+                                      TimestampConverter.formatCustom(
+                                        _parsedDateTime!,
+                                        format,
+                                      );
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: _buildFormatItem(
+                                      _getFormatLabel(format),
+                                      formatted,
+                                      theme,
+                                    ),
+                                  );
+                                }),
 
                             const SizedBox(height: 12),
 
@@ -441,7 +451,8 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                             _buildFormatItem(
                               'Relative Time',
                               TimestampConverter.getRelativeTime(
-                                  _parsedDateTime!),
+                                _parsedDateTime!,
+                              ),
                               theme,
                             ),
                           ],
