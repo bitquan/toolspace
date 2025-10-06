@@ -107,7 +107,7 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
-                      const issueNumber = ${{ steps.issue_info.outputs.issue_number }};
+                      const issueNumber = '${{ steps.issue_info.outputs.issue_number }}';
 
                       // Check if OPS-Gamma created a feature branch
                       try {
