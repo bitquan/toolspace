@@ -2,7 +2,7 @@
 
 ## Overview
 
-Three instant-win micro tools designed for maximum utility and immediate value: JSON Doctor, Text Diff, and QR Maker.
+Four instant-win micro tools designed for maximum utility and immediate value: JSON Doctor, Text Diff, QR Maker, and Regex Tester.
 
 ## Implementation Date
 
@@ -58,6 +58,22 @@ October 6, 2025
   - Quick templates for common formats
   - Download functionality
   - Statistics display
+
+### 4. Regex Tester
+
+- **File**: `lib/tools/regex_tester/regex_tester_screen.dart`
+- **Purpose**: Test regex patterns with live match highlighting and capture groups
+- **Features**:
+  - Real-time pattern validation and testing
+  - Live match highlighting in test text
+  - Capture group extraction (numbered and named)
+  - Regex flags support (case-sensitive, multiline, dotAll, unicode)
+  - Pattern library with 20+ common regex presets organized by category
+  - Error messages for invalid patterns
+  - Match count and position information
+  - Copy pattern to clipboard
+  - Split-view interface with test text and results panels
+  - Expandable match cards showing detailed information
 
 ## Design Philosophy
 

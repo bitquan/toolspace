@@ -14,20 +14,24 @@
     "qa": "npm run typecheck"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "eslint": "^9",
-    "@typescript-eslint/parser": "^8",
+    "@types/jest": "^30",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^9",
     "jest": "^30",
     "ts-jest": "^29",
-    "@types/jest": "^30",
-    "@types/uuid": "^10.0.0"
+    "typescript": "^5"
   },
   "dependencies": {
+    "@types/marked": "^5.0.2",
     "firebase-admin": "^12.7.0",
     "firebase-functions": "^5.1.1",
+    "marked": "^16.3.0",
     "nanoid": "^5.0.0",
     "pdf-merger-js": "^5.1.0",
+    "puppeteer": "^24.23.0",
+    "sharp": "^0.33.5",
     "uuid": "^10.0.0"
   }
 }
