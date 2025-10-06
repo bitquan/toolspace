@@ -1,6 +1,19 @@
 #!/bin/bash
 # Script to close failed Dependabot PRs
-# Requires GitHub CLI (gh) to be installed and authenticated
+# Requires GitHub CLI (gh) and jq to be installed and authenticated
+
+# Check dependencies
+if ! command -v gh &> /dev/null; then
+    echo "❌ GitHub CLI (gh) is not installed. Please install it first."
+    exit 1
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "❌ jq is not installed. Please install it first."
+    echo "  On Ubuntu/Debian: sudo apt install jq"
+    echo "  On macOS: brew install jq"
+    exit 1
+fi
 
 echo "🔍 Finding failed Dependabot PRs..."
 
@@ -12,15 +25,21 @@ if [ -s failed_prs.json ]; then
     cat failed_prs.json | jq -r '"\(.number): \(.title)"'
     
     echo ""
-    echo "🗑️ Closing failed PRs..."
+    read -p "Do you want to close these failed PRs? (y/N): " confirmation
     
-    # Close each failed PR
-    cat failed_prs.json | jq -r '.number' | while read pr_number; do
-        echo "Closing PR #$pr_number..."
-        gh pr close $pr_number --comment "Auto-closing due to CI failures. Dependencies will be updated in grouped PRs going forward."
-    done
-    
-    echo "✅ Completed closing failed PRs"
+    if [[ $confirmation == "y" || $confirmation == "Y" ]]; then
+        echo "🗑️ Closing failed PRs..."
+        
+        # Close each failed PR
+        cat failed_prs.json | jq -r '.number' | while read pr_number; do
+            echo "Closing PR #$pr_number..."
+            gh pr close $pr_number --comment "Auto-closing due to CI failures. Dependencies will be updated in grouped PRs going forward."
+        done
+        
+        echo "✅ Completed closing failed PRs"
+    else
+        echo "❌ Operation cancelled"
+    fi
 else
     echo "✅ No failed Dependabot PRs found"
 fi
