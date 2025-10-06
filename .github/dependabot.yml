@@ -8,26 +8,37 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "bitquan"
+    open-pull-requests-limit: 2  # Reduced from 5
     commit-message:
       prefix: "deps(functions)"
       include: "scope"
+    groups:
+      firebase:
+        patterns:
+          - "firebase*"
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "typescript*"
+          - "jest*"
 
   # GitHub Actions dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"  # Changed from weekly to monthly
       day: "monday"
       time: "09:00"
-    open-pull-requests-limit: 3
-    reviewers:
-      - "bitquan"
+    open-pull-requests-limit: 2  # Reduced from 3
     commit-message:
       prefix: "deps(actions)"
       include: "scope"
+    groups:
+      actions:
+        patterns:
+          - "actions/*"
+          - "github/*"
 
   # Pub dependencies (Flutter)
   - package-ecosystem: "pub"
@@ -36,9 +47,15 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "bitquan"
+    open-pull-requests-limit: 2  # Reduced from 5
     commit-message:
       prefix: "deps(flutter)"
       include: "scope"
+    groups:
+      flutter-core:
+        patterns:
+          - "flutter*"
+      dev-dependencies:
+        patterns:
+          - "*_test*"
+          - "*_lints*"
