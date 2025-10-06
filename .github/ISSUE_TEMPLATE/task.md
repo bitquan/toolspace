@@ -31,6 +31,31 @@ assignees: ""
 
 - [ ]
 - [ ]
+
+---
+
+## Autonomous Workflow
+
+<!-- This issue is compatible with the autonomous development workflow -->
+
+**Branch Type**: `feat` | `fix` | `chore` | `docs` (select one)
+**Tools/Area**: <!-- e.g., file_merger, text_tools, core, etc. -->
+**Estimated Effort**: <!-- e.g., 0.5d, 1d, 2d -->
+
+### Workflow Steps
+
+1. Add `ready` label when this issue is ready for development
+2. System will auto-create branch: `{type}/issue-{number}-{slug}`
+3. Make changes, commit with issue references: `#123 Your commit message`
+4. Push triggers CI (tests, lint, security scan)
+5. When CI passes, system auto-creates PR
+6. After review approval, system auto-merges and closes issue
+7. Dev log automatically updated
+
+**Ready for autonomous development?** Add the `ready` label to start the workflow!
+
+- [ ]
+- [ ]
 - [ ]
 
 ## Dependencies

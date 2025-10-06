@@ -1,0 +1,29 @@
+{
+  "name": "ops-delta-scripts",
+  "version": "1.0.0",
+  "description": "OPS-Delta adaptive sprint management scripts",
+  "type": "module",
+  "scripts": {
+    "velocity": "node scripts/velocity.mjs",
+    "report": "node scripts/report.mjs",
+    "velocity-dry": "node scripts/velocity.mjs --dry-run",
+    "report-dry": "node scripts/report.mjs --dry-run",
+    "test-scheduler": "echo 'Use: gh workflow run delta-scheduler.yml -f dry_run=true'",
+    "test-progress": "echo 'Use: gh workflow run delta-progress.yml -f dry_run=true'",
+    "test-report": "echo 'Use: gh workflow run delta-report.yml -f dry_run=true'",
+    "test-watchdog": "echo 'Use: gh workflow run delta-watchdog.yml -f dry_run=true'"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.10",
+    "@octokit/rest": "^20.0.2"
+  },
+  "keywords": [
+    "sprint-management",
+    "automation",
+    "github-actions",
+    "velocity-tracking",
+    "ops-delta"
+  ],
+  "author": "OPS-Delta System",
+  "license": "MIT"
+}

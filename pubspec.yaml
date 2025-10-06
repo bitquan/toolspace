@@ -12,6 +12,16 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Firebase dependencies for File Merger
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  firebase_storage: ^11.6.0
+  cloud_functions: ^4.6.0
+
+  # UI and utility dependencies
+  file_picker: ^6.1.1
+  url_launcher: ^6.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,310 +1,310 @@
 name: Policy Checks
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  push:
-    branches-ignore:
-      - main
+    pull_request:
+        types: [opened, synchronize, reopened]
+    push:
+        branches-ignore:
+            - main
 
 permissions:
-  contents: read
-  pull-requests: write
-  checks: write
+    contents: read
+    pull-requests: write
+    checks: write
 
 jobs:
-  enforce-policies:
-    name: Enforce Repository Policies
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    enforce-policies:
+        name: Enforce Repository Policies
+        runs-on: ubuntu-latest
 
-      - name: Check branch naming convention
-        id: branch-check
-        run: |
-          branch="${{ github.head_ref || github.ref_name }}"
-          echo "Checking branch: $branch"
-          
-          # Skip main branch
-          if [ "$branch" = "main" ]; then
-            echo "✅ Main branch, skipping"
-            echo "valid=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Allow special branches
-          if [[ "$branch" =~ ^(develop|staging|hotfix/.+)$ ]]; then
-            echo "✅ Special branch allowed: $branch"
-            echo "valid=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Check standard naming convention
-          if [[ "$branch" =~ ^(feat|fix|chore|docs)/issue-[0-9]+-[a-z0-9-]+$ ]]; then
-            echo "✅ Branch name follows convention"
-            echo "valid=true" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Branch name does not follow convention"
-            echo "Expected: {feat|fix|chore|docs}/issue-###-description"
-            echo "Got: $branch"
-            echo "valid=false" >> $GITHUB_OUTPUT
-          fi
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Check commit message policy
-        id: commit-check
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Checking commit messages in PR..."
-          
-          # Get commits in the PR
-          base_sha="${{ github.event.pull_request.base.sha }}"
-          head_sha="${{ github.event.pull_request.head.sha }}"
-          
-          # Get the list of commits
-          commits=$(git rev-list $base_sha..$head_sha)
-          
-          if [ -z "$commits" ]; then
-            echo "No commits found in PR"
-            echo "valid=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          failed_commits=()
-          
-          while IFS= read -r commit; do
-            if [ -n "$commit" ]; then
-              message=$(git log --format=%s -n 1 $commit)
-              echo "Checking: $commit - $message"
-              
-              # Check if commit references an issue
-              if [[ "$message" =~ \#[0-9]+ ]] || [[ "$message" =~ (close[sd]?|fix(ed|es)?|resolve[sd]?)\s+\#[0-9]+ ]]; then
-                echo "✅ References issue"
-              else
-                echo "❌ No issue reference"
-                failed_commits+=("$commit")
-              fi
-            fi
-          done <<< "$commits"
-          
-          if [ ${#failed_commits[@]} -gt 0 ]; then
-            echo "Failed commits: ${failed_commits[@]}"
-            echo "valid=false" >> $GITHUB_OUTPUT
-          else
-            echo "✅ All commits reference issues"
-            echo "valid=true" >> $GITHUB_OUTPUT
-          fi
+            - name: Check branch naming convention
+              id: branch-check
+              run: |
+                  branch="${{ github.head_ref || github.ref_name }}"
+                  echo "Checking branch: $branch"
 
-      - name: Check PR requirements
-        id: pr-check
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            
-            console.log('Checking PR requirements...');
-            
-            let violations = [];
-            
-            // Check if PR has a description
-            if (!pr.body || pr.body.trim().length < 10) {
-              violations.push('PR must have a meaningful description (at least 10 characters)');
-            }
-            
-            // Check if PR is linked to an issue
-            const issuePattern = /(?:close[sd]?|fix(?:ed|es)?|resolve[sd]?)\s+#(\d+)|#(\d+)/gi;
-            const hasIssueReference = issuePattern.test(pr.body || '') || issuePattern.test(pr.title || '');
-            
-            if (!hasIssueReference) {
-              violations.push('PR must reference an issue (use "Closes #123" or mention "#123")');
-            }
-            
-            // Check if PR has appropriate labels
-            const labels = pr.labels.map(l => l.name);
-            const hasTypeLabel = labels.some(l => l.startsWith('type:') || ['feat', 'fix', 'chore', 'docs'].includes(l));
-            
-            if (!hasTypeLabel) {
-              violations.push('PR must have a type label (type:feature, type:fix, type:chore, etc.)');
-            }
-            
-            // Check if branch follows naming convention (from previous step)
-            const branchValid = '${{ steps.branch-check.outputs.valid }}' === 'true';
-            if (!branchValid) {
-              violations.push('Branch name must follow convention: {feat|fix|chore|docs}/issue-###-description');
-            }
-            
-            // Check commit messages (from previous step)
-            const commitValid = '${{ steps.commit-check.outputs.valid }}' === 'true';
-            if (!commitValid) {
-              violations.push('All commits must reference an issue (#123 or "fixes #123")');
-            }
-            
-            // Set output
-            core.setOutput('violations', violations.join('\n'));
-            core.setOutput('valid', violations.length === 0 ? 'true' : 'false');
-            
-            console.log(`Found ${violations.length} policy violations`);
-            return violations;
+                  # Skip main branch
+                  if [ "$branch" = "main" ]; then
+                    echo "✅ Main branch, skipping"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
 
-      - name: Check required documentation
-        id: docs-check
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Checking documentation requirements..."
-          
-          # Get changed files
-          git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} > changed_files.txt
-          
-          # Check if code changes require doc updates
-          has_code_changes=false
-          has_doc_changes=false
-          
-          while read -r file; do
-            if [[ "$file" =~ \.(dart|ts|js|py)$ ]]; then
-              has_code_changes=true
-            fi
-            
-            if [[ "$file" =~ ^docs/ ]] || [[ "$file" =~ README\.md$ ]]; then
-              has_doc_changes=true
-            fi
-          done < changed_files.txt
-          
-          # Determine if docs are required
-          needs_docs=false
-          
-          # Check if it's a feature that might need docs
-          if [ "$has_code_changes" = true ]; then
-            # Check PR labels for features
-            labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
-            if [[ "$labels" =~ feat|feature|type:feature ]]; then
-              needs_docs=true
-            fi
-          fi
-          
-          # Evaluate
-          if [ "$needs_docs" = true ] && [ "$has_doc_changes" = false ]; then
-            echo "❌ Feature changes detected but no documentation updates"
-            echo "valid=false" >> $GITHUB_OUTPUT
-            echo "message=Feature PRs should include documentation updates" >> $GITHUB_OUTPUT
-          else
-            echo "✅ Documentation requirements met"
-            echo "valid=true" >> $GITHUB_OUTPUT
-            echo "message=" >> $GITHUB_OUTPUT
-          fi
+                  # Allow special branches
+                  if [[ "$branch" =~ ^(develop|staging|hotfix/.+)$ ]]; then
+                    echo "✅ Special branch allowed: $branch"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
 
-      - name: Create policy check status
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const branchValid = '${{ steps.branch-check.outputs.valid }}' === 'true';
-            const commitValid = '${{ steps.commit-check.outputs.valid }}' === 'true' || '${{ steps.commit-check.outputs.valid }}' === '';
-            const prValid = '${{ steps.pr-check.outputs.valid }}' === 'true' || '${{ steps.pr-check.outputs.valid }}' === '';
-            const docsValid = '${{ steps.docs-check.outputs.valid }}' === 'true' || '${{ steps.docs-check.outputs.valid }}' === '';
-            
-            const allValid = branchValid && commitValid && prValid && docsValid;
-            
-            console.log('Policy check results:');
-            console.log(`Branch naming: ${branchValid ? '✅' : '❌'}`);
-            console.log(`Commit messages: ${commitValid ? '✅' : '❌'}`);
-            console.log(`PR requirements: ${prValid ? '✅' : '❌'}`);
-            console.log(`Documentation: ${docsValid ? '✅' : '❌'}`);
-            
-            if (context.eventName === 'pull_request') {
-              let commentBody = '## 🚦 Policy Check Results\n\n';
-              
-              // Branch naming
-              commentBody += `**Branch Naming**: ${branchValid ? '✅ Valid' : '❌ Invalid'}\n`;
-              if (!branchValid) {
-                commentBody += '  - Expected format: `{feat|fix|chore|docs}/issue-###-description`\n';
-              }
-              
-              // Commit messages
-              commentBody += `**Commit Messages**: ${commitValid ? '✅ Valid' : '❌ Invalid'}\n`;
-              if (!commitValid) {
-                commentBody += '  - All commits must reference an issue (#123 or "fixes #123")\n';
-              }
-              
-              // PR requirements
-              commentBody += `**PR Requirements**: ${prValid ? '✅ Valid' : '❌ Invalid'}\n`;
-              if (!prValid) {
-                const violations = '${{ steps.pr-check.outputs.violations }}';
-                if (violations) {
-                  violations.split('\n').forEach(violation => {
-                    commentBody += `  - ${violation}\n`;
-                  });
-                }
-              }
-              
-              // Documentation
-              commentBody += `**Documentation**: ${docsValid ? '✅ Valid' : '❌ Needs attention'}\n`;
-              if (!docsValid) {
-                const docsMessage = '${{ steps.docs-check.outputs.message }}';
-                if (docsMessage) {
-                  commentBody += `  - ${docsMessage}\n`;
-                }
-              }
-              
-              commentBody += '\n';
-              
-              if (allValid) {
-                commentBody += '🎉 **All policy checks passed!** Your PR is ready for review.\n';
-              } else {
-                commentBody += '⚠️ **Policy violations detected.** Please fix the issues above before merging.\n\n';
-                commentBody += '### Quick Fixes\n';
-                commentBody += '- **Branch naming**: Create a new branch with the correct format\n';
-                commentBody += '- **Commit messages**: Use `git commit --amend` or interactive rebase to fix messages\n';
-                commentBody += '- **PR requirements**: Update the PR description and add proper labels\n';
-                commentBody += '- **Documentation**: Add or update relevant documentation\n';
-              }
-              
-              // Find existing policy check comment
-              const comments = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number
-              });
-              
-              const existingComment = comments.data.find(comment => 
-                comment.user.type === 'Bot' && 
-                comment.body.includes('🚦 Policy Check Results')
-              );
-              
-              if (existingComment) {
-                // Update existing comment
-                await github.rest.issues.updateComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: existingComment.id,
-                  body: commentBody
-                });
-              } else {
-                // Create new comment
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.payload.pull_request.number,
-                  body: commentBody
-                });
-              }
-            }
-            
-            // Set the final check status
-            if (!allValid) {
-              core.setFailed('Policy checks failed. Please review and fix the violations.');
-            }
-            
-            // Generate summary
-            core.summary.addHeading('Policy Check Summary', 2);
-            core.summary.addTable([
-              ['Check', 'Status'],
-              ['Branch Naming', branchValid ? '✅ Valid' : '❌ Invalid'],
-              ['Commit Messages', commitValid ? '✅ Valid' : '❌ Invalid'],
-              ['PR Requirements', prValid ? '✅ Valid' : '❌ Invalid'],
-              ['Documentation', docsValid ? '✅ Valid' : '❌ Needs attention']
-            ]);
-            await core.summary.write();
+                  # Check standard naming convention
+                  if [[ "$branch" =~ ^(feat|fix|chore|docs)/issue-[0-9]+-[a-z0-9-]+$ ]]; then
+                    echo "✅ Branch name follows convention"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "❌ Branch name does not follow convention"
+                    echo "Expected: {feat|fix|chore|docs}/issue-###-description"
+                    echo "Got: $branch"
+                    echo "valid=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Check commit message policy
+              id: commit-check
+              if: github.event_name == 'pull_request'
+              run: |
+                  echo "Checking commit messages in PR..."
+
+                  # Get commits in the PR
+                  base_sha="${{ github.event.pull_request.base.sha }}"
+                  head_sha="${{ github.event.pull_request.head.sha }}"
+
+                  # Get the list of commits
+                  commits=$(git rev-list $base_sha..$head_sha)
+
+                  if [ -z "$commits" ]; then
+                    echo "No commits found in PR"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
+
+                  failed_commits=()
+
+                  while IFS= read -r commit; do
+                    if [ -n "$commit" ]; then
+                      message=$(git log --format=%s -n 1 $commit)
+                      echo "Checking: $commit - $message"
+                      
+                      # Check if commit references an issue
+                      if [[ "$message" =~ \#[0-9]+ ]] || [[ "$message" =~ (close[sd]?|fix(ed|es)?|resolve[sd]?)\s+\#[0-9]+ ]]; then
+                        echo "✅ References issue"
+                      else
+                        echo "❌ No issue reference"
+                        failed_commits+=("$commit")
+                      fi
+                    fi
+                  done <<< "$commits"
+
+                  if [ ${#failed_commits[@]} -gt 0 ]; then
+                    echo "Failed commits: ${failed_commits[@]}"
+                    echo "valid=false" >> $GITHUB_OUTPUT
+                  else
+                    echo "✅ All commits reference issues"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Check PR requirements
+              id: pr-check
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const pr = context.payload.pull_request;
+
+                      console.log('Checking PR requirements...');
+
+                      let violations = [];
+
+                      // Check if PR has a description
+                      if (!pr.body || pr.body.trim().length < 10) {
+                        violations.push('PR must have a meaningful description (at least 10 characters)');
+                      }
+
+                      // Check if PR is linked to an issue
+                      const issuePattern = /(?:close[sd]?|fix(?:ed|es)?|resolve[sd]?)\s+#(\d+)|#(\d+)/gi;
+                      const hasIssueReference = issuePattern.test(pr.body || '') || issuePattern.test(pr.title || '');
+
+                      if (!hasIssueReference) {
+                        violations.push('PR must reference an issue (use "Closes #123" or mention "#123")');
+                      }
+
+                      // Check if PR has appropriate labels
+                      const labels = pr.labels.map(l => l.name);
+                      const hasTypeLabel = labels.some(l => l.startsWith('type:') || ['feat', 'fix', 'chore', 'docs'].includes(l));
+
+                      if (!hasTypeLabel) {
+                        violations.push('PR must have a type label (type:feature, type:fix, type:chore, etc.)');
+                      }
+
+                      // Check if branch follows naming convention (from previous step)
+                      const branchValid = '${{ steps.branch-check.outputs.valid }}' === 'true';
+                      if (!branchValid) {
+                        violations.push('Branch name must follow convention: {feat|fix|chore|docs}/issue-###-description');
+                      }
+
+                      // Check commit messages (from previous step)
+                      const commitValid = '${{ steps.commit-check.outputs.valid }}' === 'true';
+                      if (!commitValid) {
+                        violations.push('All commits must reference an issue (#123 or "fixes #123")');
+                      }
+
+                      // Set output
+                      core.setOutput('violations', violations.join('\n'));
+                      core.setOutput('valid', violations.length === 0 ? 'true' : 'false');
+
+                      console.log(`Found ${violations.length} policy violations`);
+                      return violations;
+
+            - name: Check required documentation
+              id: docs-check
+              if: github.event_name == 'pull_request'
+              run: |
+                  echo "Checking documentation requirements..."
+
+                  # Get changed files
+                  git diff --name-only ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} > changed_files.txt
+
+                  # Check if code changes require doc updates
+                  has_code_changes=false
+                  has_doc_changes=false
+
+                  while read -r file; do
+                    if [[ "$file" =~ \.(dart|ts|js|py)$ ]]; then
+                      has_code_changes=true
+                    fi
+                    
+                    if [[ "$file" =~ ^docs/ ]] || [[ "$file" =~ README\.md$ ]]; then
+                      has_doc_changes=true
+                    fi
+                  done < changed_files.txt
+
+                  # Determine if docs are required
+                  needs_docs=false
+
+                  # Check if it's a feature that might need docs
+                  if [ "$has_code_changes" = true ]; then
+                    # Check PR labels for features
+                    labels="${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+                    if [[ "$labels" =~ feat|feature|type:feature ]]; then
+                      needs_docs=true
+                    fi
+                  fi
+
+                  # Evaluate
+                  if [ "$needs_docs" = true ] && [ "$has_doc_changes" = false ]; then
+                    echo "❌ Feature changes detected but no documentation updates"
+                    echo "valid=false" >> $GITHUB_OUTPUT
+                    echo "message=Feature PRs should include documentation updates" >> $GITHUB_OUTPUT
+                  else
+                    echo "✅ Documentation requirements met"
+                    echo "valid=true" >> $GITHUB_OUTPUT
+                    echo "message=" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Create policy check status
+              if: always()
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const branchValid = '${{ steps.branch-check.outputs.valid }}' === 'true';
+                      const commitValid = '${{ steps.commit-check.outputs.valid }}' === 'true' || '${{ steps.commit-check.outputs.valid }}' === '';
+                      const prValid = '${{ steps.pr-check.outputs.valid }}' === 'true' || '${{ steps.pr-check.outputs.valid }}' === '';
+                      const docsValid = '${{ steps.docs-check.outputs.valid }}' === 'true' || '${{ steps.docs-check.outputs.valid }}' === '';
+
+                      const allValid = branchValid && commitValid && prValid && docsValid;
+
+                      console.log('Policy check results:');
+                      console.log(`Branch naming: ${branchValid ? '✅' : '❌'}`);
+                      console.log(`Commit messages: ${commitValid ? '✅' : '❌'}`);
+                      console.log(`PR requirements: ${prValid ? '✅' : '❌'}`);
+                      console.log(`Documentation: ${docsValid ? '✅' : '❌'}`);
+
+                      if (context.eventName === 'pull_request') {
+                        let commentBody = '## 🚦 Policy Check Results\n\n';
+                        
+                        // Branch naming
+                        commentBody += `**Branch Naming**: ${branchValid ? '✅ Valid' : '❌ Invalid'}\n`;
+                        if (!branchValid) {
+                          commentBody += '  - Expected format: `{feat|fix|chore|docs}/issue-###-description`\n';
+                        }
+                        
+                        // Commit messages
+                        commentBody += `**Commit Messages**: ${commitValid ? '✅ Valid' : '❌ Invalid'}\n`;
+                        if (!commitValid) {
+                          commentBody += '  - All commits must reference an issue (#123 or "fixes #123")\n';
+                        }
+                        
+                        // PR requirements
+                        commentBody += `**PR Requirements**: ${prValid ? '✅ Valid' : '❌ Invalid'}\n`;
+                        if (!prValid) {
+                          const violations = '${{ steps.pr-check.outputs.violations }}';
+                          if (violations) {
+                            violations.split('\n').forEach(violation => {
+                              commentBody += `  - ${violation}\n`;
+                            });
+                          }
+                        }
+                        
+                        // Documentation
+                        commentBody += `**Documentation**: ${docsValid ? '✅ Valid' : '❌ Needs attention'}\n`;
+                        if (!docsValid) {
+                          const docsMessage = '${{ steps.docs-check.outputs.message }}';
+                          if (docsMessage) {
+                            commentBody += `  - ${docsMessage}\n`;
+                          }
+                        }
+                        
+                        commentBody += '\n';
+                        
+                        if (allValid) {
+                          commentBody += '🎉 **All policy checks passed!** Your PR is ready for review.\n';
+                        } else {
+                          commentBody += '⚠️ **Policy violations detected.** Please fix the issues above before merging.\n\n';
+                          commentBody += '### Quick Fixes\n';
+                          commentBody += '- **Branch naming**: Create a new branch with the correct format\n';
+                          commentBody += '- **Commit messages**: Use `git commit --amend` or interactive rebase to fix messages\n';
+                          commentBody += '- **PR requirements**: Update the PR description and add proper labels\n';
+                          commentBody += '- **Documentation**: Add or update relevant documentation\n';
+                        }
+                        
+                        // Find existing policy check comment
+                        const comments = await github.rest.issues.listComments({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.pull_request.number
+                        });
+                        
+                        const existingComment = comments.data.find(comment => 
+                          comment.user.type === 'Bot' && 
+                          comment.body.includes('🚦 Policy Check Results')
+                        );
+                        
+                        if (existingComment) {
+                          // Update existing comment
+                          await github.rest.issues.updateComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: existingComment.id,
+                            body: commentBody
+                          });
+                        } else {
+                          // Create new comment
+                          await github.rest.issues.createComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: context.payload.pull_request.number,
+                            body: commentBody
+                          });
+                        }
+                      }
+
+                      // Set the final check status
+                      if (!allValid) {
+                        core.setFailed('Policy checks failed. Please review and fix the violations.');
+                      }
+
+                      // Generate summary
+                      core.summary.addHeading('Policy Check Summary', 2);
+                      core.summary.addTable([
+                        ['Check', 'Status'],
+                        ['Branch Naming', branchValid ? '✅ Valid' : '❌ Invalid'],
+                        ['Commit Messages', commitValid ? '✅ Valid' : '❌ Invalid'],
+                        ['PR Requirements', prValid ? '✅ Valid' : '❌ Invalid'],
+                        ['Documentation', docsValid ? '✅ Valid' : '❌ Needs attention']
+                      ]);
+                      await core.summary.write();

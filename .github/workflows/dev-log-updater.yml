@@ -26,7 +26,7 @@ jobs:
   update-dev-log:
     name: Update Development Log
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,16 +39,16 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Get input parameters
             const prNumber = context.payload.inputs?.pr_number;
             const issueNumber = context.payload.inputs?.issue_number;
-            
+
             console.log(`Creating dev log entry for PR: ${prNumber}, Issue: ${issueNumber}`);
-            
+
             let logEntry = '';
             const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-            
+
             if (prNumber) {
               // Get PR details
               try {
@@ -57,7 +57,7 @@ jobs:
                   repo: context.repo.repo,
                   pull_number: parseInt(prNumber)
                 });
-                
+
                 logEntry += `## ${timestamp} - ${pr.data.title}\n\n`;
                 logEntry += `**Type**: ${pr.data.head.ref.split('/')[0] || 'unknown'}\n`;
                 logEntry += `**PR**: #${prNumber}\n`;
@@ -66,18 +66,18 @@ jobs:
                 }
                 logEntry += `**Branch**: \`${pr.data.head.ref}\`\n`;
                 logEntry += `**Merged**: ${pr.data.merged_at}\n\n`;
-                
+
                 if (pr.data.body) {
                   logEntry += `**Description**:\n${pr.data.body}\n\n`;
                 }
-                
+
                 // Get commit details
                 const commits = await github.rest.pulls.listCommits({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   pull_number: parseInt(prNumber)
                 });
-                
+
                 if (commits.data.length > 0) {
                   logEntry += `**Changes**:\n`;
                   commits.data.forEach(commit => {
@@ -86,30 +86,30 @@ jobs:
                   });
                   logEntry += '\n';
                 }
-                
+
                 // Get file changes
                 const files = await github.rest.pulls.listFiles({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   pull_number: parseInt(prNumber)
                 });
-                
+
                 if (files.data.length > 0) {
                   logEntry += `**Files Modified**: ${files.data.length} files\n`;
                   const additions = files.data.reduce((sum, file) => sum + file.additions, 0);
                   const deletions = files.data.reduce((sum, file) => sum + file.deletions, 0);
                   logEntry += `**Lines**: +${additions} -${deletions}\n\n`;
-                  
+
                   logEntry += `<details>\n<summary>Files changed</summary>\n\n`;
                   files.data.forEach(file => {
-                    const status = file.status === 'added' ? '➕' : 
-                                 file.status === 'removed' ? '🗑️' : 
+                    const status = file.status === 'added' ? '➕' :
+                                 file.status === 'removed' ? '🗑️' :
                                  file.status === 'modified' ? '✏️' : '📝';
                     logEntry += `${status} \`${file.filename}\` (+${file.additions} -${file.deletions})\n`;
                   });
                   logEntry += `\n</details>\n\n`;
                 }
-                
+
               } catch (error) {
                 console.log(`Could not fetch PR details: ${error.message}`);
                 logEntry += `## ${timestamp} - Auto-generated entry\n\n`;
@@ -127,7 +127,7 @@ jobs:
                 sha: context.sha,
                 per_page: 5
               });
-              
+
               logEntry += `## ${timestamp} - Direct commit(s)\n\n`;
               logEntry += `**Commits**:\n`;
               commits.data.forEach(commit => {
@@ -136,17 +136,17 @@ jobs:
               });
               logEntry += '\n';
             }
-            
+
             // Create dev-log directory if it doesn't exist
             const devLogDir = 'docs/dev-log';
             if (!fs.existsSync(devLogDir)) {
               fs.mkdirSync(devLogDir, { recursive: true });
             }
-            
+
             // Determine log file name (monthly)
             const yearMonth = timestamp.substring(0, 7); // YYYY-MM
             const logFileName = `${devLogDir}/${yearMonth}.md`;
-            
+
             let existingContent = '';
             if (fs.existsSync(logFileName)) {
               existingContent = fs.readFileSync(logFileName, 'utf8');
@@ -156,29 +156,29 @@ jobs:
                                `This file contains the development activity log for ${yearMonth}.\n\n` +
                                `---\n\n`;
             }
-            
+
             // Add new entry at the top (after header)
             const lines = existingContent.split('\n');
             const headerEnd = lines.findIndex(line => line === '---');
-            
+
             if (headerEnd !== -1) {
               lines.splice(headerEnd + 1, 0, '', logEntry.trim(), '');
             } else {
               // If no header found, just prepend
               existingContent = logEntry + '\n' + existingContent;
             }
-            
+
             const newContent = headerEnd !== -1 ? lines.join('\n') : existingContent;
-            
+
             // Write the updated log file
             fs.writeFileSync(logFileName, newContent);
-            
+
             console.log(`✅ Updated dev log: ${logFileName}`);
-            
+
             // Update the main dev-log index if it exists
             const indexFile = `${devLogDir}/README.md`;
             let indexContent = '';
-            
+
             if (fs.existsSync(indexFile)) {
               indexContent = fs.readFileSync(indexFile, 'utf8');
             } else {
@@ -186,14 +186,14 @@ jobs:
                            `This directory contains the development activity logs.\n\n` +
                            `## Monthly Logs\n\n`;
             }
-            
+
             // Check if this month is already listed
             const monthEntry = `- [${yearMonth}](${yearMonth}.md)`;
             if (!indexContent.includes(monthEntry)) {
               // Add to the list (keep it sorted)
               const lines = indexContent.split('\n');
               const logSectionStart = lines.findIndex(line => line.includes('## Monthly Logs'));
-              
+
               if (logSectionStart !== -1) {
                 // Find where to insert (keep reverse chronological order)
                 let insertIndex = logSectionStart + 2;
@@ -204,15 +204,15 @@ jobs:
                   }
                   insertIndex++;
                 }
-                
+
                 lines.splice(insertIndex, 0, monthEntry);
                 indexContent = lines.join('\n');
-                
+
                 fs.writeFileSync(indexFile, indexContent);
                 console.log(`✅ Updated dev log index: ${indexFile}`);
               }
             }
-            
+
             // Set outputs for commit step
             core.setOutput('log_file', logFileName);
             core.setOutput('has_changes', 'true');
@@ -222,16 +222,16 @@ jobs:
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Check if there are changes
           if git diff --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          
+
           # Add and commit changes
           git add docs/dev-log/
-          
+
           if [ -n "${{ github.event.inputs.pr_number }}" ]; then
             commit_msg="📝 Update dev log for PR #${{ github.event.inputs.pr_number }}"
             if [ -n "${{ github.event.inputs.issue_number }}" ]; then
@@ -240,10 +240,10 @@ jobs:
           else
             commit_msg="📝 Update dev log - $(date '+%Y-%m-%d')"
           fi
-          
+
           git commit -m "$commit_msg"
           git push
-          
+
           echo "✅ Dev log committed and pushed"
 
       - name: Create summary

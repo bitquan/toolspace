@@ -15,7 +15,7 @@ Successfully implemented a comprehensive autonomous development workflow system 
 #### 🌿 Issue → Branch (`issue-to-branch.yml`)
 - **Trigger**: Issues labeled with `ready`
 - **Action**: Auto-creates branches following `{feat|fix|chore|docs}/issue-###-slug` pattern
-- **Features**: 
+- **Features**:
   - Intelligent branch type detection from issue labels
   - Duplicate branch prevention
   - Auto-comments with development instructions
