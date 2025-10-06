@@ -19,6 +19,19 @@ October 6, 2025
   - Auto-formatting with proper indentation
   - Smart error detection and repair suggestions
   - Common fixes (single quotes, Python booleans, unquoted keys)
+  - **JSONPath Queries**: Execute JSONPath expressions to extract data from JSON
+    - Support for property access (`$.user.name`)
+    - Array indexing (`$.items[0]`)
+    - Wildcard queries (`$.users[*].name`)
+    - Complex nested queries
+  - **JSON Schema Validation**: Validate JSON data against schemas
+    - Type validation (string, integer, boolean, array, object, null, number)
+    - Required properties checking
+    - String length constraints (minLength, maxLength)
+    - Number range validation (minimum, maximum)
+    - Enum value validation
+    - Nested object and array validation
+    - Auto-generate schemas from sample JSON data
   - Copy to clipboard functionality
   - Animated success feedback
 
