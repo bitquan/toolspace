@@ -40,6 +40,8 @@
 
 Complete PDF/image merging tool with Firebase Functions backend, quota management, and Flutter web UI.
 
+📄 **[Epic Summary](../epics/file-merger-v1-summary.md)** | 📖 **[Implementation Log](../dev-log/features/2025-10-06-file-merger-v1.md)** | 📚 **[User Documentation](../tools/file_merger.md)**
+
 ### GIT-01 Stabilizer ✅ COMPLETED
 
 Cross-platform git push validation system with preflight checks, npm integration, and GitHub Actions diagnostics.
