@@ -73,28 +73,36 @@ class _TextToolsScreenState extends State<TextToolsScreen>
       inputHint: 'Enter text to convert case...',
       actions: [
         _buildActionButton('UPPERCASE', () {
-          _outputController.text = CaseConverter.toUpperCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toUpperCase(_inputController.text);
         }),
         _buildActionButton('lowercase', () {
-          _outputController.text = CaseConverter.toLowerCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toLowerCase(_inputController.text);
         }),
         _buildActionButton('Title Case', () {
-          _outputController.text = CaseConverter.toTitleCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toTitleCase(_inputController.text);
         }),
         _buildActionButton('Sentence case', () {
-          _outputController.text = CaseConverter.toSentenceCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toSentenceCase(_inputController.text);
         }),
         _buildActionButton('camelCase', () {
-          _outputController.text = CaseConverter.toCamelCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toCamelCase(_inputController.text);
         }),
         _buildActionButton('PascalCase', () {
-          _outputController.text = CaseConverter.toPascalCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toPascalCase(_inputController.text);
         }),
         _buildActionButton('snake_case', () {
-          _outputController.text = CaseConverter.toSnakeCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toSnakeCase(_inputController.text);
         }),
         _buildActionButton('kebab-case', () {
-          _outputController.text = CaseConverter.toKebabCase(_inputController.text);
+          _outputController.text =
+              CaseConverter.toKebabCase(_inputController.text);
         }),
       ],
     );
@@ -106,19 +114,24 @@ class _TextToolsScreenState extends State<TextToolsScreen>
       inputHint: 'Enter text to clean...',
       actions: [
         _buildActionButton('Collapse Spaces', () {
-          _outputController.text = TextCleaner.collapseSpaces(_inputController.text);
+          _outputController.text =
+              TextCleaner.collapseSpaces(_inputController.text);
         }),
         _buildActionButton('Clean Whitespace', () {
-          _outputController.text = TextCleaner.cleanWhitespace(_inputController.text);
+          _outputController.text =
+              TextCleaner.cleanWhitespace(_inputController.text);
         }),
         _buildActionButton('Strip Punctuation', () {
-          _outputController.text = TextCleaner.stripPunctuation(_inputController.text);
+          _outputController.text =
+              TextCleaner.stripPunctuation(_inputController.text);
         }),
         _buildActionButton('Normalize Unicode', () {
-          _outputController.text = TextCleaner.normalizeUnicode(_inputController.text);
+          _outputController.text =
+              TextCleaner.normalizeUnicode(_inputController.text);
         }),
         _buildActionButton('Strip Numbers', () {
-          _outputController.text = TextCleaner.stripNumbers(_inputController.text);
+          _outputController.text =
+              TextCleaner.stripNumbers(_inputController.text);
         }),
         _buildActionButton('Clean All', () {
           _outputController.text = TextCleaner.cleanAll(_inputController.text);
@@ -141,10 +154,12 @@ class _TextToolsScreenState extends State<TextToolsScreen>
           }
         }),
         _buildActionButton('Pretty Print (2 spaces)', () {
-          _outputController.text = JsonTools.prettyPrint(_inputController.text, indent: 2);
+          _outputController.text =
+              JsonTools.prettyPrint(_inputController.text, indent: 2);
         }),
         _buildActionButton('Pretty Print (4 spaces)', () {
-          _outputController.text = JsonTools.prettyPrint(_inputController.text, indent: 4);
+          _outputController.text =
+              JsonTools.prettyPrint(_inputController.text, indent: 4);
         }),
         _buildActionButton('Minify', () {
           _outputController.text = JsonTools.minify(_inputController.text);
@@ -165,10 +180,12 @@ class _TextToolsScreenState extends State<TextToolsScreen>
           _outputController.text = Slugify.toSlug(_inputController.text);
         }),
         _buildActionButton('Slug (Keep Accents)', () {
-          _outputController.text = Slugify.custom(_inputController.text, removeAccents: false);
+          _outputController.text =
+              Slugify.custom(_inputController.text, removeAccents: false);
         }),
         _buildActionButton('Slug (Custom Separator)', () {
-          _outputController.text = Slugify.toSlug(_inputController.text, separator: '_');
+          _outputController.text =
+              Slugify.toSlug(_inputController.text, separator: '_');
         }),
         _buildActionButton('Validate Slug', () {
           final isValid = Slugify.isValidSlug(_inputController.text);
@@ -231,13 +248,16 @@ class _TextToolsScreenState extends State<TextToolsScreen>
     return Column(
       children: [
         _buildStatRow('Characters', result.characters.toString()),
-        _buildStatRow('Characters (no spaces)', result.charactersNoSpaces.toString()),
+        _buildStatRow(
+            'Characters (no spaces)', result.charactersNoSpaces.toString()),
         _buildStatRow('Words', result.words.toString()),
         _buildStatRow('Sentences', result.sentences.toString()),
         _buildStatRow('Paragraphs', result.paragraphs.toString()),
         _buildStatRow('Lines', result.lines.toString()),
-        _buildStatRow('Avg words per sentence', result.avgWordsPerSentence.toStringAsFixed(1)),
-        _buildStatRow('Avg chars per word', result.avgCharsPerWord.toStringAsFixed(1)),
+        _buildStatRow('Avg words per sentence',
+            result.avgWordsPerSentence.toStringAsFixed(1)),
+        _buildStatRow(
+            'Avg chars per word', result.avgCharsPerWord.toStringAsFixed(1)),
         if (result.wordFrequency.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
@@ -300,7 +320,8 @@ class _TextToolsScreenState extends State<TextToolsScreen>
                         _outputController.text = UuidGenerator.generateSimple();
                       }),
                       _buildUuidButton('Uppercase', () {
-                        _outputController.text = UuidGenerator.generateUppercase();
+                        _outputController.text =
+                            UuidGenerator.generateUppercase();
                       }),
                       _buildUuidButton('Short (8 chars)', () {
                         _outputController.text = UuidGenerator.generateShort();

@@ -44,7 +44,7 @@ jobs:
     flutter-qa:
         name: Flutter QA
         runs-on: ubuntu-latest
-        timeout-minutes: 15  # Prevent hanging jobs
+        timeout-minutes: 15 # Prevent hanging jobs
 
         steps:
             - name: Checkout code
@@ -54,7 +54,7 @@ jobs:
               uses: subosito/flutter-action@v2
               with:
                   channel: "stable"
-                  flutter-version: "3.24.3"  # Pin specific version for better caching
+                  flutter-version: "3.24.3" # Pin specific version for better caching
                   cache: true
 
             - name: Flutter version
@@ -131,13 +131,13 @@ jobs:
                   echo "Backend QA: ${{ needs.backend-qa.result }}"
                   echo "Flutter QA: ${{ needs.flutter-qa.result }}"
                   echo "Security Scan: ${{ needs.security-scan.result || 'skipped' }}"
-                  
+
                   # Check required jobs (backend-qa and flutter-qa must succeed)
                   if [ "${{ needs.backend-qa.result }}" != "success" ] || [ "${{ needs.flutter-qa.result }}" != "success" ]; then
                     echo "One or more required checks failed." >&2
                     exit 1
                   fi
-                  
+
                   # Security scan is optional (may be skipped on non-main branches)
                   if [ "${{ needs.security-scan.result }}" = "failure" ]; then
                     echo "Security scan failed, but continuing..." >&2
