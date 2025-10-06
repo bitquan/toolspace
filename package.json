@@ -16,7 +16,12 @@
     "test-notify": "echo 'Use: gh workflow run delta-notify.yml -f dry_run=true'",
     "test-digest": "echo 'Use: gh workflow run delta-digest.yml -f dry_run=true'",
     "push:preflight": "powershell -ExecutionPolicy Bypass -File scripts/git/push-preflight.ps1",
-    "push": "npm run push:preflight && git push"
+    "push": "npm run push:preflight && git push",
+    "assign": "node scripts/assign-to-copilot.mjs",
+    "auto-assign": "node scripts/auto-assign-new-issues.mjs",
+    "test-assignment": "node scripts/assign-to-copilot.mjs 25",
+    "create-issue": "node scripts/create-and-assign-issue.mjs",
+    "create-and-assign": "node scripts/create-and-assign-issue.mjs --assign"
   },
   "dependencies": {
     "dayjs": "^1.11.10",

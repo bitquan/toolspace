@@ -1,0 +1,112 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Assign Issue to Copilot",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/assign-to-copilot.mjs", "${input:issueNumber}"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Assigns a GitHub issue to the Copilot bot and adds 'ready' label for auto-development"
+    },
+    {
+      "label": "Install Node Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Install Node.js dependencies required for automation scripts"
+    },
+    {
+      "label": "Create Issue",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/create-and-assign-issue.mjs"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Create a new GitHub issue with interactive prompts"
+    },
+    {
+      "label": "Create Issue and Assign to Copilot",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/create-and-assign-issue.mjs", "--assign"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Create a new GitHub issue and automatically assign to Copilot pipeline"
+    },
+    {
+      "label": "Run Auto-Assignment (Dry Run)",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/auto-assign-new-issues.mjs", "--dry-run"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Preview auto-assignment of recent issues without making changes"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "issueNumber",
+      "description": "Enter the GitHub issue number to assign to Copilot",
+      "type": "promptString"
+    }
+  ]
+}
