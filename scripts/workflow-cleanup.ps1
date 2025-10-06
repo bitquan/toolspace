@@ -18,8 +18,8 @@ param(
 
 function Show-Help {
     Write-Host ""
-    Write-Host "🧹 OPS-Zeta Workflow Cleanup Script" -ForegroundColor Cyan
-    Write-Host "====================================" -ForegroundColor Cyan
+    Write-Host "OPS-Zeta Workflow Cleanup Script" -ForegroundColor Cyan
+    Write-Host "=================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "USAGE:" -ForegroundColor Yellow
     Write-Host "  .\scripts\workflow-cleanup.ps1 -Action <action> [options]"
@@ -54,7 +54,7 @@ function Show-Help {
 }
 
 function Get-WorkflowStats {
-    Write-Host "📊 Analyzing workflow runs..." -ForegroundColor Cyan
+    Write-Host "Analyzing workflow runs..." -ForegroundColor Cyan
     
     try {
         $allRuns = gh run list --limit 500 --json databaseId,status,conclusion,createdAt,workflowName | ConvertFrom-Json
@@ -68,7 +68,7 @@ function Get-WorkflowStats {
         $oldCount = $oldRuns.Count
         
         Write-Host ""
-        Write-Host "📈 Current Statistics:" -ForegroundColor Green
+        Write-Host "Current Statistics:" -ForegroundColor Green
         Write-Host "  Total workflow runs: $totalRuns"
         Write-Host "  Failed/cancelled runs: $failedCount"
         Write-Host "  Runs older than $DaysToKeep days: $oldCount"
@@ -104,7 +104,7 @@ function Confirm-Action {
     }
     
     Write-Host ""
-    Write-Host "⚠️ CONFIRMATION REQUIRED" -ForegroundColor $color
+    Write-Host "WARNING: CONFIRMATION REQUIRED" -ForegroundColor $color
     Write-Host $Message -ForegroundColor $color
     Write-Host "Impact Level: $Impact" -ForegroundColor $color
     Write-Host ""
@@ -121,7 +121,7 @@ function Invoke-GitHubWorkflow {
     
     $dryRunValue = if ($IsDryRun) { "true" } else { "false" }
     
-    Write-Host "🚀 Triggering GitHub workflow cleanup..." -ForegroundColor Cyan
+    Write-Host "Triggering GitHub workflow cleanup..." -ForegroundColor Cyan
     Write-Host "  Scope: $Scope"
     Write-Host "  Dry Run: $dryRunValue"
     Write-Host "  Days to Keep: $DaysToKeep"
@@ -130,7 +130,7 @@ function Invoke-GitHubWorkflow {
         $result = gh workflow run workflow-cleanup.yml -f "cleanup_scope=$Scope" -f "dry_run=$dryRunValue" -f "days_to_keep=$DaysToKeep"
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ Workflow triggered successfully!" -ForegroundColor Green
+            Write-Host "Workflow triggered successfully!" -ForegroundColor Green
             Write-Host ""
             Write-Host "Monitor progress with:" -ForegroundColor Yellow
             Write-Host "  gh run list --workflow=workflow-cleanup.yml"
@@ -154,13 +154,13 @@ switch ($Action) {
     "preview" {
         $stats = Get-WorkflowStats
         if ($stats) {
-            Write-Host "🔍 PREVIEW MODE - No changes will be made" -ForegroundColor Cyan
+            Write-Host "PREVIEW MODE - No changes will be made" -ForegroundColor Cyan
             Write-Host ""
             Write-Host "Available cleanup actions:" -ForegroundColor Green
-            Write-Host "  • Failed runs cleanup: $($stats.Failed) runs"
-            Write-Host "  • Old runs cleanup: $($stats.Old) runs (older than $DaysToKeep days)"
-            Write-Host "  • Cache cleanup: GitHub Actions cache and artifacts"
-            Write-Host "  • Full cleanup: ALL $($stats.Total) runs + cache + artifacts"
+            Write-Host "  Failed runs cleanup: $($stats.Failed) runs"
+            Write-Host "  Old runs cleanup: $($stats.Old) runs (older than $DaysToKeep days)"
+            Write-Host "  Cache cleanup: GitHub Actions cache and artifacts"
+            Write-Host "  Full cleanup: ALL $($stats.Total) runs + cache + artifacts"
         }
         
         # Also trigger GitHub workflow preview
@@ -176,7 +176,7 @@ switch ($Action) {
                 Invoke-GitHubWorkflow -Scope "failed_runs" -IsDryRun $DryRun
             }
         } else {
-            Write-Host "✅ No failed runs to clean up." -ForegroundColor Green
+            Write-Host "No failed runs to clean up." -ForegroundColor Green
         }
     }
     
@@ -188,7 +188,7 @@ switch ($Action) {
                 Invoke-GitHubWorkflow -Scope "old_runs" -IsDryRun $DryRun
             }
         } else {
-            Write-Host "✅ No old runs to clean up." -ForegroundColor Green
+            Write-Host "No old runs to clean up." -ForegroundColor Green
         }
     }
     
@@ -202,7 +202,7 @@ switch ($Action) {
     "all" {
         $stats = Get-WorkflowStats
         if ($stats) {
-            $message = "⚠️ WARNING: This will delete ALL $($stats.Total) workflow runs! This action cannot be undone."
+            $message = "WARNING: This will delete ALL $($stats.Total) workflow runs! This action cannot be undone."
             if (Confirm-Action -Message $message -Impact "High") {
                 Invoke-GitHubWorkflow -Scope "all_runs" -IsDryRun $DryRun
             }
@@ -212,7 +212,7 @@ switch ($Action) {
     "full" {
         $stats = Get-WorkflowStats
         if ($stats) {
-            $message = "🚨 MAXIMUM IMPACT: This will delete ALL $($stats.Total) workflow runs, cache, and artifacts! This action cannot be undone."
+            $message = "MAXIMUM IMPACT: This will delete ALL $($stats.Total) workflow runs, cache, and artifacts! This action cannot be undone."
             if (Confirm-Action -Message $message -Impact "High") {
                 Invoke-GitHubWorkflow -Scope "full_cleanup" -IsDryRun $DryRun
             }
@@ -227,4 +227,4 @@ switch ($Action) {
 }
 
 Write-Host ""
-Write-Host "🧹 Cleanup script completed." -ForegroundColor Cyan
+Write-Host "Cleanup script completed." -ForegroundColor Cyan
