@@ -109,6 +109,16 @@ POST /tools/file-merger/process       # Process file merge
 - Admin functions require elevated permissions
 - API rate limiting
 
+### Storage Rules
+
+Cloud Storage security is enforced through `storage.rules`:
+
+- **User folders** (`/users/{userId}/`): Full read/write access for authenticated users to their own folders
+- **Upload area** (`/uploads/{userId}/`): Temporary storage for file merger uploads, 10MB limit per file, PDF/image types only
+- **Merged files** (`/merged/{userId}/`): Output files from file merger, read-only for users (backend writes via admin SDK)
+- **Public assets** (`/public/`): Read-only access for all users
+- All paths use deny-by-default security model
+
 ### Input Validation
 
 - All inputs validated and sanitized

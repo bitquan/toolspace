@@ -309,6 +309,30 @@ DISCORD_WEBHOOK_URL: optional
 SLACK_WEBHOOK_URL: optional
 ```
 
+### Storage Rules
+
+Updated `storage.rules` to include file merger-specific paths:
+
+```
+// File Merger: User uploads (temporary storage)
+match /uploads/{userId}/{fileName} {
+  allow write: if authenticated && own user && file <= 10MB && (PDF or PNG or JPEG)
+  allow read, delete: if authenticated && own user
+}
+
+// File Merger: Merged output files
+match /merged/{userId}/{fileName} {
+  allow read, delete: if authenticated && own user
+  allow write: if false  // Only backend (admin) can write
+}
+```
+
+This ensures:
+- Users can only upload to their own folders
+- File type and size validation at storage layer
+- Merged files are created securely by backend only
+- Users can download and delete their own merged files
+
 ## Impact Assessment
 
 ### User Value
