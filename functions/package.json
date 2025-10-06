@@ -23,7 +23,7 @@
     "@types/jest": "^29"
   },
   "dependencies": {
-    "firebase-admin": "^12",
-    "firebase-functions": "^5"
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^5.1.1"
   }
 }
