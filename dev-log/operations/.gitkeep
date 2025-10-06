@@ -1,0 +1,9 @@
+# This directory contains operational logs and records
+#
+# Files in this directory track:
+# - Deployment activities
+# - Incident reports
+# - Maintenance operations
+# - Configuration changes
+#
+# These files document the operational history of the Toolspace platform.

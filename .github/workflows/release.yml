@@ -1,0 +1,89 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*.*.*"
+
+jobs:
+    release:
+        name: Create Release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+
+            - name: Build backend
+              run: |
+                  cd functions
+                  npm ci
+                  npm run build
+
+            - name: Build Flutter web
+              run: |
+                  flutter pub get
+                  flutter build web --release
+
+            - name: Create release artifacts
+              run: |
+                  mkdir -p release-artifacts
+
+                  # Backend artifacts
+                  tar -czf release-artifacts/functions.tar.gz -C functions lib/
+
+                  # Frontend artifacts  
+                  tar -czf release-artifacts/web-build.tar.gz -C build web/
+
+                  # Configuration files
+                  cp firebase.json firestore.rules firestore.indexes.json storage.rules release-artifacts/
+
+            - name: Generate release notes
+              id: release_notes
+              run: |
+                  echo "# Release Notes" > RELEASE_NOTES.md
+                  echo "" >> RELEASE_NOTES.md
+                  echo "## Changes in this release:" >> RELEASE_NOTES.md
+                  git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> RELEASE_NOTES.md
+                  echo "" >> RELEASE_NOTES.md
+                  echo "## Deployment:" >> RELEASE_NOTES.md
+                  echo "1. Deploy Firebase Functions: \`firebase deploy --only functions\`" >> RELEASE_NOTES.md
+                  echo "2. Deploy Firestore rules: \`firebase deploy --only firestore:rules\`" >> RELEASE_NOTES.md  
+                  echo "3. Deploy web app: \`firebase deploy --only hosting\`" >> RELEASE_NOTES.md
+
+            - name: Create GitHub Release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: Release ${{ github.ref }}
+                  body_path: RELEASE_NOTES.md
+                  draft: false
+                  prerelease: false
+
+            - name: Upload release artifacts
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: release-artifacts/functions.tar.gz
+                  asset_name: functions.tar.gz
+                  asset_content_type: application/gzip
+
+            # TODO: Add deployment to Firebase hosting when ready
+            # - name: Deploy to Firebase
+            #   run: |
+            #     npm install -g firebase-tools
+            #     firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}

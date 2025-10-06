@@ -1,0 +1,27 @@
+# Repository Ownership
+
+# Global owners
+* @bitquan
+
+# Backend/Functions
+/functions/ @bitquan
+
+# Core routing and shared components  
+/core/ @bitquan
+
+# Tool-specific ownership
+/tools/quick_invoice/ @bitquan
+/tools/text_tools/ @bitquan
+/tools/file_merger/ @bitquan
+
+# Documentation
+/docs/ @bitquan
+/README.md @bitquan
+
+# Infrastructure and CI
+/.github/ @bitquan
+/firebase.json @bitquan
+/firestore.rules @bitquan
+
+# Dev logs and quality
+/dev-log/ @bitquan

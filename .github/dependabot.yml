@@ -1,0 +1,44 @@
+version: 2
+
+updates:
+  # Firebase Functions dependencies
+  - package-ecosystem: "npm"
+    directory: "/functions"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "bitquan"
+    commit-message:
+      prefix: "deps(functions)"
+      include: "scope"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "bitquan"
+    commit-message:
+      prefix: "deps(actions)"
+      include: "scope"
+
+  # Pub dependencies (Flutter)
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "bitquan"
+    commit-message:
+      prefix: "deps(flutter)"
+      include: "scope"

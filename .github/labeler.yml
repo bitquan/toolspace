@@ -1,0 +1,56 @@
+# Auto-labeling configuration for pull requests
+
+# Tool-specific labels
+tool:quick-invoice:
+  - "tools/quick_invoice/**"
+  - "docs/tools/quick_invoice.md"
+
+tool:text-tools:
+  - "tools/text_tools/**"
+  - "docs/tools/text_tools.md"
+
+tool:file-merger:
+  - "tools/file_merger/**"
+  - "docs/tools/file_merger.md"
+
+# Area labels
+area:backend:
+  - "functions/**"
+  - "firebase.json"
+  - "firestore.rules"
+  - "firestore.indexes.json"
+  - "storage.rules"
+
+area:frontend:
+  - "lib/**"
+  - "core/**"
+  - "pubspec.yaml"
+
+area:devops:
+  - ".github/**"
+  - "firebase.json"
+
+area:docs:
+  - "docs/**"
+  - "*.md"
+  - "README.md"
+
+area:security:
+  - "firestore.rules"
+  - "storage.rules"
+  - "functions/src/middleware/**"
+  - "functions/src/util/guards.ts"
+
+# Size estimation based on file patterns
+size:xs:
+  - "*.md"
+  - ".github/ISSUE_TEMPLATE/**"
+
+size:s:
+  - "docs/**"
+  - any: ["*.md", "*.yml", "*.yaml", "*.json"]
+
+size:l:
+  - "functions/src/**"
+  - "lib/**"
+  - "core/**"
