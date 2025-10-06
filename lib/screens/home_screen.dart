@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/csv_cleaner/csv_cleaner_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -138,6 +139,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'csv-cleaner',
+      name: 'CSV Cleaner',
+      description: 'Trim, dedupe, normalize CSV files with ease',
+      icon: Icons.table_rows,
+      screen: const CsvCleanerScreen(),
+      color: PlayfulTheme.toolColors[0],
     ),
   ];
 }
