@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'logic/word_diff_engine.dart';
 
 /// Text Diff - Compare texts with highlighted differences (simplified version)
 class TextDiffScreen extends StatefulWidget {
@@ -13,17 +14,29 @@ class _TextDiffScreenState extends State<TextDiffScreen>
     with TickerProviderStateMixin {
   final TextEditingController _text1Controller = TextEditingController();
   final TextEditingController _text2Controller = TextEditingController();
+  final TextEditingController _baseTextController = TextEditingController();
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late TabController _tabController;
 
   List<DiffLine> _diffLines = [];
+  List<WordDiff> _wordDiffs = [];
+  ThreeWayMergeResult? _mergeResult;
   bool _isComparing = false;
   DiffStats _stats = DiffStats.empty();
+  WordDiffStats _wordStats = const WordDiffStats(
+    additions: 0,
+    deletions: 0,
+    unchanged: 0,
+    changes: 0,
+  );
 
   @override
   void initState() {
     super.initState();
+
+    _tabController = TabController(length: 3, vsync: this);
 
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 300),
@@ -36,12 +49,15 @@ class _TextDiffScreenState extends State<TextDiffScreen>
 
     _text1Controller.addListener(_onTextChanged);
     _text2Controller.addListener(_onTextChanged);
+    _baseTextController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
     _text1Controller.dispose();
     _text2Controller.dispose();
+    _baseTextController.dispose();
+    _tabController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
