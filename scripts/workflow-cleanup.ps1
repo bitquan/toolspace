@@ -5,13 +5,13 @@ param(
     [Parameter()]
     [ValidateSet("failed", "old", "all", "cache", "full", "preview", "help")]
     [string]$Action = "help",
-    
+
     [Parameter()]
     [int]$DaysToKeep = 7,
-    
+
     [Parameter()]
     [switch]$DryRun,
-    
+
     [Parameter()]
     [switch]$Force
 )
@@ -55,25 +55,25 @@ function Show-Help {
 
 function Get-WorkflowStats {
     Write-Host "Analyzing workflow runs..." -ForegroundColor Cyan
-    
+
     try {
         $allRuns = gh run list --limit 500 --json databaseId,status,conclusion,createdAt,workflowName | ConvertFrom-Json
         $totalRuns = $allRuns.Count
-        
+
         $failedRuns = $allRuns | Where-Object { $_.conclusion -eq "failure" -or $_.conclusion -eq "cancelled" }
         $failedCount = $failedRuns.Count
-        
+
         $cutoffDate = (Get-Date).AddDays(-$DaysToKeep)
         $oldRuns = $allRuns | Where-Object { [DateTime]$_.createdAt -lt $cutoffDate }
         $oldCount = $oldRuns.Count
-        
+
         Write-Host ""
         Write-Host "Current Statistics:" -ForegroundColor Green
         Write-Host "  Total workflow runs: $totalRuns"
         Write-Host "  Failed/cancelled runs: $failedCount"
         Write-Host "  Runs older than $DaysToKeep days: $oldCount"
         Write-Host ""
-        
+
         return @{
             Total = $totalRuns
             Failed = $failedCount
@@ -91,24 +91,24 @@ function Get-WorkflowStats {
 
 function Confirm-Action {
     param([string]$Message, [string]$Impact = "Medium")
-    
+
     if ($Force) {
         return $true
     }
-    
+
     $color = switch ($Impact) {
         "Low" { "Green" }
         "Medium" { "Yellow" }
         "High" { "Red" }
         default { "Yellow" }
     }
-    
+
     Write-Host ""
     Write-Host "WARNING: CONFIRMATION REQUIRED" -ForegroundColor $color
     Write-Host $Message -ForegroundColor $color
     Write-Host "Impact Level: $Impact" -ForegroundColor $color
     Write-Host ""
-    
+
     $response = Read-Host "Do you want to continue? (y/N)"
     return $response -eq "y" -or $response -eq "Y"
 }
@@ -118,17 +118,17 @@ function Invoke-GitHubWorkflow {
         [string]$Scope,
         [bool]$IsDryRun = $false
     )
-    
+
     $dryRunValue = if ($IsDryRun) { "true" } else { "false" }
-    
+
     Write-Host "Triggering GitHub workflow cleanup..." -ForegroundColor Cyan
     Write-Host "  Scope: $Scope"
     Write-Host "  Dry Run: $dryRunValue"
     Write-Host "  Days to Keep: $DaysToKeep"
-    
+
     try {
         $result = gh workflow run workflow-cleanup.yml -f "cleanup_scope=$Scope" -f "dry_run=$dryRunValue" -f "days_to_keep=$DaysToKeep"
-        
+
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Workflow triggered successfully!" -ForegroundColor Green
             Write-Host ""
@@ -150,7 +150,7 @@ switch ($Action) {
         Show-Help
         return
     }
-    
+
     "preview" {
         $stats = Get-WorkflowStats
         if ($stats) {
@@ -162,12 +162,12 @@ switch ($Action) {
             Write-Host "  Cache cleanup: GitHub Actions cache and artifacts"
             Write-Host "  Full cleanup: ALL $($stats.Total) runs + cache + artifacts"
         }
-        
+
         # Also trigger GitHub workflow preview
         Invoke-GitHubWorkflow -Scope "failed_runs" -IsDryRun $true
         return
     }
-    
+
     "failed" {
         $stats = Get-WorkflowStats
         if ($stats -and $stats.Failed -gt 0) {
@@ -179,7 +179,7 @@ switch ($Action) {
             Write-Host "No failed runs to clean up." -ForegroundColor Green
         }
     }
-    
+
     "old" {
         $stats = Get-WorkflowStats
         if ($stats -and $stats.Old -gt 0) {
@@ -191,14 +191,14 @@ switch ($Action) {
             Write-Host "No old runs to clean up." -ForegroundColor Green
         }
     }
-    
+
     "cache" {
         $message = "This will clean GitHub Actions cache and artifacts."
         if (Confirm-Action -Message $message -Impact "Low") {
             Invoke-GitHubWorkflow -Scope "cache_cleanup" -IsDryRun $DryRun
         }
     }
-    
+
     "all" {
         $stats = Get-WorkflowStats
         if ($stats) {
@@ -208,7 +208,7 @@ switch ($Action) {
             }
         }
     }
-    
+
     "full" {
         $stats = Get-WorkflowStats
         if ($stats) {
@@ -218,7 +218,7 @@ switch ($Action) {
             }
         }
     }
-    
+
     default {
         Write-Error "Invalid action: $Action"
         Show-Help

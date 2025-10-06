@@ -145,7 +145,15 @@
       "label": "🧹 Cleanup Workflows (Dry Run)",
       "type": "shell",
       "command": "gh",
-      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=failed_runs", "-f", "dry_run=true"],
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=failed_runs",
+        "-f",
+        "dry_run=true"
+      ],
       "group": "test",
       "presentation": {
         "echo": true,
@@ -165,7 +173,15 @@
       "label": "🧹 Cleanup Failed Workflows",
       "type": "shell",
       "command": "gh",
-      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=failed_runs", "-f", "dry_run=false"],
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=failed_runs",
+        "-f",
+        "dry_run=false"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -185,7 +201,17 @@
       "label": "🧹 Cleanup Old Workflows",
       "type": "shell",
       "command": "gh",
-      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=old_runs", "-f", "days_to_keep=7", "-f", "dry_run=false"],
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=old_runs",
+        "-f",
+        "days_to_keep=7",
+        "-f",
+        "dry_run=false"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -205,7 +231,15 @@
       "label": "🧹 Full Workflow Cleanup",
       "type": "shell",
       "command": "gh",
-      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=full_cleanup", "-f", "dry_run=false"],
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=full_cleanup",
+        "-f",
+        "dry_run=false"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -222,10 +256,101 @@
       "detail": "⚠️ WARNING: Complete cleanup of ALL workflow runs, cache, and artifacts"
     },
     {
+      "label": "🔥 Delete ALL Workflows",
+      "type": "shell",
+      "command": "gh",
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=all_runs",
+        "-f",
+        "dry_run=false"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "🔥 DELETE ALL workflow runs (not reversible!)"
+    },
+    {
+      "label": "🔥 Preview Delete ALL Workflows",
+      "type": "shell",
+      "command": "gh",
+      "args": [
+        "workflow",
+        "run",
+        "workflow-cleanup.yml",
+        "-f",
+        "cleanup_scope=all_runs",
+        "-f",
+        "dry_run=true"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Preview what would be deleted when deleting ALL workflows"
+    },
+    {
+      "label": "🔥💥 NUCLEAR Cleanup",
+      "type": "shell",
+      "command": "gh",
+      "args": [
+        "workflow",
+        "run",
+        "nuclear-cleanup.yml",
+        "-f",
+        "confirmation=DELETE_ALL_WORKFLOWS",
+        "-f",
+        "keep_recent=0"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "🔥💥 NUCLEAR: Immediately delete EVERYTHING (maximum destruction!)"
+    },
+    {
       "label": "🧹 Cleanup Helper (PowerShell)",
       "type": "shell",
       "command": "powershell",
-      "args": ["-ExecutionPolicy", "Bypass", "-File", "scripts/workflow-cleanup.ps1", "-Action", "${input:cleanupAction}"],
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/workflow-cleanup.ps1",
+        "-Action",
+        "${input:cleanupAction}"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -252,15 +377,7 @@
       "id": "cleanupAction",
       "description": "Select cleanup action",
       "type": "pickString",
-      "options": [
-        "preview",
-        "failed",
-        "old",
-        "cache",
-        "all",
-        "full",
-        "help"
-      ],
+      "options": ["preview", "failed", "old", "cache", "all", "full", "help"],
       "default": "preview"
     }
   ]
