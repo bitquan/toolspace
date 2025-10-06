@@ -1,0 +1,324 @@
+name: PR Auto-Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_run:
+    workflows: ["CI", "Branch CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  checks: read
+
+jobs:
+  check-merge-conditions:
+    name: Check Merge Conditions
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    outputs:
+      should_merge: ${{ steps.check.outputs.should_merge }}
+      pr_number: ${{ steps.check.outputs.pr_number }}
+      issue_number: ${{ steps.check.outputs.issue_number }}
+      
+    steps:
+      - name: Get PR details
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let prNumber;
+            
+            // Get PR number from different event types
+            if (context.eventName === 'pull_request' || context.eventName === 'pull_request_review') {
+              prNumber = context.payload.pull_request.number;
+            } else if (context.eventName === 'workflow_run' || context.eventName === 'check_suite') {
+              // Find PR associated with this commit
+              const prs = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                head: context.payload.workflow_run?.head_branch || context.payload.check_suite?.head_branch
+              });
+              
+              if (prs.data.length === 0) {
+                console.log('No open PR found for this workflow run');
+                core.setOutput('should_merge', 'false');
+                return;
+              }
+              
+              prNumber = prs.data[0].number;
+            } else {
+              console.log(`Unsupported event type: ${context.eventName}`);
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            core.setOutput('pr_number', prNumber);
+            
+            console.log(`Checking merge conditions for PR #${prNumber}`);
+            
+            // Get PR details
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            console.log(`PR: ${pr.data.title}`);
+            console.log(`Branch: ${pr.data.head.ref}`);
+            console.log(`Draft: ${pr.data.draft}`);
+            console.log(`Mergeable: ${pr.data.mergeable}`);
+            
+            // Skip if draft
+            if (pr.data.draft) {
+              console.log('PR is draft, skipping auto-merge');
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            // Extract issue number from PR body or branch
+            let issueNumber = null;
+            
+            // Check PR body for "Closes #123" pattern
+            const bodyMatch = pr.data.body?.match(/(?:close[sd]?|fix(?:ed|es)?|resolve[sd]?)\s+#(\d+)/i);
+            if (bodyMatch) {
+              issueNumber = bodyMatch[1];
+            } else {
+              // Check branch name for issue number
+              const branchMatch = pr.data.head.ref.match(/issue-(\d+)/);
+              if (branchMatch) {
+                issueNumber = branchMatch[1];
+              }
+            }
+            
+            core.setOutput('issue_number', issueNumber || '');
+            console.log(`Linked issue: ${issueNumber ? '#' + issueNumber : 'None'}`);
+            
+            // Check if PR has auto-merge label or is auto-generated
+            const labels = pr.data.labels.map(l => l.name);
+            const hasAutoMergeLabel = labels.includes('auto-merge') || labels.includes('auto-generated');
+            
+            if (!hasAutoMergeLabel) {
+              console.log('PR does not have auto-merge label, skipping');
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            // Check reviews
+            const reviews = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            const latestReviews = {};
+            reviews.data.forEach(review => {
+              latestReviews[review.user.login] = review.state;
+            });
+            
+            const approvals = Object.values(latestReviews).filter(state => state === 'APPROVED').length;
+            const rejections = Object.values(latestReviews).filter(state => state === 'CHANGES_REQUESTED').length;
+            
+            console.log(`Reviews - Approvals: ${approvals}, Changes requested: ${rejections}`);
+            
+            if (rejections > 0) {
+              console.log('PR has requested changes, cannot auto-merge');
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            if (approvals === 0) {
+              console.log('PR has no approvals yet, cannot auto-merge');
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            // Check CI status
+            const checks = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.data.head.sha
+            });
+            
+            const workflowRuns = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: pr.data.head.sha
+            });
+            
+            // Check for required CI workflows
+            const requiredWorkflows = ['CI', 'Branch CI'];
+            const workflowStatus = {};
+            
+            for (const workflowName of requiredWorkflows) {
+              const runs = workflowRuns.data.workflow_runs.filter(run => 
+                run.name === workflowName && run.head_sha === pr.data.head.sha
+              );
+              
+              if (runs.length === 0) {
+                workflowStatus[workflowName] = 'missing';
+              } else {
+                const latestRun = runs[0];
+                workflowStatus[workflowName] = {
+                  status: latestRun.status,
+                  conclusion: latestRun.conclusion
+                };
+              }
+            }
+            
+            console.log('Workflow status:', JSON.stringify(workflowStatus, null, 2));
+            
+            // Check if all required workflows passed
+            for (const [workflow, status] of Object.entries(workflowStatus)) {
+              if (status === 'missing') {
+                console.log(`Required workflow '${workflow}' has not run`);
+                core.setOutput('should_merge', 'false');
+                return;
+              }
+              
+              if (status.status !== 'completed' || status.conclusion !== 'success') {
+                console.log(`Workflow '${workflow}' did not pass: ${status.status} - ${status.conclusion}`);
+                core.setOutput('should_merge', 'false');
+                return;
+              }
+            }
+            
+            // Check mergeable state
+            if (pr.data.mergeable === false) {
+              console.log('PR has merge conflicts');
+              core.setOutput('should_merge', 'false');
+              return;
+            }
+            
+            console.log('✅ All conditions met, ready to merge');
+            core.setOutput('should_merge', 'true');
+
+  merge-pr:
+    name: Merge Pull Request
+    needs: [check-merge-conditions]
+    if: needs.check-merge-conditions.outputs.should_merge == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Merge PR and update issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = parseInt('${{ needs.check-merge-conditions.outputs.pr_number }}');
+            const issueNumber = '${{ needs.check-merge-conditions.outputs.issue_number }}';
+            
+            console.log(`Merging PR #${prNumber}`);
+            
+            // Get PR details for merge commit message
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            // Merge the PR
+            const mergeResult = await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              commit_title: `${pr.data.title} (#${prNumber})`,
+              commit_message: `Auto-merged after CI passed and review approved\n\n${pr.data.body || ''}`,
+              merge_method: 'squash' // Use squash merge to keep history clean
+            });
+            
+            console.log(`✅ PR merged: ${mergeResult.data.sha}`);
+            
+            // Update linked issue if exists
+            if (issueNumber) {
+              try {
+                // Close the issue
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNumber),
+                  state: 'closed'
+                });
+                
+                // Add completion comment
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNumber),
+                  body: `🎉 **Issue Completed**\n\n` +
+                        `This issue has been resolved and merged via PR #${prNumber}.\n\n` +
+                        `**Merge commit**: ${mergeResult.data.sha}\n` +
+                        `**Merged at**: ${new Date().toISOString()}\n\n` +
+                        `The changes are now live on the main branch!`
+                });
+                
+                // Add completion labels
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNumber),
+                  labels: ['status: completed']
+                });
+                
+                console.log(`✅ Issue #${issueNumber} closed and updated`);
+                
+              } catch (error) {
+                console.log(`Could not update issue #${issueNumber}: ${error.message}`);
+              }
+            }
+            
+            // Clean up branch
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${pr.data.head.ref}`
+              });
+              
+              console.log(`✅ Deleted branch: ${pr.data.head.ref}`);
+            } catch (error) {
+              console.log(`Could not delete branch: ${error.message}`);
+            }
+            
+            // Generate summary
+            core.summary.addHeading('Auto-Merge Completed', 2);
+            core.summary.addTable([
+              ['Property', 'Value'],
+              ['PR Number', `#${prNumber}`],
+              ['Issue Number', issueNumber ? `#${issueNumber}` : 'None'],
+              ['Merge SHA', mergeResult.data.sha],
+              ['Branch Deleted', pr.data.head.ref],
+              ['Merged At', new Date().toISOString()]
+            ]);
+            await core.summary.write();
+
+  trigger-post-merge:
+    name: Trigger Post-Merge Actions
+    needs: [check-merge-conditions, merge-pr]
+    if: always() && needs.merge-pr.result == 'success'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger dev-log update
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Trigger the dev-log updater workflow
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'dev-log-updater.yml',
+              ref: 'main',
+              inputs: {
+                pr_number: '${{ needs.check-merge-conditions.outputs.pr_number }}',
+                issue_number: '${{ needs.check-merge-conditions.outputs.issue_number }}'
+              }
+            });
+            
+            console.log('✅ Triggered dev-log updater workflow');

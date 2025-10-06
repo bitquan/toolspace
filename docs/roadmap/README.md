@@ -13,18 +13,18 @@ This directory contains structured roadmaps that can automatically generate GitH
 
 Each roadmap file must contain a markdown table with these columns:
 
-| Column | Description | Required | Example |
-|--------|-------------|----------|---------|
-| `epic` | Group related tasks | Yes | "File Merger v1" |
-| `title` | Issue title | Yes | "UI: drag/drop + progress" |
-| `desc` | Issue description | No | "Flutter UI + upload mgr + progress bar" |
-| `labels` | Comma-separated labels | No | "feat,tool:file-merger,area:frontend" |
-| `tool` | Tool/component name | No | "file_merger" |
-| `area` | Code area | No | "frontend", "backend", "ops" |
-| `priority` | Priority level | No | "P0-blocker", "P1", "P2" |
-| `estimate` | Time estimate | No | "0.5d", "1w" |
-| `sprint` | When to create | Yes | "now", "later", "backlog" |
-| `assignee` | GitHub username | No | "@bitquan" |
+| Column     | Description            | Required | Example                                  |
+| ---------- | ---------------------- | -------- | ---------------------------------------- |
+| `epic`     | Group related tasks    | Yes      | "File Merger v1"                         |
+| `title`    | Issue title            | Yes      | "UI: drag/drop + progress"               |
+| `desc`     | Issue description      | No       | "Flutter UI + upload mgr + progress bar" |
+| `labels`   | Comma-separated labels | No       | "feat,tool:file-merger,area:frontend"    |
+| `tool`     | Tool/component name    | No       | "file_merger"                            |
+| `area`     | Code area              | No       | "frontend", "backend", "ops"             |
+| `priority` | Priority level         | No       | "P0-blocker", "P1", "P2"                 |
+| `estimate` | Time estimate          | No       | "0.5d", "1w"                             |
+| `sprint`   | When to create         | Yes      | "now", "later", "backlog"                |
+| `assignee` | GitHub username        | No       | "@bitquan"                               |
 
 ## Sprint Control
 
@@ -62,28 +62,33 @@ The workflow also runs automatically when you push changes to `docs/roadmap/**` 
 The system expects these labels to exist in your repository:
 
 ### Issue Types
+
 - `type: epic` - Epic tracking issues
 - `feat` - New features
-- `fix` - Bug fixes  
+- `fix` - Bug fixes
 - `chore` - Maintenance tasks
 
 ### Priorities
+
 - `P0-blocker` - Critical/blocking
 - `P1` - High priority
 - `P2` - Medium priority
 
 ### Areas
+
 - `area:frontend` - Flutter/UI work
 - `area:backend` - Firebase Functions/API
 - `area:ops` - CI/CD/DevOps
 - `area:docs` - Documentation
 
 ### Tools
+
 - `tool:text-tools` - Text processing tool
 - `tool:file-merger` - File merging tool
 - `tool:auth` - Authentication system
 
 ### Workflow
+
 - `ready` - Ready for development (triggers branch creation)
 - `in-progress` - Being worked on
 
@@ -92,17 +97,17 @@ The system expects these labels to exist in your repository:
 ### Minimal Example
 
 ```markdown
-| epic | title | sprint |
-|------|-------|--------|
-| My Feature | Add login button | now |
+| epic       | title            | sprint |
+| ---------- | ---------------- | ------ |
+| My Feature | Add login button | now    |
 ```
 
 ### Full Example
 
 ```markdown
-| epic | title | desc | labels | tool | area | priority | estimate | sprint | assignee |
-|------|-------|------|--------|------|------|----------|----------|--------|----------|
-| Auth v2 | OAuth integration | Add Google/GitHub OAuth | feat,security | auth | backend | P1 | 1d | now | @bitquan |
+| epic    | title             | desc                    | labels        | tool | area    | priority | estimate | sprint | assignee |
+| ------- | ----------------- | ----------------------- | ------------- | ---- | ------- | -------- | -------- | ------ | -------- |
+| Auth v2 | OAuth integration | Add Google/GitHub OAuth | feat,security | auth | backend | P1       | 1d       | now    | @bitquan |
 ```
 
 ## Troubleshooting

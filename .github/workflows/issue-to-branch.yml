@@ -1,0 +1,161 @@
+name: Issue → Branch
+
+on:
+    issues:
+        types: [labeled]
+
+permissions:
+    contents: write
+    issues: read
+
+jobs:
+    create-branch:
+        if: contains(github.event.label.name, 'ready')
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Extract issue info and create branch
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const issue = context.payload.issue;
+                      const issueNumber = issue.number;
+                      const issueTitle = issue.title;
+
+                      // Extract branch type from issue labels
+                      let branchType = 'feat'; // default
+                      const labels = issue.labels.map(l => l.name);
+
+                      if (labels.some(l => l.includes('fix') || l.includes('bug'))) {
+                        branchType = 'fix';
+                      } else if (labels.some(l => l.includes('chore') || l.includes('refactor'))) {
+                        branchType = 'chore';
+                      } else if (labels.some(l => l.includes('docs'))) {
+                        branchType = 'docs';
+                      }
+
+                      // Create safe branch name slug from title
+                      const slug = issueTitle
+                        .toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+                        .replace(/\s+/g, '-')          // Replace spaces with hyphens
+                        .replace(/-+/g, '-')           // Collapse multiple hyphens
+                        .replace(/^-|-$/g, '')         // Remove leading/trailing hyphens
+                        .substring(0, 50);             // Limit length
+
+                      const branchName = `${branchType}/issue-${issueNumber}-${slug}`;
+
+                      core.info(`Creating branch: ${branchName}`);
+                      core.info(`Issue: #${issueNumber} - ${issueTitle}`);
+                      core.info(`Labels: ${labels.join(', ')}`);
+
+                      try {
+                        // Check if branch already exists
+                        try {
+                          const existingBranch = await github.rest.repos.getBranch({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            branch: branchName
+                          });
+
+                          core.info(`Branch ${branchName} already exists, skipping creation`);
+
+                          // Comment on the issue that branch exists
+                          await github.rest.issues.createComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: issueNumber,
+                            body: `🌿 **Branch Ready**: \`${branchName}\` already exists and is ready for development.\n\n` +
+                                  `To start working:\n` +
+                                  `\`\`\`bash\n` +
+                                  `git checkout ${branchName}\n` +
+                                  `git pull origin ${branchName}\n` +
+                                  `\`\`\`\n\n` +
+                                  `Remember to reference this issue (#${issueNumber}) in your commits!`
+                          });
+
+                          return;
+                        } catch (error) {
+                          // Branch doesn't exist, proceed with creation
+                          core.info(`Branch ${branchName} doesn't exist, creating it`);
+                        }
+
+                        // Get the main branch SHA
+                        const mainBranch = await github.rest.repos.getBranch({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          branch: 'main'
+                        });
+
+                        // Create the new branch
+                        await github.rest.git.createRef({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          ref: `refs/heads/${branchName}`,
+                          sha: mainBranch.data.commit.sha
+                        });
+
+                        core.info(`✅ Successfully created branch: ${branchName}`);
+
+                        // Add a comment to the issue with branch info
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: issueNumber,
+                          body: `🌿 **Branch Created**: \`${branchName}\`\n\n` +
+                                `Ready for development! To start working:\n` +
+                                `\`\`\`bash\n` +
+                                `git checkout -b ${branchName} origin/${branchName}\n` +
+                                `\`\`\`\n\n` +
+                                `**Guidelines:**\n` +
+                                `- Reference this issue (#${issueNumber}) in all commit messages\n` +
+                                `- Follow the branch naming convention: \`${branchType}/issue-${issueNumber}-*\`\n` +
+                                `- Push regularly to trigger CI checks\n` +
+                                `- Create a PR when ready for review\n\n` +
+                                `The CI pipeline will automatically run tests when you push changes.`
+                        });
+
+                        // Add work-in-progress label
+                        await github.rest.issues.addLabels({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: issueNumber,
+                          labels: ['status: in-progress']
+                        });
+
+                        // Remove ready label since work has started
+                        try {
+                          await github.rest.issues.removeLabel({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: issueNumber,
+                            name: 'ready'
+                          });
+                        } catch (error) {
+                          core.info('Could not remove ready label (might not exist)');
+                        }
+
+                      } catch (error) {
+                        core.setFailed(`Failed to create branch: ${error.message}`);
+
+                        // Comment on issue about the failure
+                        await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: issueNumber,
+                          body: `❌ **Branch Creation Failed**\n\n` +
+                                `Could not automatically create branch \`${branchName}\`.\n` +
+                                `Error: ${error.message}\n\n` +
+                                `Please create the branch manually:\n` +
+                                `\`\`\`bash\n` +
+                                `git checkout -b ${branchName}\n` +
+                                `git push -u origin ${branchName}\n` +
+                                `\`\`\`\n\n` +
+                                `@bitquan - manual intervention needed.`
+                        });
+                      }
