@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/codec_lab/codec_lab_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -138,6 +139,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'codec-lab',
+      name: 'Codec Lab',
+      description: 'Base64, Hex, and URL encoding/decoding for text and files',
+      icon: Icons.code,
+      screen: const CodecLabScreen(),
+      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
     ),
   ];
 }
