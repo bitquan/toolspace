@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/md_to_pdf/md_to_pdf_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -138,6 +139,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'md-to-pdf',
+      name: 'Markdown to PDF',
+      description: 'Convert markdown to PDF with themes and custom settings',
+      icon: Icons.picture_as_pdf,
+      screen: const MdToPdfScreen(),
+      color: PlayfulTheme.toolColors[0],
     ),
   ];
 }
