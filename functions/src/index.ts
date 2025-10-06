@@ -8,3 +8,4 @@ export {
 // File Merger Tool
 export { mergePdfs } from "./tools/file_merger/merge_pdfs.js";
 export { getQuotaStatus } from "./tools/file_merger/quota.js";
+export { getSignedUrl } from "./tools/file_merger/signed_url.js";

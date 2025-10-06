@@ -85,10 +85,15 @@ The File Merger tool allows you to combine multiple PDF documents and images (PN
 
 ### File Access
 
-- **Private Upload Space**: Files are uploaded to user-specific storage
-- **Signed URLs**: Download links are time-limited and secure
+- **Private Upload Space**: Files are uploaded to user-specific storage with strict access controls
+- **Signed URLs**: Download links are time-limited and secure (7 days validity)
 - **No Public Access**: Your files are never publicly accessible
-- **Link Expiration**: Download links expire after 7 days
+- **Link Expiration**: Download links expire after 7 days but can be regenerated
+- **Storage Rules**: Enforced security rules ensure only you can access your files:
+  - Upload folder (`uploads/{userId}/`): Read/write only by file owner
+  - Merged folder (`merged/{userId}/`): Read-only by owner, write-only by backend
+  - File size validation: 10 MB limit enforced at storage level
+  - Content type validation: Only PDF and image types accepted
 
 ### Compliance
 
@@ -179,16 +184,33 @@ For developers wanting to integrate File Merger functionality:
 
 ### Firebase Functions
 
+#### Merge PDFs
+
 ```typescript
 // Call the mergePdfs function
 const result = await firebase.functions().httpsCallable("mergePdfs")({
-  files: ["path/to/file1.pdf", "path/to/file2.jpg"],
+  files: ["uploads/user-id/file1.pdf", "uploads/user-id/file2.jpg"],
 });
 
 console.log("Download URL:", result.data.downloadUrl);
+console.log("File Path:", result.data.outputPath);
+console.log("Merge ID:", result.data.mergeId);
 ```
 
-### Quota Management
+#### Regenerate Signed URL
+
+```typescript
+// Get a new signed URL for an existing merged file
+const result = await firebase.functions().httpsCallable("getSignedUrl")({
+  filePath: "merged/user-id/merge-id.pdf",
+});
+
+console.log("Download URL:", result.data.downloadUrl);
+console.log("Expires in:", result.data.expiresIn, "milliseconds");
+console.log("File metadata:", result.data.metadata);
+```
+
+#### Quota Management
 
 ```typescript
 // Check quota status

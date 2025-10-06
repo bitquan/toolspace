@@ -6,6 +6,22 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
+    // File merger: temporary uploads (write only during upload, read for processing)
+    match /uploads/{userId}/{fileName} {
+      allow write: if request.auth != null && request.auth.uid == userId
+                   && request.resource.size <= 10 * 1024 * 1024  // 10MB limit
+                   && request.resource.contentType.matches('(application/pdf|image/(png|jpeg))');
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // File merger: merged output files (read only, created by backend)
+    match /merged/{userId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;  // Only backend can write merged files
+      allow delete: if false; // Only backend can delete (via lifecycle rules)
+    }
+    
     // Public assets (logos, etc.) - read only
     match /public/{allPaths=**} {
       allow read: if true;
