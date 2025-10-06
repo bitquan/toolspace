@@ -140,6 +140,106 @@
       },
       "problemMatcher": [],
       "detail": "Preview bulk approval of Copilot PRs without making changes"
+    },
+    {
+      "label": "🧹 Cleanup Workflows (Dry Run)",
+      "type": "shell",
+      "command": "gh",
+      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=failed_runs", "-f", "dry_run=true"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Preview workflow cleanup - shows what would be cleaned up without making changes"
+    },
+    {
+      "label": "🧹 Cleanup Failed Workflows",
+      "type": "shell",
+      "command": "gh",
+      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=failed_runs", "-f", "dry_run=false"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Clean up all failed and cancelled workflow runs"
+    },
+    {
+      "label": "🧹 Cleanup Old Workflows",
+      "type": "shell",
+      "command": "gh",
+      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=old_runs", "-f", "days_to_keep=7", "-f", "dry_run=false"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Clean up workflow runs older than 7 days"
+    },
+    {
+      "label": "🧹 Full Workflow Cleanup",
+      "type": "shell",
+      "command": "gh",
+      "args": ["workflow", "run", "workflow-cleanup.yml", "-f", "cleanup_scope=full_cleanup", "-f", "dry_run=false"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "⚠️ WARNING: Complete cleanup of ALL workflow runs, cache, and artifacts"
+    },
+    {
+      "label": "🧹 Cleanup Helper (PowerShell)",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-ExecutionPolicy", "Bypass", "-File", "scripts/workflow-cleanup.ps1", "-Action", "${input:cleanupAction}"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Interactive PowerShell cleanup helper with confirmation prompts"
     }
   ],
   "inputs": [
@@ -147,6 +247,21 @@
       "id": "issueNumber",
       "description": "Enter the GitHub issue number to assign to Copilot",
       "type": "promptString"
+    },
+    {
+      "id": "cleanupAction",
+      "description": "Select cleanup action",
+      "type": "pickString",
+      "options": [
+        "preview",
+        "failed",
+        "old",
+        "cache",
+        "all",
+        "full",
+        "help"
+      ],
+      "default": "preview"
     }
   ]
 }

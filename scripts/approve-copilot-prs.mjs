@@ -156,8 +156,9 @@ async function bulkApproveCopilotPRs(options) {
     });
 
     // Filter for Copilot PRs (both possible login names)
-    const copilotPRs = prs.filter((pr) => 
-      pr.user.login === "app/copilot-swe-agent" || pr.user.login === "Copilot"
+    const copilotPRs = prs.filter(
+      (pr) =>
+        pr.user.login === "app/copilot-swe-agent" || pr.user.login === "Copilot"
     );
 
     console.log(`INFO: Found ${prs.length} total open PRs`);

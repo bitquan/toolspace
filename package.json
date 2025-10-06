@@ -23,7 +23,13 @@
     "create-issue": "node scripts/create-and-assign-issue.mjs",
     "create-and-assign": "node scripts/create-and-assign-issue.mjs --assign",
     "approve-prs": "node scripts/approve-copilot-prs.mjs",
-    "approve-prs-dry": "node scripts/approve-copilot-prs.mjs --dry-run"
+    "approve-prs-dry": "node scripts/approve-copilot-prs.mjs --dry-run",
+    "cleanup:preview": "gh workflow run workflow-cleanup.yml -f cleanup_scope=failed_runs -f dry_run=true",
+    "cleanup:failed": "gh workflow run workflow-cleanup.yml -f cleanup_scope=failed_runs -f dry_run=false",
+    "cleanup:old": "gh workflow run workflow-cleanup.yml -f cleanup_scope=old_runs -f days_to_keep=7 -f dry_run=false",
+    "cleanup:cache": "gh workflow run workflow-cleanup.yml -f cleanup_scope=cache_cleanup -f dry_run=false",
+    "cleanup:full": "gh workflow run workflow-cleanup.yml -f cleanup_scope=full_cleanup -f dry_run=false",
+    "cleanup:help": "echo 'Workflow Cleanup Commands:' && echo '  npm run cleanup:preview  - Preview what would be cleaned' && echo '  npm run cleanup:failed   - Clean failed/cancelled runs' && echo '  npm run cleanup:old      - Clean runs older than 7 days' && echo '  npm run cleanup:cache    - Clean cache and artifacts' && echo '  npm run cleanup:full     - ⚠️  FULL cleanup (ALL data)'"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
