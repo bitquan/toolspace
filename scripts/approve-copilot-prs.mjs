@@ -3,7 +3,7 @@
 /**
  * Bulk Approve Copilot PRs Script
  *
- * This script approves all open pull requests created by the Copilot SWE Agent (app/copilot-swe-agent).
+ * This script approves all open pull requests created by the Copilot SWE Agent.
  *
  * Usage: node scripts/approve-copilot-prs.mjs [--dry-run]
  *
@@ -155,8 +155,10 @@ async function bulkApproveCopilotPRs(options) {
       per_page: 100,
     });
 
-    // Filter for Copilot PRs (app/copilot-swe-agent)
-    const copilotPRs = prs.filter((pr) => pr.user.login === "app/copilot-swe-agent");
+    // Filter for Copilot PRs (both possible login names)
+    const copilotPRs = prs.filter((pr) => 
+      pr.user.login === "app/copilot-swe-agent" || pr.user.login === "Copilot"
+    );
 
     console.log(`INFO: Found ${prs.length} total open PRs`);
     console.log(`INFO: Found ${copilotPRs.length} Copilot PRs`);
@@ -249,13 +251,10 @@ async function bulkApproveCopilotPRs(options) {
 }
 
 // Main execution
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const options = parseArgs();
+const options = parseArgs();
+validateEnvironment();
 
-  validateEnvironment();
-
-  bulkApproveCopilotPRs(options).catch((error) => {
-    console.error("ERROR: Unexpected error:", error);
-    process.exit(1);
-  });
-}
+bulkApproveCopilotPRs(options).catch((error) => {
+  console.error("ERROR: Unexpected error:", error);
+  process.exit(1);
+});
