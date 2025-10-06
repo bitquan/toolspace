@@ -19,6 +19,19 @@ October 6, 2025
   - Auto-formatting with proper indentation
   - Smart error detection and repair suggestions
   - Common fixes (single quotes, Python booleans, unquoted keys)
+  - **JSONPath Queries**: Execute JSONPath expressions to extract data from JSON
+    - Support for property access (`$.user.name`)
+    - Array indexing (`$.items[0]`)
+    - Wildcard queries (`$.users[*].name`)
+    - Complex nested queries
+  - **JSON Schema Validation**: Validate JSON data against schemas
+    - Type validation (string, integer, boolean, array, object, null, number)
+    - Required properties checking
+    - String length constraints (minLength, maxLength)
+    - Number range validation (minimum, maximum)
+    - Enum value validation
+    - Nested object and array validation
+    - Auto-generate schemas from sample JSON data
   - Copy to clipboard functionality
   - Animated success feedback
 
@@ -256,9 +269,40 @@ class ToolScreen extends StatefulWidget {
 
 COMPLETE - All three tools implemented with full functionality and playful theme integration
 
+## T-ToolsPack v2 Enhancements
+
+### Implementation Date
+October 2024
+
+### Tools Enhanced
+
+#### 1. JSON Doctor v2
+- **Added**: Schema validation with comprehensive type checking
+- **Added**: JSONPath query engine with wildcard support  
+- **Features**: Real-time validation, auto-schema generation, path suggestions
+- **Tests**: 40+ test cases covering validation and query scenarios
+
+#### 2. Text Diff v2
+- **Added**: Word-level difference detection
+- **Added**: Three-way merge with conflict detection
+- **Features**: Multiple comparison modes (line/word/merge), conflict markers, statistics
+- **Tests**: 25+ test cases covering word diff and merge scenarios
+
+#### 3. QR Maker v2
+- **Added**: Batch generation capability
+- **Features**: Multi-line input processing, grid preview, bulk download
+- **UI**: Two-tab interface (Single QR / Batch Generation)
+
+### Status
+COMPLETE - All v2 enhancements implemented and tested
+
+### Documentation
+See [T-ToolsPack v2 Documentation](../../tools/t-toolspack-v2.md) for detailed feature descriptions and usage examples.
+
 ## Related Tasks
 
 - Foundation for future micro-tool expansion
 - Demonstrates instant-win development approach
 - Showcases playful theme system capabilities
 - Provides user engagement and retention features
+- Sets pattern for v3 enhancements (advanced features, integrations)
