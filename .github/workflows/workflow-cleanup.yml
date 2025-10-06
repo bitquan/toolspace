@@ -127,7 +127,7 @@ jobs:
             echo "Found failed runs to delete:"
             echo "$FAILED_RUNS" | while read -r run_id; do
               echo "  Deleting run ID: $run_id"
-              gh run delete "$run_id" --yes || echo "    ⚠️ Failed to delete run $run_id"
+              gh run delete "\$run_id" || echo "    ⚠️ Failed to delete run $run_id"
               sleep 1  # Rate limiting
             done
           fi
@@ -152,7 +152,7 @@ jobs:
             echo "Found old runs to delete:"
             echo "$OLD_RUNS" | while read -r run_id; do
               echo "  Deleting run ID: $run_id"
-              gh run delete "$run_id" --yes || echo "    ⚠️ Failed to delete run $run_id"
+              gh run delete "\$run_id" || echo "    ⚠️ Failed to delete run $run_id"
               sleep 1  # Rate limiting
             done
           fi
@@ -174,7 +174,7 @@ jobs:
             echo "Found runs to delete:"
             echo "$ALL_RUNS" | while read -r run_id; do
               echo "  Deleting run ID: $run_id"
-              gh run delete "$run_id" --yes || echo "    ⚠️ Failed to delete run $run_id"
+              gh run delete "\$run_id" || echo "    ⚠️ Failed to delete run $run_id"
               sleep 1  # Rate limiting
             done
           fi
