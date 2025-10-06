@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
-import 'logic/csv_processor.dart';
+import 'dart:html' as html;
+import 'package:flutter/material.dart';
+import 'package:csv/csv.dart';
+import '../../shared/shared_data_service.dart';
 
-/// CSV Cleaner tool for trimming, deduplicating, and normalizing CSV files
 class CsvCleanerScreen extends StatefulWidget {
   const CsvCleanerScreen({super.key});
 
@@ -13,12 +11,216 @@ class CsvCleanerScreen extends StatefulWidget {
   State<CsvCleanerScreen> createState() => _CsvCleanerScreenState();
 }
 
-class _CsvCleanerScreenState extends State<CsvCleanerScreen> {
+class _CsvCleanerScreenState extends State<CsvCleanerScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
   List<List<String>> _csvData = [];
-  String _fileName = '';
+  List<String> _headers = [];
+  String? _selectedDedupeColumn;
   bool _isLoading = false;
-  String? _errorMessage;
-  int? _selectedKeyColumn;
+  String? _fileName;
+  String _statusMessage = '';
+
+  // Operation states
+  bool _trimWhitespace = true;
+  bool _lowercaseHeaders = true;
+  bool _removeDuplicates = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _pickFile() async {
+    final html.FileUploadInputElement uploadInput =
+        html.FileUploadInputElement();
+    uploadInput.accept = '.csv';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      if (files!.isEmpty) return;
+
+      final file = files[0];
+      _fileName = file.name;
+
+      final reader = html.FileReader();
+      reader.readAsText(file);
+
+      reader.onLoad.listen((e) {
+        _processCsvContent(reader.result as String);
+      });
+    });
+  }
+
+  void _processCsvContent(String content) async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Processing CSV file...';
+    });
+
+    try {
+      await Future.delayed(const Duration(milliseconds: 500)); // UX delay
+
+      final List<List<dynamic>> rawData =
+          const CsvToListConverter().convert(content);
+
+      if (rawData.isEmpty) {
+        throw Exception('CSV file is empty');
+      }
+
+      _headers = rawData[0].map((e) => e.toString()).toList();
+      _csvData = rawData
+          .skip(1)
+          .map((row) => row.map((cell) => cell.toString()).toList())
+          .toList();
+
+      setState(() {
+        _isLoading = false;
+        _statusMessage =
+            'CSV loaded successfully! ${_csvData.length} rows found.';
+        _selectedDedupeColumn = _headers.isNotEmpty ? _headers[0] : null;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _statusMessage = 'Error processing CSV: ${e.toString()}';
+        _csvData.clear();
+        _headers.clear();
+      });
+    }
+  }
+
+  void _applyCleaningOperations() async {
+    if (_csvData.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'Applying cleaning operations...';
+    });
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    try {
+      List<List<String>> cleanedData = List.from(_csvData);
+      List<String> cleanedHeaders = List.from(_headers);
+
+      // Trim whitespace
+      if (_trimWhitespace) {
+        cleanedData = cleanedData
+            .map((row) => row.map((cell) => cell.trim()).toList())
+            .toList();
+      }
+
+      // Lowercase headers
+      if (_lowercaseHeaders) {
+        cleanedHeaders =
+            cleanedHeaders.map((header) => header.toLowerCase()).toList();
+      }
+
+      // Remove duplicates
+      if (_removeDuplicates && _selectedDedupeColumn != null) {
+        final columnIndex = _headers.indexOf(_selectedDedupeColumn!);
+        if (columnIndex != -1) {
+          final seen = <String>{};
+          cleanedData = cleanedData.where((row) {
+            if (row.length > columnIndex) {
+              final value = row[columnIndex];
+              if (seen.contains(value)) {
+                return false;
+              }
+              seen.add(value);
+            }
+            return true;
+          }).toList();
+        }
+      }
+
+      setState(() {
+        _csvData = cleanedData;
+        _headers = cleanedHeaders;
+        _isLoading = false;
+        _statusMessage =
+            'Cleaning operations applied! ${cleanedData.length} rows remaining.';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _statusMessage = 'Error during cleaning: ${e.toString()}';
+      });
+    }
+  }
+
+  void _exportCsv() {
+    if (_csvData.isEmpty) return;
+
+    try {
+      final List<List<String>> exportData = [_headers, ..._csvData];
+      final String csvContent = const ListToCsvConverter().convert(exportData);
+
+      // Create download
+      final bytes = utf8.encode(csvContent);
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+
+      final anchor = html.AnchorElement(href: url)
+        ..target = 'download'
+        ..download =
+            _fileName?.replaceAll('.csv', '_cleaned.csv') ?? 'cleaned_data.csv';
+      anchor.click();
+
+      html.Url.revokeObjectUrl(url);
+
+      setState(() {
+        _statusMessage = 'CSV exported successfully!';
+      });
+
+      // Save to shared data for cross-tool use
+      SharedDataService.instance.setSharedData('csv_cleaner_export', {
+        'headers': _headers,
+        'data': _csvData,
+        'filename': _fileName,
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      setState(() {
+        _statusMessage = 'Error exporting CSV: ${e.toString()}';
+      });
+    }
+  }
+
+  void _resetData() {
+    setState(() {
+      _csvData.clear();
+      _headers.clear();
+      _fileName = null;
+      _statusMessage = '';
+      _selectedDedupeColumn = null;
+      _trimWhitespace = true;
+      _lowercaseHeaders = true;
+      _removeDuplicates = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,416 +229,291 @@ class _CsvCleanerScreenState extends State<CsvCleanerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('CSV Cleaner'),
+        backgroundColor: theme.colorScheme.primaryContainer,
+        foregroundColor: theme.colorScheme.onPrimaryContainer,
         elevation: 0,
-      ),
-      body: _csvData.isEmpty && !_isLoading
-          ? _buildEmptyState(theme)
-          : _isLoading
-              ? _buildLoadingState()
-              : _buildDataView(theme),
-    );
-  }
-
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-              shape: BoxShape.circle,
+        actions: [
+          if (_csvData.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _resetData,
+              tooltip: 'Reset',
             ),
-            child: Icon(
-              Icons.table_chart_outlined,
-              size: 64,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No CSV file loaded',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Upload a CSV file to get started',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 32),
-          FilledButton.icon(
-            onPressed: _pickFile,
-            icon: const Icon(Icons.upload_file),
-            label: const Text('Upload CSV File'),
-          ),
-          if (_errorMessage != null) ...[
-            const SizedBox(height: 16),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 32),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: theme.colorScheme.onErrorContainer,
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      _errorMessage!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text('Loading CSV file...'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDataView(ThemeData theme) {
-    final headers = CsvProcessor.getHeaders(_csvData);
-    
-    return Column(
-      children: [
-        // Header with file info and actions
-        Container(
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          color: theme.colorScheme.surfaceContainerHighest,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.table_chart,
-                    color: theme.colorScheme.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _fileName,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+              // Header Section
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.cleaning_services,
+                            color: theme.colorScheme.primary,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'CSV Data Cleaner',
+                                  style:
+                                      theme.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Trim whitespace, normalize headers, and remove duplicates',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: 16),
+                      if (_csvData.isEmpty)
+                        Center(
+                          child: Column(
+                            children: [
+                              FilledButton.icon(
+                                onPressed: _isLoading ? null : _pickFile,
+                                icon: _isLoading
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
+                                      )
+                                    : const Icon(Icons.upload_file),
+                                label: Text(_isLoading
+                                    ? 'Processing...'
+                                    : 'Upload CSV File'),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Drag and drop a CSV file or click to browse',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Status Message
+              if (_statusMessage.isNotEmpty)
+                Card(
+                  color: _statusMessage.contains('Error')
+                      ? theme.colorScheme.errorContainer
+                      : theme.colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _statusMessage.contains('Error')
+                              ? Icons.error_outline
+                              : Icons.info_outline,
+                          color: _statusMessage.contains('Error')
+                              ? theme.colorScheme.onErrorContainer
+                              : theme.colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _statusMessage,
+                            style: TextStyle(
+                              color: _statusMessage.contains('Error')
+                                  ? theme.colorScheme.onErrorContainer
+                                  : theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: _clearData,
-                    tooltip: 'Clear data',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${_csvData.length} rows × ${headers.length} columns',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
                 ),
-              ),
+
               const SizedBox(height: 16),
-              
-              // Operation buttons
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildActionChip(
-                    context,
-                    label: 'Trim Whitespace',
-                    icon: Icons.format_clear,
-                    onPressed: _trimWhitespace,
-                  ),
-                  _buildActionChip(
-                    context,
-                    label: 'Lowercase Headers',
-                    icon: Icons.text_fields,
-                    onPressed: _lowercaseHeaders,
-                  ),
-                  _buildActionChip(
-                    context,
-                    label: 'Remove Duplicates',
-                    icon: Icons.content_copy,
-                    onPressed: _showDedupeDialog,
-                  ),
-                  _buildActionChip(
-                    context,
-                    label: 'Export CSV',
-                    icon: Icons.download,
-                    onPressed: _exportCsv,
-                    isPrimary: true,
-                  ),
-                  _buildActionChip(
-                    context,
-                    label: 'Upload New',
-                    icon: Icons.upload_file,
-                    onPressed: _pickFile,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        
-        // CSV table preview
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: _buildDataTable(theme),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildActionChip(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-    bool isPrimary = false,
-  }) {
-    final theme = Theme.of(context);
-    
-    if (isPrimary) {
-      return FilledButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 18),
-        label: Text(label),
-        style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        ),
-      );
-    }
-    
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
-    );
-  }
-
-  Widget _buildDataTable(ThemeData theme) {
-    if (_csvData.isEmpty) return const SizedBox();
-
-    final headers = _csvData[0];
-    final dataRows = _csvData.skip(1).toList();
-
-    return DataTable(
-      headingRowColor: WidgetStateProperty.all(
-        theme.colorScheme.primaryContainer.withOpacity(0.5),
-      ),
-      columns: headers
-          .map((header) => DataColumn(
-                label: Text(
-                  header,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ))
-          .toList(),
-      rows: dataRows
-          .map((row) => DataRow(
-                cells: row
-                    .map((cell) => DataCell(
-                          Text(
-                            cell,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+              // Operations Panel
+              if (_csvData.isNotEmpty) ...[
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Cleaning Operations',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                        ))
-                    .toList(),
-              ))
-          .toList(),
-    );
-  }
-
-  Future<void> _pickFile() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['csv'],
-        withData: true,
-      );
-
-      if (result != null && result.files.single.bytes != null) {
-        setState(() {
-          _isLoading = true;
-          _errorMessage = null;
-        });
-
-        final bytes = result.files.single.bytes!;
-        final content = utf8.decode(bytes);
-        
-        await Future.delayed(const Duration(milliseconds: 300));
-        
-        final rows = CsvProcessor.parseCsv(content);
-        final validation = CsvProcessor.validate(rows);
-
-        setState(() {
-          _isLoading = false;
-          if (validation.isValid) {
-            _csvData = rows;
-            _fileName = result.files.single.name;
-            _errorMessage = null;
-          } else {
-            _errorMessage = validation.error ?? 'Invalid CSV format';
-          }
-        });
-
-        if (validation.isValid) {
-          _showSuccessSnackBar('CSV file loaded successfully');
-        }
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Failed to load CSV file: $e';
-      });
-    }
-  }
-
-  void _trimWhitespace() {
-    setState(() {
-      _csvData = CsvProcessor.trimWhitespace(_csvData);
-    });
-    _showSuccessSnackBar('Whitespace trimmed from all cells');
-  }
-
-  void _lowercaseHeaders() {
-    setState(() {
-      _csvData = CsvProcessor.lowercaseHeaders(_csvData);
-    });
-    _showSuccessSnackBar('Headers converted to lowercase');
-  }
-
-  Future<void> _showDedupeDialog() async {
-    final headers = CsvProcessor.getHeaders(_csvData);
-    
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Duplicates'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Select column to use as key for deduplication:'),
-            const SizedBox(height: 16),
-            DropdownButton<int?>(
-              value: _selectedKeyColumn,
-              isExpanded: true,
-              hint: const Text('Use entire row'),
-              items: [
-                const DropdownMenuItem<int?>(
-                  value: null,
-                  child: Text('Entire row (all columns)'),
+                        ),
+                        const SizedBox(height: 16),
+                        CheckboxListTile(
+                          title: const Text('Trim Whitespace'),
+                          subtitle: const Text(
+                              'Remove leading and trailing spaces from all cells'),
+                          value: _trimWhitespace,
+                          onChanged: (value) =>
+                              setState(() => _trimWhitespace = value ?? false),
+                        ),
+                        CheckboxListTile(
+                          title: const Text('Lowercase Headers'),
+                          subtitle: const Text(
+                              'Convert all column headers to lowercase'),
+                          value: _lowercaseHeaders,
+                          onChanged: (value) => setState(
+                              () => _lowercaseHeaders = value ?? false),
+                        ),
+                        CheckboxListTile(
+                          title: const Text('Remove Duplicates'),
+                          subtitle: const Text(
+                              'Remove duplicate rows based on selected column'),
+                          value: _removeDuplicates,
+                          onChanged: (value) => setState(
+                              () => _removeDuplicates = value ?? false),
+                        ),
+                        if (_removeDuplicates && _headers.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 56, top: 8),
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Duplicate Detection Column',
+                                border: OutlineInputBorder(),
+                              ),
+                              value: _selectedDedupeColumn,
+                              items: _headers.map((header) {
+                                return DropdownMenuItem(
+                                  value: header,
+                                  child: Text(header),
+                                );
+                              }).toList(),
+                              onChanged: (value) =>
+                                  setState(() => _selectedDedupeColumn = value),
+                            ),
+                          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            FilledButton.icon(
+                              onPressed:
+                                  _isLoading ? null : _applyCleaningOperations,
+                              icon: const Icon(Icons.auto_fix_high),
+                              label: const Text('Apply Operations'),
+                            ),
+                            const SizedBox(width: 12),
+                            FilledButton.tonalIcon(
+                              onPressed: _isLoading ? null : _exportCsv,
+                              icon: const Icon(Icons.download),
+                              label: const Text('Export CSV'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                ...List.generate(
-                  headers.length,
-                  (index) => DropdownMenuItem<int?>(
-                    value: index,
-                    child: Text(headers[index]),
+
+                const SizedBox(height: 16),
+
+                // Data Preview
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Data Preview',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Chip(
+                              label: Text('${_csvData.length} rows'),
+                              backgroundColor:
+                                  theme.colorScheme.primaryContainer,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 400),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: _headers.map((header) {
+                                return DataColumn(
+                                  label: Text(
+                                    header,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                );
+                              }).toList(),
+                              rows: _csvData.take(10).map((row) {
+                                return DataRow(
+                                  cells: row.map((cell) {
+                                    return DataCell(
+                                      Container(
+                                        constraints:
+                                            const BoxConstraints(maxWidth: 150),
+                                        child: Text(
+                                          cell,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        if (_csvData.length > 10)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              'Showing first 10 rows of ${_csvData.length} total rows',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedKeyColumn = value;
-                });
-                Navigator.of(context).pop();
-                _removeDuplicates(value);
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  void _removeDuplicates(int? keyColumn) {
-    final beforeCount = _csvData.length;
-    setState(() {
-      _csvData = CsvProcessor.removeDuplicates(_csvData, keyColumnIndex: keyColumn);
-    });
-    final afterCount = _csvData.length;
-    final removed = beforeCount - afterCount;
-    _showSuccessSnackBar('Removed $removed duplicate row${removed == 1 ? '' : 's'}');
-  }
-
-  void _exportCsv() {
-    final csvContent = CsvProcessor.toCsv(_csvData);
-    
-    // Copy to clipboard
-    Clipboard.setData(ClipboardData(text: csvContent));
-    
-    _showSuccessSnackBar('CSV exported to clipboard');
-  }
-
-  void _clearData() {
-    setState(() {
-      _csvData = [];
-      _fileName = '';
-      _errorMessage = null;
-      _selectedKeyColumn = null;
-    });
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(message),
-          ],
         ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }
