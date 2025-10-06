@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'logic/word_diff_engine.dart';
+import '../../core/services/shared_data_service.dart';
+import '../../core/ui/import_data_button.dart';
+import '../../core/ui/share_data_button.dart';
 
 /// Text Diff - Compare texts with highlighted differences (simplified version)
 class TextDiffScreen extends StatefulWidget {
@@ -195,6 +198,22 @@ class _TextDiffScreenState extends State<TextDiffScreen>
           ],
         ),
         actions: [
+          if (_text1Controller.text.isNotEmpty)
+            ShareDataButton(
+              data: _text1Controller.text,
+              type: SharedDataType.text,
+              sourceTool: 'Text Diff',
+              label: 'Original',
+              compact: true,
+            ),
+          if (_text2Controller.text.isNotEmpty)
+            ShareDataButton(
+              data: _text2Controller.text,
+              type: SharedDataType.text,
+              sourceTool: 'Text Diff',
+              label: 'Modified',
+              compact: true,
+            ),
           IconButton(
             onPressed: _swapTexts,
             icon: const Icon(Icons.swap_horiz),
@@ -278,11 +297,25 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                             color: theme.colorScheme.surfaceVariant
                                 .withOpacity(0.3),
                           ),
-                          child: Text(
-                            'Original Text',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Original Text',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Spacer(),
+                              ImportDataButton(
+                                acceptedTypes: const [SharedDataType.text],
+                                onImport: (data, type, source) {
+                                  setState(() {
+                                    _text1Controller.text = data;
+                                  });
+                                },
+                                compact: true,
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
@@ -323,11 +356,25 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                           color:
                               theme.colorScheme.surfaceVariant.withOpacity(0.3),
                         ),
-                        child: Text(
-                          'Modified Text',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Modified Text',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const Spacer(),
+                            ImportDataButton(
+                              acceptedTypes: const [SharedDataType.text],
+                              onImport: (data, type, source) {
+                                setState(() {
+                                  _text2Controller.text = data;
+                                });
+                              },
+                              compact: true,
+                            ),
+                          ],
                         ),
                       ),
                       Expanded(

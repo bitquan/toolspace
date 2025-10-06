@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'logic/schema_validator.dart';
 import 'logic/jsonpath_query.dart';
+import '../../core/services/shared_data_service.dart';
+import '../../core/ui/import_data_button.dart';
+import '../../core/ui/share_data_button.dart';
 
 /// JSON Doctor - Validate, format, and repair JSON with instant feedback
 class JsonDoctorScreen extends StatefulWidget {
@@ -160,6 +163,22 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
           ],
         ),
         actions: [
+          ImportDataButton(
+            acceptedTypes: const [SharedDataType.json, SharedDataType.text],
+            onImport: (data, type, source) {
+              setState(() {
+                _inputController.text = data;
+              });
+            },
+            compact: true,
+          ),
+          if (_outputController.text.isNotEmpty)
+            ShareDataButton(
+              data: _outputController.text,
+              type: SharedDataType.json,
+              sourceTool: 'JSON Doctor',
+              compact: true,
+            ),
           IconButton(
             onPressed: _clearAll,
             icon: const Icon(Icons.clear_all),
