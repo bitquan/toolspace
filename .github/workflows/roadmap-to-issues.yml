@@ -1,0 +1,244 @@
+name: Roadmap → Issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        description: 'Roadmap markdown path'
+        default: 'docs/roadmap/phase-1.md'
+        required: true
+      dry_run:
+        description: 'Dry run (true/false)'
+        default: 'true'
+        required: true
+  push:
+    paths:
+      - 'docs/roadmap/**'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse roadmap and create issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ github.event.inputs.path }}' || 'docs/roadmap/phase-1.md';
+            const dry = ('${{ github.event.inputs.dry_run }}' || 'true').toLowerCase() === 'true';
+            
+            core.info(`Processing roadmap: ${path}`);
+            core.info(`Dry run mode: ${dry}`);
+            
+            // Read and parse the markdown file
+            let md;
+            try {
+              md = fs.readFileSync(path, 'utf8');
+            } catch (error) {
+              core.setFailed(`Failed to read file ${path}: ${error.message}`);
+              return;
+            }
+
+            // Parse markdown table (crude but sufficient for our schema)
+            const rows = [];
+            const lines = md.split('\n').filter(l => l.trim().startsWith('|') && l.includes('|'));
+            
+            if (lines.length < 3) {
+              core.setFailed(`No markdown table found in ${path}. Expected at least header + separator + data rows.`);
+              return;
+            }
+            
+            // Extract header
+            const header = lines[0].split('|').map(s => s.trim()).filter(Boolean);
+            core.info(`Table columns: ${header.join(', ')}`);
+            
+            // Parse data rows (skip header and separator)
+            for (let i = 2; i < lines.length; i++) {
+              const cols = lines[i].split('|').map(s => s.trim());
+              if (cols.length < header.length + 1) continue; // Skip malformed rows
+              
+              const obj = {};
+              header.forEach((h, idx) => {
+                obj[h] = cols[idx + 1] || '';
+              });
+              rows.push(obj);
+            }
+
+            // Filter for 'now' sprint items
+            const nowRows = rows.filter(r => (r['sprint'] || '').toLowerCase() === 'now');
+            core.info(`Found ${rows.length} total rows, ${nowRows.length} marked for 'now' sprint`);
+
+            if (nowRows.length === 0) {
+              core.info('No items marked for immediate creation (sprint: now)');
+              return;
+            }
+
+            // Helper: ensure epic issue exists & get its number
+            async function ensureEpic(epicTitle) {
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: 'type: epic',
+                state: 'open',
+                per_page: 100
+              });
+              
+              const found = issues.find(i => i.title === `[EPIC] ${epicTitle}`);
+              if (found) {
+                core.info(`Found existing epic: #${found.number} - ${epicTitle}`);
+                return found.number;
+              }
+              
+              if (dry) {
+                core.info(`[DRY] Would create epic: ${epicTitle}`);
+                return null;
+              }
+              
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[EPIC] ${epicTitle}`,
+                labels: ['type: epic', 'P1'],
+                body: `# Epic: ${epicTitle}\n\nThis epic groups related tasks from the roadmap.\n\n## Auto-generated\nThis epic was automatically created by the roadmap-to-issues workflow.`
+              });
+              
+              core.info(`Created new epic: #${created.number} - ${epicTitle}`);
+              return created.number;
+            }
+
+            // Helper functions
+            function parseLabels(s) {
+              return (s || '').split(',').map(x => x.trim()).filter(Boolean);
+            }
+            
+            function normUser(s) {
+              return (s || '').replace(/^@/, '');
+            }
+
+            // Create issues for each 'now' row
+            let createdCount = 0;
+            const results = [];
+            
+            for (const r of nowRows) {
+              const epic = r['epic'] || 'Uncategorized';
+              const epicNum = await ensureEpic(epic);
+              const title = r['title'];
+              
+              if (!title) {
+                core.warning('Skipping row with empty title');
+                continue;
+              }
+              
+              // Build labels array
+              const labels = [
+                ...parseLabels(r['labels']),
+                r['priority'] || 'P2',
+                r['tool'] ? `tool:${r['tool']}` : null,
+                r['area'] ? `area:${r['area']}` : null,
+              ].filter(Boolean);
+
+              // Build issue body
+              const body = [
+                r['desc'] ? `**Description**:\n${r['desc']}` : '',
+                epicNum ? `\n**Epic**: #${epicNum}` : '',
+                '\n**Acceptance Criteria**:',
+                '- [ ] Implement functionality',
+                '- [ ] Tests pass',
+                '- [ ] Documentation updated',
+                r['estimate'] ? `\n**Estimate**: ${r['estimate']}` : '',
+                '\n---\n*Auto-generated from roadmap*'
+              ].filter(Boolean).join('\n');
+
+              const assignee = normUser(r['assignee']);
+              
+              if (dry) {
+                const result = {
+                  title,
+                  labels,
+                  assignee: assignee || 'unassigned',
+                  epic: epic,
+                  epicNumber: epicNum
+                };
+                results.push(result);
+                core.info(`[DRY] Would create: "${title}" | Labels: ${labels.join(',')} | Assignee: ${assignee || 'none'}`);
+                continue;
+              }
+
+              // Check if issue already exists with same title
+              const { data: existingIssues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100
+              });
+              
+              const duplicate = existingIssues.find(issue => issue.title === title);
+              if (duplicate) {
+                core.warning(`Issue "${title}" already exists (#${duplicate.number}), skipping`);
+                continue;
+              }
+
+              // Create the issue
+              try {
+                const { data: issue } = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                  labels,
+                  assignees: assignee ? [assignee] : undefined
+                });
+
+                // Add 'ready' label to trigger auto-branch creation
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['ready']
+                });
+
+                results.push({
+                  number: issue.number,
+                  title,
+                  url: issue.html_url,
+                  labels,
+                  assignee: assignee || 'unassigned'
+                });
+
+                createdCount++;
+                core.info(`✅ Created #${issue.number}: ${title}`);
+                
+              } catch (error) {
+                core.error(`Failed to create issue "${title}": ${error.message}`);
+              }
+            }
+
+            // Generate summary
+            await core.summary
+              .addHeading('🗺️ Roadmap → Issues Generator')
+              .addRaw(`**Mode**: ${dry ? 'Dry Run' : 'Live Creation'}\n`)
+              .addRaw(`**File**: \`${path}\`\n`)
+              .addRaw(`**Items processed**: ${nowRows.length}\n`)
+              .addRaw(`**Issues ${dry ? 'would be ' : ''}created**: ${dry ? results.length : createdCount}\n\n`)
+              .addDetails(
+                'Results',
+                results.map(r => 
+                  dry 
+                    ? `- **${r.title}** (${r.labels.join(', ')}) → ${r.assignee}`
+                    : `- [#${r.number}](${r.url}) **${r.title}** → ${r.assignee}`
+                ).join('\n')
+              )
+              .write();
+
+            if (dry) {
+              core.info('✨ Dry run completed. Set dry_run=false to create issues.');
+            } else {
+              core.info(`🎉 Successfully created ${createdCount} issues from roadmap!`);
+            }

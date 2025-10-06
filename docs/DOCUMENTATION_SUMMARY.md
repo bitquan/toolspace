@@ -25,6 +25,11 @@ This directory contains all documentation for the Toolspace project.
 - `tools/text_tools.md` - Text Tools documentation
 - `tools/file_merger.md` - File Merger tool documentation
 
+### Roadmap and Planning
+
+- `roadmap/README.md` - Roadmap system documentation and usage guide
+- `roadmap/phase-1.md` - Current phase roadmap with auto-issue generation
+
 ## Contributing to Documentation
 
 - Keep documentation up-to-date with code changes
