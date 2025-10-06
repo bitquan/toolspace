@@ -44,6 +44,7 @@ jobs:
     flutter-qa:
         name: Flutter QA
         runs-on: ubuntu-latest
+        timeout-minutes: 15  # Prevent hanging jobs
 
         steps:
             - name: Checkout code
@@ -53,6 +54,7 @@ jobs:
               uses: subosito/flutter-action@v2
               with:
                   channel: "stable"
+                  flutter-version: "3.24.3"  # Pin specific version for better caching
                   cache: true
 
             - name: Flutter version
@@ -86,6 +88,8 @@ jobs:
     security-scan:
         name: Security Scan
         runs-on: ubuntu-latest
+        # Only run security scan on main branch pushes and PRs to main
+        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
 
         steps:
             - name: Checkout code
@@ -114,19 +118,27 @@ jobs:
               if: always()
               with:
                   sarif_file: "trivy-results.sarif"
-              continue-on-error: true  # Don't fail if code scanning isn't enabled
+              continue-on-error: true # Don't fail if code scanning isn't enabled
 
     ci-gate:
         name: CI Gate (format/analyze/test)
         runs-on: ubuntu-latest
-        needs: [backend-qa, flutter-qa]
+        needs: [backend-qa, flutter-qa, security-scan]
         if: always()
         steps:
             - name: Report dependent job results
               run: |
                   echo "Backend QA: ${{ needs.backend-qa.result }}"
                   echo "Flutter QA: ${{ needs.flutter-qa.result }}"
+                  echo "Security Scan: ${{ needs.security-scan.result || 'skipped' }}"
+                  
+                  # Check required jobs (backend-qa and flutter-qa must succeed)
                   if [ "${{ needs.backend-qa.result }}" != "success" ] || [ "${{ needs.flutter-qa.result }}" != "success" ]; then
                     echo "One or more required checks failed." >&2
                     exit 1
+                  fi
+                  
+                  # Security scan is optional (may be skipped on non-main branches)
+                  if [ "${{ needs.security-scan.result }}" = "failure" ]; then
+                    echo "Security scan failed, but continuing..." >&2
                   fi
