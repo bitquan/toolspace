@@ -150,7 +150,11 @@ class _TextToolsScreenState extends State<TextToolsScreen>
           if (result.isValid) {
             _outputController.text = 'Valid JSON ✓';
           } else {
-            _outputController.text = 'Invalid JSON ✗\n${result.error}';
+            final errorMsg = StringBuffer('Invalid JSON ✗\n${result.error}');
+            if (result.errorLine != null && result.errorColumn != null) {
+              errorMsg.write('\n\nError at Line ${result.errorLine}, Column ${result.errorColumn}');
+            }
+            _outputController.text = errorMsg.toString();
           }
         }),
         _buildActionButton('Pretty Print (2 spaces)', () {
