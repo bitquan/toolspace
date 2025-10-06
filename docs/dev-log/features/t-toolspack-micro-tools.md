@@ -28,11 +28,14 @@ October 6, 2025
 - **Purpose**: Compare texts with highlighted differences
 - **Features**:
   - Line-by-line text comparison
+  - **Word-level text comparison** ✨ NEW
+  - **Three-way merge with conflict detection** ✨ NEW
   - Visual highlighting of additions/deletions
   - Statistics panel (additions, deletions, similarity percentage)
   - Swap texts functionality
   - Copy diff results
   - Animated transitions
+  - Tabbed interface for different comparison modes
 
 ### 3. QR Maker
 
@@ -125,19 +128,30 @@ class ToolScreen extends StatefulWidget {
 
 ### Text Diff
 
-#### Comparison Algorithm
+#### Comparison Algorithms
 
-- Line-by-line difference detection
-- Simple but effective algorithm
-- Statistical analysis
+- **Line-by-line difference detection**: Simple and effective for document comparison
+- **Word-level difference detection**: Powered by longest common subsequence (LCS) algorithm
+- **Three-way merge algorithm**: Compares base, left, and right versions with conflict detection
+- Statistical analysis for all modes
 - Performance optimized for large texts
 
 #### Visualization
 
-- Color-coded differences (green/red)
+- **Line Diff Mode**: Color-coded line additions/deletions (green/red)
+- **Word Diff Mode**: Word-by-word inline highlighting with preserving whitespace
+- **Three-Way Merge Mode**: Base/Left/Right panel layout with conflict markers
 - Side-by-side comparison
 - Unified diff view
-- Statistical summary
+- Statistical summary for each mode
+
+#### Advanced Features
+
+- **Multiple Comparison Modes**: Tabbed interface for switching between line, word, and merge views
+- **Three-Way Merge**: Enter base text, left version, and right version to detect conflicts
+- **Conflict Detection**: Automatic identification of conflicting changes
+- **Merge Preview**: Shows merged result with conflict markers (Git-style)
+- **Word-Level Precision**: Detects insertions, deletions, and unchanged words
 
 #### Utility Features
 
@@ -145,6 +159,7 @@ class ToolScreen extends StatefulWidget {
 - Copy diff results
 - Clear all data
 - Responsive layout
+- Real-time comparison updates
 
 ### QR Maker
 
@@ -234,10 +249,10 @@ class ToolScreen extends StatefulWidget {
    - JSONPath queries
    - Bulk processing
 
-2. **Text Diff Advanced**
+2. **Text Diff Advanced** ✅
 
-   - Word-level diffing
-   - Three-way merge
+   - Word-level diffing ✅
+   - Three-way merge ✅
    - File comparison
 
 3. **QR Maker Plus**
@@ -252,9 +267,34 @@ class ToolScreen extends StatefulWidget {
 - **Collaboration**: Share tool results with others
 - **API Integration**: Connect with external services
 
+## Testing
+
+### Text Diff Test Coverage
+
+- **File**: `test/tools/text_diff_test.dart`
+- **Coverage**:
+  - Word splitting with whitespace preservation
+  - Word-level diff computation (insertions, deletions, replacements)
+  - Three-way merge algorithm
+  - Conflict detection
+  - Statistics calculation
+  - Edge cases (empty text, long text, special characters, Unicode)
+  - Model classes (WordDiff, WordDiffStats, ThreeWayMergeResult, MergeConflict)
+
+### Test Groups
+
+1. **Word Splitting Tests**: Validates text tokenization with whitespace handling
+2. **Word Diff Tests**: Verifies diff computation accuracy
+3. **Statistics Tests**: Ensures correct metrics calculation
+4. **Three-Way Merge Tests**: Tests merge logic and conflict detection
+5. **Edge Cases**: Handles special scenarios and corner cases
+6. **Model Tests**: Validates data structures
+
 ## Status
 
 COMPLETE - All three tools implemented with full functionality and playful theme integration
+
+**Text Diff v2 Enhancement**: ✅ Word-level diffing and three-way merge implemented with comprehensive test coverage
 
 ## Related Tasks
 
