@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/regex_tester/regex_tester_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -138,6 +139,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'regex-tester',
+      name: 'Regex Tester',
+      description: 'Test regex patterns with live match highlighting and capture groups',
+      icon: Icons.code,
+      screen: const RegexTesterScreen(),
+      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
     ),
   ];
 }
