@@ -149,7 +149,7 @@ class CsvProcessor {
       result = CsvProcessor.lowercaseHeaders(result);
     }
 
-    if (dedupeKeyColumn != null || dedupeKeyColumn == -1) {
+    if (dedupeKeyColumn != null) {
       // -1 means dedupe by entire row
       result = removeDuplicates(
         result,
