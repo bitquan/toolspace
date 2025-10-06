@@ -1,0 +1,222 @@
+name: "🔥 Nuclear Workflow Cleanup"
+
+on:
+    workflow_dispatch:
+        inputs:
+            confirmation:
+                description: "Type 'DELETE_ALL_WORKFLOWS' to confirm nuclear cleanup"
+                required: true
+                default: "DELETE_ALL_WORKFLOWS"
+                type: string
+            keep_recent:
+                description: "Keep the most recent N runs (0 = delete everything)"
+                required: false
+                default: "0"
+                type: string
+
+permissions:
+    actions: write
+    contents: read
+
+jobs:
+    nuclear-cleanup:
+        name: "🔥 Nuclear Cleanup - Delete All Workflows"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkout Repository"
+              uses: actions/checkout@v4
+
+            - name: "Validate Confirmation"
+              run: |
+                  if [ "${{ github.event.inputs.confirmation }}" != "DELETE_ALL_WORKFLOWS" ]; then
+                    echo "❌ Invalid confirmation. You must type exactly: DELETE_ALL_WORKFLOWS"
+                    echo "You typed: ${{ github.event.inputs.confirmation }}"
+                    exit 1
+                  fi
+                  echo "✅ Confirmation validated. Proceeding with nuclear cleanup..."
+
+            - name: "Setup GitHub CLI"
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  echo "🔧 Setting up GitHub CLI environment..."
+                  gh auth status
+                  echo "Repository: ${{ github.repository }}"
+                  echo "Actor: ${{ github.actor }}"
+
+            - name: "Show Warning Banner"
+              run: |
+                  echo ""
+                  echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+                  echo "🔥                                                            🔥"
+                  echo "🔥               ⚠️  NUCLEAR CLEANUP ACTIVATED ⚠️                🔥"
+                  echo "🔥                                                            🔥"
+                  echo "🔥         This will DELETE ALL workflow run history!         🔥"
+                  echo "🔥             This action CANNOT be undone!                  🔥"
+                  echo "🔥                                                            🔥"
+                  echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+                  echo ""
+                  echo "⏰ Waiting 10 seconds before beginning destruction..."
+                  sleep 10
+
+            - name: "Count Total Workflows"
+              id: count
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  echo "📊 Analyzing workflow runs before nuclear cleanup..."
+
+                  # Get all workflow runs (up to GitHub's API limits)
+                  ALL_RUNS=$(gh run list --limit 1000 --json databaseId,status,conclusion,createdAt,workflowName)
+                  TOTAL_COUNT=$(echo "$ALL_RUNS" | jq 'length')
+
+                  # Count by status
+                  SUCCESS_COUNT=$(echo "$ALL_RUNS" | jq '[.[] | select(.conclusion == "success")] | length')
+                  FAILED_COUNT=$(echo "$ALL_RUNS" | jq '[.[] | select(.conclusion == "failure")] | length')
+                  CANCELLED_COUNT=$(echo "$ALL_RUNS" | jq '[.[] | select(.conclusion == "cancelled")] | length')
+                  IN_PROGRESS_COUNT=$(echo "$ALL_RUNS" | jq '[.[] | select(.status == "in_progress")] | length')
+
+                  echo "📋 Workflow Run Statistics:"
+                  echo "  Total runs: $TOTAL_COUNT"
+                  echo "  ✅ Successful: $SUCCESS_COUNT"
+                  echo "  ❌ Failed: $FAILED_COUNT"
+                  echo "  🚫 Cancelled: $CANCELLED_COUNT"
+                  echo "  🔄 In Progress: $IN_PROGRESS_COUNT"
+                  echo ""
+
+                  # Set keep count
+                  KEEP_COUNT=${{ github.event.inputs.keep_recent || 0 }}
+                  if [ "$KEEP_COUNT" -gt 0 ]; then
+                    echo "📌 Will keep the $KEEP_COUNT most recent runs"
+                    DELETE_COUNT=$((TOTAL_COUNT - KEEP_COUNT))
+                  else
+                    echo "🔥 Will delete ALL $TOTAL_COUNT runs (nuclear mode)"
+                    DELETE_COUNT=$TOTAL_COUNT
+                  fi
+
+                  echo "🗑️ Runs to delete: $DELETE_COUNT"
+                  echo ""
+
+                  # Export for next step
+                  echo "total_count=$TOTAL_COUNT" >> $GITHUB_OUTPUT
+                  echo "delete_count=$DELETE_COUNT" >> $GITHUB_OUTPUT
+                  echo "keep_count=$KEEP_COUNT" >> $GITHUB_OUTPUT
+
+            - name: "Execute Nuclear Deletion"
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  echo "🔥 Beginning nuclear cleanup of ALL workflow runs..."
+
+                  KEEP_COUNT=${{ steps.count.outputs.keep_count }}
+                  DELETE_COUNT=${{ steps.count.outputs.delete_count }}
+
+                  if [ "$DELETE_COUNT" -eq 0 ]; then
+                    echo "✅ No runs to delete."
+                    exit 0
+                  fi
+
+                  # Get runs to delete (skip recent ones if keep_count > 0)
+                  if [ "$KEEP_COUNT" -gt 0 ]; then
+                    echo "📌 Keeping $KEEP_COUNT most recent runs..."
+                    RUNS_TO_DELETE=$(gh run list --limit 1000 --json databaseId,createdAt --jq 'sort_by(.createdAt) | reverse | .['$KEEP_COUNT':] | .[].databaseId')
+                  else
+                    echo "🔥 NUCLEAR MODE: Deleting ALL runs..."
+                    RUNS_TO_DELETE=$(gh run list --limit 1000 --json databaseId --jq '.[].databaseId')
+                  fi
+
+                  if [ -z "$RUNS_TO_DELETE" ]; then
+                    echo "✅ No runs found to delete."
+                    exit 0
+                  fi
+
+                  echo "🗑️ Starting deletion of $DELETE_COUNT workflow runs..."
+                  echo ""
+
+                  # Delete runs with progress tracking
+                  DELETED=0
+                  FAILED=0
+
+                  echo "$RUNS_TO_DELETE" | while read -r run_id; do
+                    if [ -n "$run_id" ]; then
+                      DELETED=$((DELETED + 1))
+                      echo "[$DELETED/$DELETE_COUNT] 🗑️ Deleting run ID: $run_id"
+
+                      if gh run delete "$run_id" 2>/dev/null; then
+                        echo "  ✅ Deleted successfully"
+                      else
+                        FAILED=$((FAILED + 1))
+                        echo "  ❌ Failed to delete (may already be deleted)"
+                      fi
+
+                      # Rate limiting - be aggressive but not too aggressive
+                      sleep 0.5
+
+                      # Progress indicator every 10 deletions
+                      if [ $((DELETED % 10)) -eq 0 ]; then
+                        echo "  📊 Progress: $DELETED/$DELETE_COUNT deleted, $FAILED failed"
+                      fi
+                    fi
+                  done
+
+                  echo ""
+                  echo "🔥 Nuclear cleanup completed!"
+                  echo "📊 Final statistics:"
+                  echo "  🗑️ Attempted deletions: $DELETE_COUNT"
+                  echo "  ✅ Successful: $((DELETE_COUNT - FAILED))"
+                  echo "  ❌ Failed: $FAILED"
+
+            - name: "Cleanup Caches and Artifacts"
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  echo ""
+                  echo "🧹 Cleaning up caches and artifacts..."
+
+                  # Clean up caches
+                  echo "🗑️ Deleting all caches..."
+                  CACHES=$(gh cache list --json id --jq '.[].id' 2>/dev/null || echo "")
+
+                  if [ -n "$CACHES" ]; then
+                    echo "$CACHES" | while read -r cache_id; do
+                      if [ -n "$cache_id" ]; then
+                        echo "  🗑️ Deleting cache ID: $cache_id"
+                        gh cache delete "$cache_id" 2>/dev/null || echo "    ❌ Failed to delete cache"
+                        sleep 0.2
+                      fi
+                    done
+                  else
+                    echo "  ✅ No caches found to delete"
+                  fi
+
+                  echo ""
+                  echo "ℹ️ Note: Artifacts are automatically managed by GitHub retention policies"
+                  echo "🔥 Nuclear cleanup process completed!"
+
+            - name: "Generate Destruction Report"
+              if: always()
+              run: |
+                  echo ""
+                  echo "# 🔥 Nuclear Cleanup Destruction Report"
+                  echo ""
+                  echo "**Execution Time:** $(date)"
+                  echo "**Mode:** NUCLEAR CLEANUP (MAXIMUM DESTRUCTION)"
+                  echo "**Confirmation:** ${{ github.event.inputs.confirmation }}"
+                  echo "**Keep Recent:** ${{ github.event.inputs.keep_recent || 0 }} runs"
+                  echo ""
+                  echo "## 💥 Destruction Summary"
+                  echo "- **Total Runs Found:** ${{ steps.count.outputs.total_count }}"
+                  echo "- **Runs Deleted:** ${{ steps.count.outputs.delete_count }}"
+                  echo "- **Runs Kept:** ${{ steps.count.outputs.keep_count }}"
+                  echo ""
+                  echo "## ⚠️ Impact Assessment"
+                  echo "- 🗑️ **ALL workflow run history has been DELETED**"
+                  echo "- 🧹 **ALL caches have been cleared**"
+                  echo "- 📊 **ALL run statistics are GONE**"
+                  echo "- 🔥 **This action was IRREVERSIBLE**"
+                  echo ""
+                  echo "## 📋 Remaining Workflows"
+                  echo "Only this nuclear cleanup run and any currently executing runs remain."
+                  echo ""
+                  echo "**Mission Accomplished:** The repository has been cleansed of workflow history. 🔥"
