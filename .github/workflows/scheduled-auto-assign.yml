@@ -1,0 +1,81 @@
+name: "Scheduled Auto-Assignment Check"
+
+on:
+    schedule:
+        # Run every 2 hours to catch any missed issues
+        - cron: "0 */2 * * *"
+    workflow_dispatch:
+        inputs:
+            max_age_hours:
+                description: "Hours to look back for unassigned issues"
+                required: false
+                default: "6"
+                type: string
+            dry_run:
+                description: "Run in dry-run mode (preview only)"
+                required: false
+                default: "false"
+                type: choice
+                options:
+                    - "true"
+                    - "false"
+
+jobs:
+    scheduled-check:
+        name: "Check for Unassigned Issues"
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkout Repository"
+              uses: actions/checkout@v4
+
+            - name: "Setup Node.js"
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18"
+                  cache: "npm"
+
+            - name: "Install Dependencies"
+              run: npm ci
+
+            - name: "Check for Unassigned Issues"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_REPOSITORY: ${{ github.repository }}
+              run: |
+                  echo "INFO: Scheduled auto-assignment check"
+                  echo "INFO: Checking issues from the last ${{ github.event.inputs.max_age_hours || '6' }} hours"
+
+                  # Determine max age - use input or default to 6 hours
+                  MAX_AGE="${{ github.event.inputs.max_age_hours || '6' }}"
+
+                  # Build command
+                  CMD="node scripts/auto-assign-new-issues.mjs --max-age=${MAX_AGE}"
+
+                  # Add dry-run if specified
+                  if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+                    CMD="$CMD --dry-run"
+                    echo "INFO: Running in dry-run mode"
+                  fi
+
+                  echo "INFO: Executing: $CMD"
+                  $CMD
+
+            - name: "Upload Assignment Logs"
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: scheduled-assignment-logs-${{ github.run_number }}
+                  path: logs/
+                  retention-days: 7
+
+            - name: "Report Summary"
+              if: always()
+              run: |
+                  echo "INFO: Scheduled check completed"
+                  echo "INFO: Check the logs for details on processed issues"
+
+                  if [ -f "logs/auto-assignments.log" ]; then
+                    echo "INFO: Assignment activity:"
+                    tail -n 10 logs/auto-assignments.log || echo "No recent assignments"
+                  fi
