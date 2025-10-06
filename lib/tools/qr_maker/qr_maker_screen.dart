@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'logic/batch_generator.dart';
 import 'widgets/batch_panel.dart';
 import 'widgets/batch_results.dart';
+import 'widgets/logo_selector.dart';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {
@@ -24,6 +25,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   int _qrSize = 200;
   Color _foregroundColor = Colors.black;
   Color _backgroundColor = Colors.white;
+  String? _selectedLogoPath;
+  double _logoSize = 20.0;
   bool _isGenerating = false;
   bool _isBatchMode = false;
   BatchResult? _batchResult;
@@ -111,6 +114,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       qrSize: _qrSize,
       foregroundColor: '#${_foregroundColor.value.toRadixString(16).substring(2)}',
       backgroundColor: '#${_backgroundColor.value.toRadixString(16).substring(2)}',
+      logoPath: _selectedLogoPath,
+      logoSize: _logoSize,
     );
 
     final result = await BatchQrGenerator.generateBatch(items, config);
@@ -228,13 +233,55 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         ),
                       ),
                     ),
-                    child: BatchPanel(
-                      onGenerate: _generateBatch,
-                      config: BatchConfig(
-                        qrSize: _qrSize,
-                        foregroundColor: '#${_foregroundColor.value.toRadixString(16).substring(2)}',
-                        backgroundColor: '#${_backgroundColor.value.toRadixString(16).substring(2)}',
-                      ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: BatchPanel(
+                            onGenerate: _generateBatch,
+                            config: BatchConfig(
+                              qrSize: _qrSize,
+                              foregroundColor: '#${_foregroundColor.value.toRadixString(16).substring(2)}',
+                              backgroundColor: '#${_backgroundColor.value.toRadixString(16).substring(2)}',
+                              logoPath: _selectedLogoPath,
+                              logoSize: _logoSize,
+                            ),
+                          ),
+                        ),
+                        // Batch customization section
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: theme.colorScheme.outline.withOpacity(0.3),
+                              ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Batch Settings',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text('Size: ${_qrSize}px'),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                        'Logo: ${_selectedLogoPath ?? 'None'}'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -439,6 +486,24 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         ),
                       ],
                     ),
+
+                    const SizedBox(height: 24),
+
+                    // Logo selection
+                    LogoSelector(
+                      selectedLogoPath: _selectedLogoPath,
+                      logoSize: _logoSize,
+                      onLogoChanged: (path) {
+                        setState(() {
+                          _selectedLogoPath = path;
+                        });
+                      },
+                      onLogoSizeChanged: (size) {
+                        setState(() {
+                          _logoSize = size;
+                        });
+                      },
+                    ),
                   ],
                 ),
                       ),
@@ -544,6 +609,27 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                                     Text('${_qrSize}x$_qrSize px'),
                                   ],
                                 ),
+                                if (_selectedLogoPath != null) ...[
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text('Logo:'),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.check_circle,
+                                            size: 12,
+                                            color: Colors.green,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(_selectedLogoPath!),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ],
                             ),
                           ),
