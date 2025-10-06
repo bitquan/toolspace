@@ -84,6 +84,45 @@ void main() {
       expect(result.error, isNotEmpty);
     });
 
+    test('validateJson provides line and column for single-line error', () {
+      final result = JsonTools.validateJson('{"name": test}');
+      expect(result.isValid, false);
+      expect(result.errorLine, isNotNull);
+      expect(result.errorColumn, isNotNull);
+    });
+
+    test('validateJson provides correct line number for multi-line error', () {
+      final input = '{\n  "name": "value",\n  "bad": test\n}';
+      final result = JsonTools.validateJson(input);
+      expect(result.isValid, false);
+      expect(result.errorLine, 3); // Error on line 3
+      expect(result.errorColumn, isNotNull);
+    });
+
+    test('validateJson handles error at end of multi-line JSON', () {
+      final input = '{\n  "name": "value",\n  "key": "unclosed';
+      final result = JsonTools.validateJson(input);
+      expect(result.isValid, false);
+      expect(result.errorLine, isNotNull);
+      expect(result.errorColumn, isNotNull);
+    });
+
+    test('validateJson handles empty string', () {
+      final result = JsonTools.validateJson('');
+      expect(result.isValid, false);
+      expect(result.error, 'JSON string is empty');
+      expect(result.errorLine, 1);
+      expect(result.errorColumn, 1);
+    });
+
+    test('validateJson handles whitespace-only string', () {
+      final result = JsonTools.validateJson('   \n  \n  ');
+      expect(result.isValid, false);
+      expect(result.error, 'JSON string is empty');
+      expect(result.errorLine, 1);
+      expect(result.errorColumn, 1);
+    });
+
     test('prettyPrint formats JSON correctly', () {
       final input = '{"name":"test","value":123}';
       final result = JsonTools.prettyPrint(input, indent: 2);
