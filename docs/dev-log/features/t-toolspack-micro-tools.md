@@ -173,6 +173,35 @@ class ToolScreen extends StatefulWidget {
 - Share functionality
 - Multiple format support
 
+#### Batch Generation Features (v2)
+
+**Input Formats**:
+- CSV format: `content,filename` (one per line)
+- JSON format: Array of objects `[{"content":"...", "filename":"..."}]` or simple strings
+- Auto-detection and parsing with validation
+
+**Batch Processing**:
+- Real-time input validation
+- Error detection and reporting
+- Progress tracking during generation
+- Success rate calculation
+
+**Batch Results**:
+- Statistics dashboard (success count, errors, processing time)
+- Success rate visualization with progress bar
+- Individual item status listing
+- Detailed error messages with explanations
+
+**Batch Export**:
+- Download all QR codes as ZIP archive
+- Individual QR code naming based on input
+- Maintains configuration across batch
+
+**Mode Toggle**:
+- Easy switch between single and batch mode
+- Preserved customization settings
+- Separate UI for optimal workflows
+
 ## Integration with Playful Theme
 
 ### Visual Consistency
@@ -240,10 +269,13 @@ class ToolScreen extends StatefulWidget {
    - Three-way merge
    - File comparison
 
-3. **QR Maker Plus**
-   - Batch generation
-   - Logo embedding
-   - Advanced styling
+3. **QR Maker Plus** ✅ IMPLEMENTED
+   - ✅ Batch generation (CSV/JSON input)
+   - ✅ Batch processing with validation
+   - ✅ Batch results with statistics
+   - ✅ Download all QR codes
+   - 🔄 Logo embedding (infrastructure ready)
+   - 🔄 Advanced styling (infrastructure ready)
 
 ### Integration Opportunities
 

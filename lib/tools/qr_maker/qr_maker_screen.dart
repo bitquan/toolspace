@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'logic/batch_generator.dart';
+import 'widgets/batch_panel.dart';
+import 'widgets/batch_results.dart';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {
@@ -22,6 +25,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   Color _foregroundColor = Colors.black;
   Color _backgroundColor = Colors.white;
   bool _isGenerating = false;
+  bool _isBatchMode = false;
+  BatchResult? _batchResult;
 
   @override
   void initState() {
@@ -86,7 +91,47 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     _textController.clear();
     setState(() {
       _qrData = '';
+      _batchResult = null;
     });
+  }
+
+  void _toggleBatchMode() {
+    setState(() {
+      _isBatchMode = !_isBatchMode;
+      _batchResult = null;
+    });
+  }
+
+  Future<void> _generateBatch(List<QrBatchItem> items) async {
+    setState(() {
+      _isGenerating = true;
+    });
+
+    final config = BatchConfig(
+      qrSize: _qrSize,
+      foregroundColor: '#${_foregroundColor.value.toRadixString(16).substring(2)}',
+      backgroundColor: '#${_backgroundColor.value.toRadixString(16).substring(2)}',
+    );
+
+    final result = await BatchQrGenerator.generateBatch(items, config);
+
+    setState(() {
+      _isGenerating = false;
+      _batchResult = result;
+    });
+  }
+
+  void _downloadAllQrCodes() {
+    if (_batchResult == null || _batchResult!.successful.isEmpty) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            'Downloading ${_batchResult!.successful.length} QR codes...'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   void _useQuickTemplate(String template) {
@@ -137,39 +182,126 @@ class _QrMakerScreenState extends State<QrMakerScreen>
           ],
         ),
         actions: [
+          // Batch mode toggle
           IconButton(
-            onPressed: _clearData,
-            icon: const Icon(Icons.clear_all),
-            tooltip: 'Clear All',
+            onPressed: _toggleBatchMode,
+            icon: Icon(_isBatchMode ? Icons.grid_view : Icons.qr_code_2),
+            tooltip: _isBatchMode ? 'Single Mode' : 'Batch Mode',
+            style: IconButton.styleFrom(
+              backgroundColor: _isBatchMode
+                  ? const Color(0xFFFF5722).withOpacity(0.2)
+                  : null,
+              foregroundColor:
+                  _isBatchMode ? const Color(0xFFFF5722) : null,
+            ),
           ),
-          IconButton(
-            onPressed: _copyQrData,
-            icon: const Icon(Icons.copy),
-            tooltip: 'Copy Data',
-          ),
-          IconButton(
-            onPressed: _downloadQr,
-            icon: const Icon(Icons.download),
-            tooltip: 'Download QR',
-          ),
+          if (!_isBatchMode) ...[
+            IconButton(
+              onPressed: _clearData,
+              icon: const Icon(Icons.clear_all),
+              tooltip: 'Clear All',
+            ),
+            IconButton(
+              onPressed: _copyQrData,
+              icon: const Icon(Icons.copy),
+              tooltip: 'Copy Data',
+            ),
+            IconButton(
+              onPressed: _downloadQr,
+              icon: const Icon(Icons.download),
+              tooltip: 'Download QR',
+            ),
+          ],
         ],
       ),
-      body: Row(
-        children: [
-          // Input panel
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  right: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+      body: _isBatchMode
+          ? Row(
+              children: [
+                // Batch input panel
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: theme.colorScheme.outline.withOpacity(0.3),
+                        ),
+                      ),
+                    ),
+                    child: BatchPanel(
+                      onGenerate: _generateBatch,
+                      config: BatchConfig(
+                        qrSize: _qrSize,
+                        foregroundColor: '#${_foregroundColor.value.toRadixString(16).substring(2)}',
+                        backgroundColor: '#${_backgroundColor.value.toRadixString(16).substring(2)}',
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
+
+                // Batch results panel
+                Expanded(
+                  flex: 1,
+                  child: _isGenerating
+                      ? const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text('Generating QR codes...'),
+                            ],
+                          ),
+                        )
+                      : _batchResult != null
+                          ? BatchResults(
+                              result: _batchResult!,
+                              onDownloadAll: _downloadAllQrCodes,
+                              onClose: () {
+                                setState(() {
+                                  _batchResult = null;
+                                });
+                              },
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.qr_code_scanner,
+                                    size: 64,
+                                    color: theme.colorScheme.outline,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Enter batch data and generate',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                // Input panel (single mode)
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: theme.colorScheme.outline.withOpacity(0.3),
+                        ),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // QR Type selector
@@ -309,112 +441,118 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-
-          // QR Preview panel
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text(
-                    'QR Code Preview',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                ),
 
-                  Expanded(
-                    child: Center(
-                      child: _isGenerating
-                          ? const CircularProgressIndicator()
-                          : _qrData.isEmpty
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                // QR Preview panel (single mode)
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'QR Code Preview',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        Expanded(
+                          child: Center(
+                            child: _isGenerating
+                                ? const CircularProgressIndicator()
+                                : _qrData.isEmpty
+                                    ? Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.qr_code_2,
+                                            size: 64,
+                                            color: theme.colorScheme.outline,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Text(
+                                            'Enter content to generate QR code',
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                              color: theme.colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      )
+                                    : AnimatedBuilder(
+                                        animation: _bounceAnimation,
+                                        builder: (context, child) {
+                                          return Transform.scale(
+                                            scale: _bounceAnimation.value,
+                                            child: _QrCodePreview(
+                                              data: _qrData,
+                                              size: _qrSize.toDouble(),
+                                              foregroundColor: _foregroundColor,
+                                              backgroundColor:
+                                                  _backgroundColor,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Generation info
+                        if (_qrData.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(
-                                      Icons.qr_code_2,
-                                      size: 64,
-                                      color: theme.colorScheme.outline,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Enter content to generate QR code',
-                                      style:
-                                          theme.textTheme.bodyMedium?.copyWith(
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
+                                    const Text('Characters:'),
+                                    Text('${_qrData.length}'),
                                   ],
-                                )
-                              : AnimatedBuilder(
-                                  animation: _bounceAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _bounceAnimation.value,
-                                      child: _QrCodePreview(
-                                        data: _qrData,
-                                        size: _qrSize.toDouble(),
-                                        foregroundColor: _foregroundColor,
-                                        backgroundColor: _backgroundColor,
-                                      ),
-                                    );
-                                  },
                                 ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Type:'),
+                                    Text(_getTypeLabel(_selectedType)),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text('Size:'),
+                                    Text('${_qrSize}x$_qrSize px'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Generation info
-                  if (_qrData.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Characters:'),
-                              Text('${_qrData.length}'),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Type:'),
-                              Text(_getTypeLabel(_selectedType)),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Size:'),
-                              Text('${_qrSize}x$_qrSize px'),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
