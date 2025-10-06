@@ -28,12 +28,10 @@
     "firebase-admin": "^12.7.0",
     "firebase-functions": "^5.1.1",
     "marked": "^16.3.0",
+    "nanoid": "^5.0.0",
     "pdf-merger-js": "^5.1.0",
-<<<<<<< HEAD
     "puppeteer": "^24.23.0",
-=======
     "sharp": "^0.33.5",
->>>>>>> origin/main
     "uuid": "^10.0.0"
   }
 }
