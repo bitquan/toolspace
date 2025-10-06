@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/regex_tester/regex_tester_screen.dart';
 import '../tools/id_gen/id_gen_screen.dart';
 import '../tools/palette_extractor/palette_extractor_screen.dart';
 import '../tools/md_to_pdf/md_to_pdf_screen.dart';
@@ -147,6 +148,14 @@ class HomeScreen extends StatelessWidget {
       color: PlayfulTheme.toolColors[4],
     ),
     ToolItem(
+      id: 'regex-tester',
+      name: 'Regex Tester',
+      description: 'Test regex patterns with live match highlighting and capture groups',
+      icon: Icons.code,
+      screen: const RegexTesterScreen(),
+      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
+    ),
+    ToolItem(
       id: 'id-gen',
       name: 'ID Generator',
       description: 'Generate UUIDs (v4, v7) and NanoIDs with batch support',
@@ -160,7 +169,7 @@ class HomeScreen extends StatelessWidget {
       description: 'Extract dominant colors from images using k-means clustering',
       icon: Icons.palette,
       screen: const PaletteExtractorScreen(),
-      color: PlayfulTheme.toolColors[5],
+      color: PlayfulTheme.toolColors[9 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'md-to-pdf',
@@ -168,7 +177,7 @@ class HomeScreen extends StatelessWidget {
       description: 'Convert markdown to PDF with themes and custom settings',
       icon: Icons.picture_as_pdf,
       screen: const MdToPdfScreen(),
-      color: PlayfulTheme.toolColors[0],
+      color: PlayfulTheme.toolColors[10 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'csv-cleaner',
