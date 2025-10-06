@@ -25,24 +25,20 @@ class SchemaValidationResult {
   final bool isValid;
   final List<SchemaValidationError> errors;
 
-  const SchemaValidationResult({
-    required this.isValid,
-    required this.errors,
-  });
+  const SchemaValidationResult({required this.isValid, required this.errors});
 }
 
 /// Simple JSON Schema validator
 class SchemaValidator {
   /// Validate JSON data against a schema
   static SchemaValidationResult validate(
-      dynamic data, Map<String, dynamic> schema) {
+    dynamic data,
+    Map<String, dynamic> schema,
+  ) {
     final errors = <SchemaValidationError>[];
     _validateNode(data, schema, '', errors);
 
-    return SchemaValidationResult(
-      isValid: errors.isEmpty,
-      errors: errors,
-    );
+    return SchemaValidationResult(isValid: errors.isEmpty, errors: errors);
   }
 
   static void _validateNode(
@@ -58,13 +54,15 @@ class SchemaValidator {
     if (expectedType != null) {
       final actualType = _getJsonType(data);
       if (actualType != expectedType) {
-        errors.add(SchemaValidationError(
-          path: path.isEmpty ? 'root' : path,
-          message: 'Type mismatch',
-          expectedType: expectedType,
-          actualType: actualType,
-          actualValue: data,
-        ));
+        errors.add(
+          SchemaValidationError(
+            path: path.isEmpty ? 'root' : path,
+            message: 'Type mismatch',
+            expectedType: expectedType,
+            actualType: actualType,
+            actualValue: data,
+          ),
+        );
         return; // Skip further validation if type is wrong
       }
     }
@@ -74,13 +72,15 @@ class SchemaValidator {
     if (required != null && data is Map<String, dynamic>) {
       for (final prop in required) {
         if (!data.containsKey(prop)) {
-          errors.add(SchemaValidationError(
-            path: path.isEmpty ? prop.toString() : '$path.$prop',
-            message: 'Required property missing',
-            expectedType: 'property',
-            actualType: 'missing',
-            actualValue: null,
-          ));
+          errors.add(
+            SchemaValidationError(
+              path: path.isEmpty ? prop.toString() : '$path.$prop',
+              message: 'Required property missing',
+              expectedType: 'property',
+              actualType: 'missing',
+              actualValue: null,
+            ),
+          );
         }
       }
     }
@@ -113,22 +113,26 @@ class SchemaValidator {
     final maxLength = schema['maxLength'] as int?;
     if (data is String) {
       if (minLength != null && data.length < minLength) {
-        errors.add(SchemaValidationError(
-          path: path.isEmpty ? 'root' : path,
-          message: 'String too short',
-          expectedType: 'string(min: $minLength)',
-          actualType: 'string(${data.length})',
-          actualValue: data,
-        ));
+        errors.add(
+          SchemaValidationError(
+            path: path.isEmpty ? 'root' : path,
+            message: 'String too short',
+            expectedType: 'string(min: $minLength)',
+            actualType: 'string(${data.length})',
+            actualValue: data,
+          ),
+        );
       }
       if (maxLength != null && data.length > maxLength) {
-        errors.add(SchemaValidationError(
-          path: path.isEmpty ? 'root' : path,
-          message: 'String too long',
-          expectedType: 'string(max: $maxLength)',
-          actualType: 'string(${data.length})',
-          actualValue: data,
-        ));
+        errors.add(
+          SchemaValidationError(
+            path: path.isEmpty ? 'root' : path,
+            message: 'String too long',
+            expectedType: 'string(max: $maxLength)',
+            actualType: 'string(${data.length})',
+            actualValue: data,
+          ),
+        );
       }
     }
 
@@ -137,35 +141,41 @@ class SchemaValidator {
     final maximum = schema['maximum'] as num?;
     if (data is num) {
       if (minimum != null && data < minimum) {
-        errors.add(SchemaValidationError(
-          path: path.isEmpty ? 'root' : path,
-          message: 'Number below minimum',
-          expectedType: 'number(min: $minimum)',
-          actualType: 'number($data)',
-          actualValue: data,
-        ));
+        errors.add(
+          SchemaValidationError(
+            path: path.isEmpty ? 'root' : path,
+            message: 'Number below minimum',
+            expectedType: 'number(min: $minimum)',
+            actualType: 'number($data)',
+            actualValue: data,
+          ),
+        );
       }
       if (maximum != null && data > maximum) {
-        errors.add(SchemaValidationError(
-          path: path.isEmpty ? 'root' : path,
-          message: 'Number above maximum',
-          expectedType: 'number(max: $maximum)',
-          actualType: 'number($data)',
-          actualValue: data,
-        ));
+        errors.add(
+          SchemaValidationError(
+            path: path.isEmpty ? 'root' : path,
+            message: 'Number above maximum',
+            expectedType: 'number(max: $maximum)',
+            actualType: 'number($data)',
+            actualValue: data,
+          ),
+        );
       }
     }
 
     // Enum validation
     final enumValues = schema['enum'] as List<dynamic>?;
     if (enumValues != null && !enumValues.contains(data)) {
-      errors.add(SchemaValidationError(
-        path: path.isEmpty ? 'root' : path,
-        message: 'Value not in enum',
-        expectedType: 'enum(${enumValues.join(', ')})',
-        actualType: _getJsonType(data),
-        actualValue: data,
-      ));
+      errors.add(
+        SchemaValidationError(
+          path: path.isEmpty ? 'root' : path,
+          message: 'Value not in enum',
+          expectedType: 'enum(${enumValues.join(', ')})',
+          actualType: _getJsonType(data),
+          actualValue: data,
+        ),
+      );
     }
   }
 
@@ -223,11 +233,7 @@ class SchemaValidator {
         required.add(entry.key);
       }
 
-      return {
-        'type': 'object',
-        'properties': properties,
-        'required': required,
-      };
+      return {'type': 'object', 'properties': properties, 'required': required};
     }
 
     return {'type': 'unknown'};

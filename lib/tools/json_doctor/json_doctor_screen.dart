@@ -75,8 +75,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
     try {
       final dynamic jsonData = jsonDecode(input);
-      final String formatted =
-          const JsonEncoder.withIndent('  ').convert(jsonData);
+      final String formatted = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(jsonData);
 
       setState(() {
         _status = JsonDoctorStatus.valid;
@@ -533,8 +534,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                       color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   )
-                                else if (_schemaErrors
-                                    .every((e) => e.message.isEmpty))
+                                else if (_schemaErrors.every(
+                                  (e) => e.message.isEmpty,
+                                ))
                                   Row(
                                     children: [
                                       Icon(
@@ -547,52 +549,53 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                         'Schema validation passed!',
                                         style: theme.textTheme.bodyMedium
                                             ?.copyWith(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                       ),
                                     ],
                                   )
                                 else
-                                  ...(_schemaErrors.map((error) => Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 8),
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: theme
-                                              .colorScheme.errorContainer
-                                              .withOpacity(0.3),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              error.path,
-                                              style: theme.textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                color: theme.colorScheme.error,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              error.message,
-                                              style: theme.textTheme.bodySmall,
-                                            ),
-                                            Text(
-                                              'Expected: ${error.expectedType}, Got: ${error.actualType}',
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                color: theme.colorScheme
-                                                    .onSurfaceVariant,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ))),
+                                  ...(_schemaErrors.map(
+                                    (error) => Container(
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.errorContainer
+                                            .withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            error.path,
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      theme.colorScheme.error,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            error.message,
+                                            style: theme.textTheme.bodySmall,
+                                          ),
+                                          Text(
+                                            'Expected: ${error.expectedType}, Got: ${error.actualType}',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )),
                               ],
                             ),
                           ),
@@ -704,13 +707,15 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                         spacing: 8,
                         runSpacing: 8,
                         children: JsonPathQuery.getExamplePaths()
-                            .map((path) => ActionChip(
-                                  label: Text(path),
-                                  onPressed: () {
-                                    _jsonPathController.text = path;
-                                    _executeJsonPath();
-                                  },
-                                ))
+                            .map(
+                              (path) => ActionChip(
+                                label: Text(path),
+                                onPressed: () {
+                                  _jsonPathController.text = path;
+                                  _executeJsonPath();
+                                },
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
@@ -768,12 +773,13 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
     try {
       final jsonData = jsonDecode(_inputController.text);
       final schema = SchemaValidator.generateSchema(jsonData);
-      _schemaController.text =
-          const JsonEncoder.withIndent('  ').convert(schema);
+      _schemaController.text = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(schema);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid JSON: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Invalid JSON: $e')));
     }
   }
 
@@ -797,9 +803,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -811,8 +817,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
       final result = JsonPathQuery.query(jsonData, path);
 
       if (result.success) {
-        _queryResultController.text =
-            const JsonEncoder.withIndent('  ').convert(result.value);
+        _queryResultController.text = const JsonEncoder.withIndent(
+          '  ',
+        ).convert(result.value);
         setState(() {
           _jsonPathResult = 'Found ${result.matches.length} match(es)';
         });

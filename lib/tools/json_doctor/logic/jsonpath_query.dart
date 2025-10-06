@@ -19,11 +19,7 @@ class JsonPathQuery {
   static JsonPathResult query(dynamic data, String path) {
     try {
       if (path.isEmpty || path == r'$') {
-        return JsonPathResult(
-          success: true,
-          value: data,
-          matches: [data],
-        );
+        return JsonPathResult(success: true, value: data, matches: [data]);
       }
 
       // Remove leading $ if present
@@ -40,10 +36,7 @@ class JsonPathQuery {
         matches: results,
       );
     } catch (e) {
-      return JsonPathResult(
-        success: false,
-        error: e.toString(),
-      );
+      return JsonPathResult(success: false, error: e.toString());
     }
   }
 
