@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/time_convert/time_convert_screen.dart';
 import '../tools/regex_tester/regex_tester_screen.dart';
 import '../tools/id_gen/id_gen_screen.dart';
 import '../tools/palette_extractor/palette_extractor_screen.dart';
@@ -148,6 +149,14 @@ class HomeScreen extends StatelessWidget {
       color: PlayfulTheme.toolColors[4],
     ),
     ToolItem(
+      id: 'time-convert',
+      name: 'Time Converter',
+      description: 'Convert timestamps between formats and parse natural language',
+      icon: Icons.schedule,
+      screen: const TimeConvertScreen(),
+      color: const Color(0xFF9C27B0),
+    ),
+    ToolItem(
       id: 'regex-tester',
       name: 'Regex Tester',
       description: 'Test regex patterns with live match highlighting and capture groups',
@@ -161,7 +170,7 @@ class HomeScreen extends StatelessWidget {
       description: 'Generate UUIDs (v4, v7) and NanoIDs with batch support',
       icon: Icons.fingerprint,
       screen: const IdGenScreen(),
-      color: const Color(0xFF9C27B0),
+      color: PlayfulTheme.toolColors[11 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'palette-extractor',
