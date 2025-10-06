@@ -24,7 +24,7 @@ jobs:
   track-copilot-pr:
     name: "Track Copilot PRs"
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'app/copilot-swe-agent'
+    if: github.event_name == 'pull_request' && (github.event.pull_request.user.login == 'app/copilot-swe-agent' || github.event.pull_request.user.login == 'Copilot')
 
     steps:
       - name: "Checkout Repository"
@@ -113,8 +113,11 @@ jobs:
         run: |
           echo "INFO: Checking for open Copilot PRs"
 
-          # Get all open Copilot PRs
+          # Get all open Copilot PRs (both possible login names)
           COPILOT_PRS=$(gh pr list --author app/copilot-swe-agent --state open --json number,title,reviewDecision,createdAt)
+          if [ -z "$COPILOT_PRS" ] || [ "$COPILOT_PRS" = "[]" ]; then
+            COPILOT_PRS=$(gh pr list --author Copilot --state open --json number,title,reviewDecision,createdAt)
+          fi
 
           if [ -z "$COPILOT_PRS" ] || [ "$COPILOT_PRS" = "[]" ]; then
             echo "✅ No open Copilot PRs found"
