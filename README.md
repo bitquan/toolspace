@@ -37,6 +37,20 @@ npm run qa                   # Run all QA checks (lint + typecheck + test)
 npm run build                # Build TypeScript
 ```
 
+## ✨ Key Features
+
+### Cross-Tool Data Sharing
+
+Share data seamlessly between tools without manual copy-paste:
+- 🔄 Share text, JSON, URLs, and more between tools
+- 📋 One-click import from other tools
+- 📜 History tracking for recent shares
+- 🎯 Type-safe data transfer
+
+Example: Format JSON in JSON Doctor → Share → Generate QR code in QR Maker
+
+[Learn more about cross-tool data sharing](docs/tools/cross-tool-data-sharing.md)
+
 ## 🛠️ Tools
 
 ### Quick Invoice
@@ -52,6 +66,31 @@ Client-side text processing utilities (case conversion, formatting, validation).
 
 - **Status**: 🚧 In Development
 - **Type**: Client-only (Flutter)
+- **Features**: Cross-tool data sharing enabled ✓
+
+### JSON Doctor
+
+JSON validation, formatting, and schema validation tool.
+
+- **Status**: ✅ Available
+- **Type**: Client-only (Flutter)
+- **Features**: Cross-tool data sharing enabled ✓
+
+### Text Diff
+
+Compare texts with line-by-line and word-level differences.
+
+- **Status**: ✅ Available
+- **Type**: Client-only (Flutter)
+- **Features**: Cross-tool data sharing enabled ✓
+
+### QR Maker
+
+Generate QR codes with customization options.
+
+- **Status**: ✅ Available
+- **Type**: Client-only (Flutter)
+- **Features**: Cross-tool data sharing enabled ✓
 
 ### File Merger
 
