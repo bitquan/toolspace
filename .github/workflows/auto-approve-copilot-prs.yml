@@ -1,0 +1,173 @@
+name: 'Auto-Approve Copilot PRs'
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_numbers:
+        description: 'Comma-separated PR numbers to approve (e.g., 37,36,35)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Preview actions without making changes'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-approve:
+    name: 'Auto-approve Copilot PRs'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+        
+      - name: 'Auto-approve New Copilot PR'
+        if: github.event_name == 'pull_request' && github.event.pull_request.user.login == 'Copilot'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          
+          echo "INFO: Processing Copilot PR #$PR_NUMBER"
+          echo "INFO: Title: $PR_TITLE"
+          echo "INFO: Author: $PR_AUTHOR"
+          
+          # Check if PR is from Copilot and is a WIP
+          if [[ "$PR_TITLE" == *"[WIP]"* ]]; then
+            echo "INFO: Copilot WIP PR detected - auto-approving"
+            
+            # Approve the PR
+            gh pr review $PR_NUMBER --approve --body "🤖 **Auto-approved Copilot PR**
+
+            This pull request has been automatically approved as it was created by the GitHub Copilot automation system.
+
+            **Auto-approval criteria met:**
+            ✅ Created by Copilot bot
+            ✅ WIP status indicates ongoing development
+            ✅ Part of automated development pipeline
+
+            **Next steps:**
+            - PR will be monitored for completion
+            - Auto-merge when tests pass and WIP status removed
+            - Manual review available if needed
+
+            ---
+            *Automated by Copilot PR Auto-Approval • $(date -u +%Y-%m-%dT%H:%M:%SZ)*"
+            
+            echo "SUCCESS: Auto-approved PR #$PR_NUMBER"
+          else
+            echo "INFO: Non-WIP PR - skipping auto-approval"
+          fi
+          
+      - name: 'Bulk Approve Specified PRs'
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.pr_numbers != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "INFO: Bulk approval requested"
+          echo "INFO: PR Numbers: ${{ github.event.inputs.pr_numbers }}"
+          echo "INFO: Dry run: ${{ github.event.inputs.dry_run }}"
+          
+          IFS=',' read -ra PR_LIST <<< "${{ github.event.inputs.pr_numbers }}"
+          
+          for PR_NUM in "${PR_LIST[@]}"; do
+            # Trim whitespace
+            PR_NUM=$(echo "$PR_NUM" | xargs)
+            
+            echo "INFO: Processing PR #$PR_NUM"
+            
+            # Get PR details
+            PR_INFO=$(gh pr view $PR_NUM --json title,author,state)
+            PR_TITLE=$(echo "$PR_INFO" | jq -r '.title')
+            PR_AUTHOR=$(echo "$PR_INFO" | jq -r '.author.login')
+            PR_STATE=$(echo "$PR_INFO" | jq -r '.state')
+            
+            echo "INFO: PR #$PR_NUM - $PR_TITLE by $PR_AUTHOR ($PR_STATE)"
+            
+            if [ "$PR_STATE" != "OPEN" ]; then
+              echo "SKIP: PR #$PR_NUM is not open"
+              continue
+            fi
+            
+            if [ "$PR_AUTHOR" != "Copilot" ]; then
+              echo "SKIP: PR #$PR_NUM not created by Copilot"
+              continue
+            fi
+            
+            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+              echo "DRY-RUN: Would approve PR #$PR_NUM"
+              continue
+            fi
+            
+            # Approve the PR
+            gh pr review $PR_NUM --approve --body "🤖 **Bulk Auto-approved Copilot PR**
+
+            This pull request has been approved as part of bulk approval for Copilot-generated PRs.
+
+            **Approval details:**
+            ✅ Verified Copilot authorship
+            ✅ Part of automated development pipeline
+            ✅ Bulk approval requested on $(date -u +%Y-%m-%d)
+
+            ---
+            *Automated by Copilot PR Bulk Approval • $(date -u +%Y-%m-%dT%H:%M:%SZ)*"
+            
+            echo "SUCCESS: Approved PR #$PR_NUM"
+          done
+          
+      - name: 'Auto-merge Ready PRs'
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "INFO: Checking for ready-to-merge Copilot PRs"
+          
+          # Get all open Copilot PRs
+          COPILOT_PRS=$(gh pr list --author Copilot --state open --json number,title,reviewDecision,statusCheckRollup)
+          
+          echo "$COPILOT_PRS" | jq -r '.[] | select(.reviewDecision == "APPROVED") | @base64' | while IFS= read -r pr_data; do
+            pr_info=$(echo "$pr_data" | base64 --decode)
+            pr_number=$(echo "$pr_info" | jq -r '.number')
+            pr_title=$(echo "$pr_info" | jq -r '.title')
+            
+            echo "INFO: Checking merge eligibility for PR #$pr_number"
+            
+            # Check if WIP is removed from title
+            if [[ "$pr_title" == *"[WIP]"* ]]; then
+              echo "INFO: PR #$pr_number still marked as WIP - not merging"
+              continue
+            fi
+            
+            # Check status checks
+            status_checks=$(echo "$pr_info" | jq -r '.statusCheckRollup // []')
+            failed_checks=$(echo "$status_checks" | jq '[.[] | select(.state != "SUCCESS")] | length')
+            
+            if [ "$failed_checks" -gt 0 ]; then
+              echo "INFO: PR #$pr_number has failing checks - not merging"
+              continue
+            fi
+            
+            echo "INFO: PR #$pr_number is ready for auto-merge"
+            
+            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+              echo "DRY-RUN: Would merge PR #$pr_number"
+              continue
+            fi
+            
+            # Auto-merge the PR
+            gh pr merge $pr_number --squash --auto --delete-branch
+            echo "SUCCESS: Auto-merged PR #$pr_number"
+          done

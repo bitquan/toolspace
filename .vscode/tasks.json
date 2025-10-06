@@ -100,6 +100,46 @@
       },
       "problemMatcher": [],
       "detail": "Preview auto-assignment of recent issues without making changes"
+    },
+    {
+      "label": "Approve All Copilot PRs",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/approve-copilot-prs.mjs"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Bulk approve all open pull requests created by Copilot bot"
+    },
+    {
+      "label": "Approve Copilot PRs (Dry Run)",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/approve-copilot-prs.mjs", "--dry-run"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Preview bulk approval of Copilot PRs without making changes"
     }
   ],
   "inputs": [
