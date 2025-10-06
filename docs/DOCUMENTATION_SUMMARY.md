@@ -24,6 +24,7 @@ This directory contains all documentation for the Toolspace project.
 - `tools/quick_invoice.md` - Quick Invoice tool documentation
 - `tools/text_tools.md` - Text Tools documentation
 - `tools/file_merger.md` - File Merger tool documentation
+- `tools/tool_integration.md` - Tool Integration system documentation
 
 ### Roadmap and Planning
 
