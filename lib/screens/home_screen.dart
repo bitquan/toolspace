@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/palette_extractor/palette_extractor_screen.dart';
 import '../tools/md_to_pdf/md_to_pdf_screen.dart';
 import '../tools/csv_cleaner/csv_cleaner_screen.dart';
 import '../tools/image_resizer/image_resizer_screen.dart';
@@ -145,19 +146,28 @@ class HomeScreen extends StatelessWidget {
       color: PlayfulTheme.toolColors[4],
     ),
     ToolItem(
-id: 'md-to-pdf',
+      id: 'palette-extractor',
+      name: 'Palette Extractor',
+      description: 'Extract dominant colors from images using k-means clustering',
+      icon: Icons.palette,
+      screen: const PaletteExtractorScreen(),
+      color: PlayfulTheme.toolColors[5],
+    ),
+    ToolItem(
+      id: 'md-to-pdf',
       name: 'Markdown to PDF',
       description: 'Convert markdown to PDF with themes and custom settings',
       icon: Icons.picture_as_pdf,
       screen: const MdToPdfScreen(),
       color: PlayfulTheme.toolColors[0],
     ),
-id: 'csv-cleaner',
+    ToolItem(
+      id: 'csv-cleaner',
       name: 'CSV Cleaner',
       description: 'Trim, dedupe, normalize CSV files with ease',
       icon: Icons.table_rows,
       screen: const CsvCleanerScreen(),
-      color: PlayfulTheme.toolColors[0],
+      color: PlayfulTheme.toolColors[7 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'image-resizer',
@@ -173,7 +183,7 @@ id: 'csv-cleaner',
       description: 'Generate secure passwords with entropy meter and rules',
       icon: Icons.password,
       screen: const PasswordGenScreen(),
-      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
+      color: PlayfulTheme.toolColors[8 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'json-flatten',
@@ -184,6 +194,6 @@ id: 'csv-cleaner',
       screen: const JsonFlattenScreen(),
       color: const Color(0xFF6A1B9A),
     ),
-];
+  ];
 }
 
