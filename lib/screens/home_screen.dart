@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/codec_lab/codec_lab_screen.dart';
 import '../tools/time_convert/time_convert_screen.dart';
 import '../tools/regex_tester/regex_tester_screen.dart';
 import '../tools/id_gen/id_gen_screen.dart';
@@ -149,20 +150,28 @@ class HomeScreen extends StatelessWidget {
       color: PlayfulTheme.toolColors[4],
     ),
     ToolItem(
+      id: 'codec-lab',
+      name: 'Codec Lab',
+      description: 'Base64, Hex, and URL encoding/decoding for text and files',
+      icon: Icons.code,
+      screen: const CodecLabScreen(),
+      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
+    ),
+    ToolItem(
       id: 'time-convert',
       name: 'Time Converter',
       description: 'Convert timestamps between formats and parse natural language',
       icon: Icons.schedule,
       screen: const TimeConvertScreen(),
-      color: const Color(0xFF9C27B0),
+      color: PlayfulTheme.toolColors[12 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'regex-tester',
       name: 'Regex Tester',
       description: 'Test regex patterns with live match highlighting and capture groups',
-      icon: Icons.code,
+      icon: Icons.pattern,
       screen: const RegexTesterScreen(),
-      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
+      color: PlayfulTheme.toolColors[13 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'id-gen',
