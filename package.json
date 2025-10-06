@@ -21,7 +21,9 @@
     "auto-assign": "node scripts/auto-assign-new-issues.mjs",
     "test-assignment": "node scripts/assign-to-copilot.mjs 25",
     "create-issue": "node scripts/create-and-assign-issue.mjs",
-    "create-and-assign": "node scripts/create-and-assign-issue.mjs --assign"
+    "create-and-assign": "node scripts/create-and-assign-issue.mjs --assign",
+    "approve-prs": "node scripts/approve-copilot-prs.mjs",
+    "approve-prs-dry": "node scripts/approve-copilot-prs.mjs --dry-run"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
