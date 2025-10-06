@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tools/unit_converter/unit_converter_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
@@ -6,6 +7,7 @@ class ToolspaceRouter {
   static const String quickInvoice = '/tools/quick-invoice';
   static const String textTools = '/tools/text-tools';
   static const String fileMerger = '/tools/file-merger';
+  static const String unitConverter = '/tools/unit-converter';
   static const String auth = '/auth';
   static const String billing = '/billing';
 
@@ -26,6 +28,10 @@ class ToolspaceRouter {
       case fileMerger:
         return MaterialPageRoute(
           builder: (_) => const FileMergerScreen(),
+        );
+      case unitConverter:
+        return MaterialPageRoute(
+          builder: (_) => const UnitConverterScreen(),
         );
       case auth:
         return MaterialPageRoute(

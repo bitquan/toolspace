@@ -5,6 +5,7 @@ import '../../lib/tools/text_tools/logic/json_tools.dart';
 import '../../lib/tools/text_tools/logic/slugify.dart';
 import '../../lib/tools/text_tools/logic/counters.dart';
 import '../../lib/tools/text_tools/logic/uuid_gen.dart';
+import '../../lib/tools/text_tools/logic/nanoid_gen.dart';
 
 void main() {
   group('CaseConverter Tests', () {
@@ -227,6 +228,24 @@ void main() {
               r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
     });
 
+    test('generateV7 creates valid UUID v7 format', () {
+      final uuid = UuidGenerator.generateV7();
+      expect(
+          uuid,
+          matches(RegExp(
+              r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
+    });
+
+    test('generateV7 creates sortable UUIDs', () {
+      final uuid1 = UuidGenerator.generateV7();
+      // Small delay to ensure different timestamp
+      Future.delayed(const Duration(milliseconds: 2));
+      final uuid2 = UuidGenerator.generateV7();
+
+      // UUID v7 should be sortable by timestamp (first part of UUID)
+      expect(uuid1.compareTo(uuid2), lessThanOrEqualTo(0));
+    });
+
     test('generateSimple creates UUID without dashes', () {
       final uuid = UuidGenerator.generateSimple();
       expect(uuid, matches(RegExp(r'^[0-9a-f]{32}$')));
@@ -262,6 +281,103 @@ void main() {
       const uuid = '550e8400e29b41d4a716446655440000';
       final formatted = UuidGenerator.formatWithSeparator(uuid, '_');
       expect(formatted, '550e8400_e29b_41d4_a716_446655440000');
+    });
+  });
+
+  group('NanoidGenerator Tests', () {
+    test('generate creates default NanoID', () {
+      final nanoid = NanoidGenerator.generate();
+      expect(nanoid.length, 21);
+      expect(NanoidGenerator.isValid(nanoid), true);
+    });
+
+    test('generateCustom creates NanoID with custom size', () {
+      final nanoid = NanoidGenerator.generateCustom(size: 10);
+      expect(nanoid.length, 10);
+    });
+
+    test('generateCustom uses custom alphabet', () {
+      final nanoid = NanoidGenerator.generateCustom(
+        size: 20,
+        alphabet: '0123456789',
+      );
+      expect(nanoid.length, 20);
+      expect(nanoid, matches(RegExp(r'^[0-9]+$')));
+    });
+
+    test('generateMultiple creates correct number of NanoIDs', () {
+      final nanoids = NanoidGenerator.generateMultiple(5, size: 10);
+      expect(nanoids.length, 5);
+      expect(nanoids.toSet().length, 5); // All should be unique
+      expect(nanoids.first.length, 10);
+    });
+
+    test('generateNumeric creates numeric only NanoID', () {
+      final nanoid = NanoidGenerator.generateNumeric(size: 15);
+      expect(nanoid.length, 15);
+      expect(nanoid, matches(RegExp(r'^[0-9]+$')));
+    });
+
+    test('generateLowercase creates lowercase only NanoID', () {
+      final nanoid = NanoidGenerator.generateLowercase(size: 15);
+      expect(nanoid.length, 15);
+      expect(nanoid, matches(RegExp(r'^[a-z]+$')));
+    });
+
+    test('generateUppercase creates uppercase only NanoID', () {
+      final nanoid = NanoidGenerator.generateUppercase(size: 15);
+      expect(nanoid.length, 15);
+      expect(nanoid, matches(RegExp(r'^[A-Z]+$')));
+    });
+
+    test('generateAlphanumeric creates alphanumeric NanoID', () {
+      final nanoid = NanoidGenerator.generateAlphanumeric(size: 15);
+      expect(nanoid.length, 15);
+      expect(nanoid, matches(RegExp(r'^[A-Za-z0-9]+$')));
+    });
+
+    test('generateHex creates hexadecimal NanoID', () {
+      final nanoid = NanoidGenerator.generateHex(size: 16);
+      expect(nanoid.length, 16);
+      expect(nanoid, matches(RegExp(r'^[0-9a-f]+$')));
+    });
+
+    test('generateCustom throws on invalid size', () {
+      expect(() => NanoidGenerator.generateCustom(size: 0),
+          throwsA(isA<ArgumentError>()));
+      expect(() => NanoidGenerator.generateCustom(size: -1),
+          throwsA(isA<ArgumentError>()));
+    });
+
+    test('generateCustom throws on empty alphabet', () {
+      expect(() => NanoidGenerator.generateCustom(alphabet: ''),
+          throwsA(isA<ArgumentError>()));
+    });
+
+    test('generateCustom throws on duplicate alphabet characters', () {
+      expect(() => NanoidGenerator.generateCustom(alphabet: '0123012'),
+          throwsA(isA<ArgumentError>()));
+    });
+
+    test('isValid validates NanoID correctly', () {
+      expect(NanoidGenerator.isValid('V1StGXR8_Z5jdHi6B-myT'), true);
+      expect(
+          NanoidGenerator.isValid('123456', alphabet: '0123456789'), true);
+      expect(NanoidGenerator.isValid('invalid!@#'), false);
+      expect(NanoidGenerator.isValid(''), false);
+    });
+
+    test('calculateCollisionProbability returns probability string', () {
+      final prob = NanoidGenerator.calculateCollisionProbability(21, 64);
+      expect(prob, isNotEmpty);
+      expect(prob, contains('%'));
+    });
+
+    test('generateMultiple with large batch', () {
+      final nanoids = NanoidGenerator.generateMultiple(1000, size: 21);
+      expect(nanoids.length, 1000);
+      // Check uniqueness
+      expect(nanoids.toSet().length, 1000);
     });
   });
 }
