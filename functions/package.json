@@ -18,9 +18,9 @@
     "eslint": "^9",
     "@typescript-eslint/parser": "^8",
     "@typescript-eslint/eslint-plugin": "^8",
-    "jest": "^29",
+    "jest": "^30",
     "ts-jest": "^29",
-    "@types/jest": "^29"
+    "@types/jest": "^30"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0",
