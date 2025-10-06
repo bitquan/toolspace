@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/csv_cleaner/csv_cleaner_screen.dart';
 import '../tools/image_resizer/image_resizer_screen.dart';
 import '../tools/password_gen/password_gen_screen.dart';
 import '../tools/json_flatten/json_flatten_screen.dart';
@@ -143,12 +144,20 @@ class HomeScreen extends StatelessWidget {
       color: PlayfulTheme.toolColors[4],
     ),
     ToolItem(
+      id: 'csv-cleaner',
+      name: 'CSV Cleaner',
+      description: 'Trim, dedupe, normalize CSV files with ease',
+      icon: Icons.table_rows,
+      screen: const CsvCleanerScreen(),
+      color: PlayfulTheme.toolColors[0],
+    ),
+    ToolItem(
       id: 'image-resizer',
       name: 'Image Resizer',
       description: 'Resize and convert images with batch processing support',
       icon: Icons.photo_size_select_large,
       screen: const ImageResizerScreen(),
-      color: PlayfulTheme.toolColors[0],
+      color: PlayfulTheme.toolColors[6 % PlayfulTheme.toolColors.length],
     ),
     ToolItem(
       id: 'password-gen',
