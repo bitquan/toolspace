@@ -19,6 +19,34 @@ class UuidGenerator {
     return _formatUuid(bytes);
   }
 
+  /// Generate a timestamp-based UUID v7 (RFC 9562)
+  /// Format: xxxxxxxx-xxxx-7xxx-yxxx-xxxxxxxxxxxx
+  /// Where x is hex digit and y is one of 8, 9, A, or B
+  /// First 48 bits contain Unix timestamp in milliseconds
+  static String generateV7() {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final bytes = List<int>.filled(16, 0);
+
+    // Fill first 48 bits (6 bytes) with timestamp
+    bytes[0] = (now >> 40) & 0xFF;
+    bytes[1] = (now >> 32) & 0xFF;
+    bytes[2] = (now >> 24) & 0xFF;
+    bytes[3] = (now >> 16) & 0xFF;
+    bytes[4] = (now >> 8) & 0xFF;
+    bytes[5] = now & 0xFF;
+
+    // Fill remaining bytes with random data
+    for (int i = 6; i < 16; i++) {
+      bytes[i] = _random.nextInt(256);
+    }
+
+    // Set version (7) and variant bits according to RFC 9562
+    bytes[6] = (bytes[6] & 0x0F) | 0x70; // Version 7
+    bytes[8] = (bytes[8] & 0x3F) | 0x80; // Variant bits
+
+    return _formatUuid(bytes);
+  }
+
   /// Generate a simple UUID without dashes
   /// Format: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   static String generateSimple() {

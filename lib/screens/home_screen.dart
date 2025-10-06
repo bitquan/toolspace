@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/id_gen/id_gen_screen.dart';
 import '../tools/palette_extractor/palette_extractor_screen.dart';
 import '../tools/md_to_pdf/md_to_pdf_screen.dart';
 import '../tools/csv_cleaner/csv_cleaner_screen.dart';
@@ -144,6 +145,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'id-gen',
+      name: 'ID Generator',
+      description: 'Generate UUIDs (v4, v7) and NanoIDs with batch support',
+      icon: Icons.fingerprint,
+      screen: const IdGenScreen(),
+      color: const Color(0xFF9C27B0),
     ),
     ToolItem(
       id: 'palette-extractor',
