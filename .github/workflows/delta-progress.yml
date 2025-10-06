@@ -52,12 +52,24 @@ jobs:
 
                       core.info(`Processing PR #${prNumber}`);
 
-                      // Get PR details
-                      const { data: pr } = await github.rest.pulls.get({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        pull_request_number: prNumber
-                      });
+                      // Get PR details with error handling
+                      let pr;
+                      try {
+                        const { data: prData } = await github.rest.pulls.get({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          pull_request_number: prNumber
+                        });
+                        pr = prData;
+                      } catch (error) {
+                        if (error.status === 404) {
+                          core.warning(`PR #${prNumber} not found (may have been deleted). Skipping progress tracking.`);
+                          return;
+                        } else {
+                          core.error(`Failed to fetch PR #${prNumber}: ${error.message}`);
+                          throw error;
+                        }
+                      }
 
                       if (!pr.merged) {
                         core.info('PR is not merged, skipping progress tracking');
