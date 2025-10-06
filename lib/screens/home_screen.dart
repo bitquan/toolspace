@@ -1,10 +1,16 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../tools/text_tools/text_tools_screen.dart';
 import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
 import '../tools/id_gen/id_gen_screen.dart';
+import '../tools/palette_extractor/palette_extractor_screen.dart';
+import '../tools/md_to_pdf/md_to_pdf_screen.dart';
+import '../tools/csv_cleaner/csv_cleaner_screen.dart';
+import '../tools/image_resizer/image_resizer_screen.dart';
+import '../tools/password_gen/password_gen_screen.dart';
+import '../tools/json_flatten/json_flatten_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -148,5 +154,55 @@ class HomeScreen extends StatelessWidget {
       screen: const IdGenScreen(),
       color: const Color(0xFF9C27B0),
     ),
+    ToolItem(
+      id: 'palette-extractor',
+      name: 'Palette Extractor',
+      description: 'Extract dominant colors from images using k-means clustering',
+      icon: Icons.palette,
+      screen: const PaletteExtractorScreen(),
+      color: PlayfulTheme.toolColors[5],
+    ),
+    ToolItem(
+      id: 'md-to-pdf',
+      name: 'Markdown to PDF',
+      description: 'Convert markdown to PDF with themes and custom settings',
+      icon: Icons.picture_as_pdf,
+      screen: const MdToPdfScreen(),
+      color: PlayfulTheme.toolColors[0],
+    ),
+    ToolItem(
+      id: 'csv-cleaner',
+      name: 'CSV Cleaner',
+      description: 'Trim, dedupe, normalize CSV files with ease',
+      icon: Icons.table_rows,
+      screen: const CsvCleanerScreen(),
+      color: PlayfulTheme.toolColors[7 % PlayfulTheme.toolColors.length],
+    ),
+    ToolItem(
+      id: 'image-resizer',
+      name: 'Image Resizer',
+      description: 'Resize and convert images with batch processing support',
+      icon: Icons.photo_size_select_large,
+      screen: const ImageResizerScreen(),
+      color: PlayfulTheme.toolColors[6 % PlayfulTheme.toolColors.length],
+    ),
+    ToolItem(
+      id: 'password-gen',
+      name: 'Password Generator',
+      description: 'Generate secure passwords with entropy meter and rules',
+      icon: Icons.password,
+      screen: const PasswordGenScreen(),
+      color: PlayfulTheme.toolColors[8 % PlayfulTheme.toolColors.length],
+    ),
+    ToolItem(
+      id: 'json-flatten',
+      name: 'JSON Flatten',
+      description:
+          'Flatten nested JSON to CSV with field selection and preview',
+      icon: Icons.table_chart,
+      screen: const JsonFlattenScreen(),
+      color: const Color(0xFF6A1B9A),
+    ),
   ];
 }
+
