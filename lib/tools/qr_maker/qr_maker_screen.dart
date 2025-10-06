@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:html' as html;
-import 'dart:typed_data';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {
@@ -56,21 +54,6 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     if (_qrData.isNotEmpty) {
       _bounceController.forward().then((_) => _bounceController.reverse());
     }
-  }
-
-  void _generateQr() {
-    if (_qrData.isEmpty) return;
-
-    setState(() {
-      _isGenerating = true;
-    });
-
-    // Simulate QR generation (in real app, use qr_flutter package)
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _isGenerating = false;
-      });
-    });
   }
 
   void _downloadQr() {
@@ -395,7 +378,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color:
-                            theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                            theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(

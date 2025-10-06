@@ -1,28 +1,28 @@
-name: 'Scheduled Auto-Assignment Check'
+name: "Scheduled Auto-Assignment Check"
 
 on:
-  schedule:
-    # Run every 2 hours to catch any missed issues
-    - cron: '0 */2 * * *'
-  workflow_dispatch:
-    inputs:
-      max_age_hours:
-        description: 'Hours to look back for unassigned issues'
-        required: false
-        default: '6'
-        type: string
-      dry_run:
-        description: 'Run in dry-run mode (preview only)'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+    schedule:
+        # Run every 2 hours to catch any missed issues
+        - cron: "0 */2 * * *"
+    workflow_dispatch:
+        inputs:
+            max_age_hours:
+                description: "Hours to look back for unassigned issues"
+                required: false
+                default: "6"
+                type: string
+            dry_run:
+                description: "Run in dry-run mode (preview only)"
+                required: false
+                default: "false"
+                type: choice
+                options:
+                    - "true"
+                    - "false"
 
 permissions:
-  issues: write
-  contents: read
+    issues: write
+    contents: read
 
 jobs:
     scheduled-check:
