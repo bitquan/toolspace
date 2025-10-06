@@ -6,12 +6,17 @@
   "scripts": {
     "velocity": "node scripts/velocity.mjs",
     "report": "node scripts/report.mjs",
+    "insights": "node scripts/delta-insights.mjs",
     "velocity-dry": "node scripts/velocity.mjs --dry-run",
     "report-dry": "node scripts/report.mjs --dry-run",
     "test-scheduler": "echo 'Use: gh workflow run delta-scheduler.yml -f dry_run=true'",
     "test-progress": "echo 'Use: gh workflow run delta-progress.yml -f dry_run=true'",
     "test-report": "echo 'Use: gh workflow run delta-report.yml -f dry_run=true'",
-    "test-watchdog": "echo 'Use: gh workflow run delta-watchdog.yml -f dry_run=true'"
+    "test-watchdog": "echo 'Use: gh workflow run delta-watchdog.yml -f dry_run=true'",
+    "test-notify": "echo 'Use: gh workflow run delta-notify.yml -f dry_run=true'",
+    "test-digest": "echo 'Use: gh workflow run delta-digest.yml -f dry_run=true'",
+    "push:preflight": "powershell -ExecutionPolicy Bypass -File scripts/git/push-preflight.ps1",
+    "push": "npm run push:preflight && git push"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
