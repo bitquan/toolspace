@@ -13,7 +13,7 @@
 | T-ToolsPack       | JSON Doctor instant tool       | ✅ Real-time validation + auto-repair           | feat,tool:json-doctor,area:frontend | json_doctor | frontend | P1       | 0.4d     | done    | @bitquan |
 | T-ToolsPack       | Text Diff comparison tool      | ✅ Line-by-line diff with visual highlighting   | feat,tool:text-diff,area:frontend   | text_diff   | frontend | P1       | 0.4d     | done    | @bitquan |
 | T-ToolsPack       | QR Maker generation tool       | ✅ Multi-type QR codes with customization       | feat,tool:qr-maker,area:frontend    | qr_maker    | frontend | P1       | 0.4d     | done    | @bitquan |
-| File Merger v1    | Storage rules + signed URL     | Tighten rules + signed URL endpoint             | chore,area:backend                  | file_merger | backend  | P2       | 0.3d     | now     |          |
+| File Merger v1    | Storage rules + signed URL     | ✅ Tighten rules + signed URL endpoint          | chore,area:backend                  | file_merger | backend  | P2       | 0.3d     | done    |          |
 | Text Tools        | JSON validator: error pinpoint | Show line/col + highlight                       | feat,tool:text-tools,area:frontend  | text_tools  | frontend | P2       | 0.3d     | now     |          |
 | Text Tools        | Export functionality           | Add export to PDF/Word for processed text       | feat,tool:text-tools,area:frontend  | text_tools  | frontend | P2       | 0.4d     | later   |          |
 | T-ToolsPack v2    | JSON Doctor schema validation  | Add JSONPath queries and schema validation      | feat,tool:json-doctor,area:frontend | json_doctor | frontend | P2       | 0.5d     | now     |          |
