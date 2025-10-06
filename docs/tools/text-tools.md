@@ -79,6 +79,13 @@ Pretty Print (2 spaces):
     "key": "value"
   }
 }
+
+Validation with Error Pinpointing:
+Input: {"name": test}
+Output: 
+Invalid JSON ✗
+Error at line 1, column 10
+Unexpected character (at character 10)
 ```
 
 ### 4. URL Slugify
