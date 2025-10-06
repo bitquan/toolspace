@@ -78,7 +78,15 @@ class _TextDiffScreenState extends State<TextDiffScreen>
     if (_text1Controller.text.isEmpty && _text2Controller.text.isEmpty) {
       setState(() {
         _diffLines = [];
+        _wordDiffs = [];
+        _mergeResult = null;
         _stats = DiffStats.empty();
+        _wordStats = const WordDiffStats(
+          additions: 0,
+          deletions: 0,
+          unchanged: 0,
+          changes: 0,
+        );
       });
       return;
     }
@@ -126,9 +134,29 @@ class _TextDiffScreenState extends State<TextDiffScreen>
       unchanged: unchanged,
     );
 
+    // Compute word-level diff
+    final wordDiffs = WordDiffEngine.computeWordDiff(
+      _text1Controller.text,
+      _text2Controller.text,
+    );
+    final wordStats = WordDiffEngine.getWordDiffStats(wordDiffs);
+
+    // Compute three-way merge if base text is provided
+    ThreeWayMergeResult? mergeResult;
+    if (_baseTextController.text.isNotEmpty) {
+      mergeResult = WordDiffEngine.computeThreeWayMerge(
+        _baseTextController.text,
+        _text1Controller.text,
+        _text2Controller.text,
+      );
+    }
+
     setState(() {
       _diffLines = diffLines;
       _stats = stats;
+      _wordDiffs = wordDiffs;
+      _wordStats = wordStats;
+      _mergeResult = mergeResult;
       _isComparing = false;
     });
 
@@ -145,9 +173,18 @@ class _TextDiffScreenState extends State<TextDiffScreen>
   void _clearAll() {
     _text1Controller.clear();
     _text2Controller.clear();
+    _baseTextController.clear();
     setState(() {
       _diffLines = [];
+      _wordDiffs = [];
+      _mergeResult = null;
       _stats = DiffStats.empty();
+      _wordStats = const WordDiffStats(
+        additions: 0,
+        deletions: 0,
+        unchanged: 0,
+        changes: 0,
+      );
     });
   }
 
@@ -194,7 +231,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
               ),
             ),
             const SizedBox(width: 12),
-            const Text('Text Diff'),
+            const Text('Text Diff v2'),
           ],
         ),
         actions: [
@@ -224,15 +261,35 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             icon: const Icon(Icons.clear_all),
             tooltip: 'Clear All',
           ),
-          if (_diffLines.isNotEmpty)
+          if (_diffLines.isNotEmpty || _wordDiffs.isNotEmpty || _mergeResult != null)
             IconButton(
               onPressed: _copyDiff,
               icon: const Icon(Icons.copy),
               tooltip: 'Copy Diff',
             ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.view_list), text: 'Line Diff'),
+            Tab(icon: Icon(Icons.text_fields), text: 'Word Diff'),
+            Tab(icon: Icon(Icons.merge), text: 'Three-Way Merge'),
+          ],
+        ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildLineDiffTab(theme),
+          _buildWordDiffTab(theme),
+          _buildThreeWayMergeTab(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLineDiffTab(ThemeData theme) {
+    return Column(
         children: [
           // Stats panel
           if (_stats.totalChanges > 0)
@@ -498,6 +555,516 @@ class _TextDiffScreenState extends State<TextDiffScreen>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildWordDiffTab(ThemeData theme) {
+    return Column(
+      children: [
+        // Word Stats panel
+        if (_wordStats.totalChanges > 0)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _StatChip(
+                  label: 'Word Additions',
+                  value: _wordStats.additions.toString(),
+                  color: Colors.green,
+                  icon: Icons.add,
+                ),
+                _StatChip(
+                  label: 'Word Deletions',
+                  value: _wordStats.deletions.toString(),
+                  color: Colors.red,
+                  icon: Icons.remove,
+                ),
+                _StatChip(
+                  label: 'Similarity',
+                  value: '${_wordStats.similarity.toStringAsFixed(1)}%',
+                  color: theme.colorScheme.primary,
+                  icon: Icons.analytics,
+                ),
+              ],
+            ),
+          ),
+
+        // Input panels
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              // Text 1
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: theme.colorScheme.outline.withOpacity(0.3),
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceVariant
+                              .withOpacity(0.3),
+                        ),
+                        child: Text(
+                          'Original Text',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: TextField(
+                            controller: _text1Controller,
+                            maxLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 14,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Paste original text here...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Text 2
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color:
+                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      ),
+                      child: Text(
+                        'Modified Text',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          controller: _text2Controller,
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 14,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Paste modified text here...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Word Diff results
+        if (_wordDiffs.isNotEmpty)
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color:
+                          theme.colorScheme.primaryContainer.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      'Differences (Word by Word)',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildWordDiffView(theme),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildWordDiffView(ThemeData theme) {
+    return SingleChildScrollView(
+      child: Wrap(
+        children: _wordDiffs.map((diff) {
+          Color? backgroundColor;
+          Color? textColor = theme.colorScheme.onSurface;
+
+          switch (diff.type) {
+            case WordDiffType.insert:
+              backgroundColor = Colors.green.withOpacity(0.3);
+              textColor = Colors.green.shade900;
+              break;
+            case WordDiffType.delete:
+              backgroundColor = Colors.red.withOpacity(0.3);
+              textColor = Colors.red.shade900;
+              break;
+            case WordDiffType.equal:
+              backgroundColor = Colors.transparent;
+              break;
+            case WordDiffType.changed:
+              backgroundColor = Colors.orange.withOpacity(0.3);
+              textColor = Colors.orange.shade900;
+              break;
+          }
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+            child: Text(
+              diff.text,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 14,
+                color: textColor,
+                fontWeight: diff.type != WordDiffType.equal
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildThreeWayMergeTab(ThemeData theme) {
+    return Column(
+      children: [
+        // Info banner
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.outline.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline,
+                  size: 16, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Three-way merge compares a base version with two modified versions and highlights conflicts.',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Input panels - 3 columns
+        Expanded(
+          flex: 2,
+          child: Row(
+            children: [
+              // Base text
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: theme.colorScheme.outline.withOpacity(0.3),
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceVariant
+                              .withOpacity(0.3),
+                        ),
+                        child: Text(
+                          'Base Version',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: TextField(
+                            controller: _baseTextController,
+                            maxLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Base version...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.all(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Left version
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: theme.colorScheme.outline.withOpacity(0.3),
+                      ),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                        ),
+                        child: Text(
+                          'Left Version',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue.shade700,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: TextField(
+                            controller: _text1Controller,
+                            maxLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Left version...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.all(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Right version
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                      ),
+                      child: Text(
+                        'Right Version',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: TextField(
+                          controller: _text2Controller,
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Right version...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.all(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Merge result
+        if (_mergeResult != null)
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _mergeResult!.hasConflicts
+                          ? Colors.orange.withOpacity(0.2)
+                          : Colors.green.withOpacity(0.2),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _mergeResult!.hasConflicts
+                              ? Icons.warning_amber
+                              : Icons.check_circle,
+                          color: _mergeResult!.hasConflicts
+                              ? Colors.orange.shade700
+                              : Colors.green.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _mergeResult!.hasConflicts
+                              ? 'Merge Result (${_mergeResult!.conflicts.length} Conflicts)'
+                              : 'Merge Result (No Conflicts)',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: _mergeResult!.hasConflicts
+                                ? Colors.orange.shade700
+                                : Colors.green.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceVariant
+                              .withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: theme.colorScheme.outline.withOpacity(0.3),
+                          ),
+                        ),
+                        child: SingleChildScrollView(
+                          child: SelectableText(
+                            _mergeResult!.mergedText,
+                            style: const TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
