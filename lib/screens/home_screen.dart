@@ -4,6 +4,7 @@ import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
 import '../tools/text_diff/text_diff_screen.dart';
 import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/password_gen/password_gen_screen.dart';
 import '../widgets/animated_tools_grid.dart';
 import '../theme/playful_theme.dart';
 
@@ -138,6 +139,14 @@ class HomeScreen extends StatelessWidget {
       icon: Icons.qr_code,
       screen: const QrMakerScreen(),
       color: PlayfulTheme.toolColors[4],
+    ),
+    ToolItem(
+      id: 'password-gen',
+      name: 'Password Generator',
+      description: 'Generate secure passwords with entropy meter and rules',
+      icon: Icons.password,
+      screen: const PasswordGenScreen(),
+      color: PlayfulTheme.toolColors[5 % PlayfulTheme.toolColors.length],
     ),
   ];
 }
