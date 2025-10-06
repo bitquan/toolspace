@@ -2,18 +2,18 @@
 
 /**
  * Bulk Approve Copilot PRs Script
- * 
- * This script approves all open pull requests created by the Copilot bot.
- * 
+ *
+ * This script approves all open pull requests created by the Copilot SWE Agent (app/copilot-swe-agent).
+ *
  * Usage: node scripts/approve-copilot-prs.mjs [--dry-run]
- * 
+ *
  * Environment Variables Required:
  * - GITHUB_TOKEN: Personal access token with repo permissions
  * - GITHUB_REPOSITORY: Repository in format "owner/repo" (optional, auto-detected)
  */
 
-import { Octokit } from '@octokit/rest';
-import { execSync } from 'child_process';
+import { Octokit } from "@octokit/rest";
+import { execSync } from "child_process";
 
 /**
  * Parse command line arguments
@@ -25,14 +25,14 @@ function parseArgs() {
   };
 
   for (const arg of args) {
-    if (arg === '--dry-run') {
+    if (arg === "--dry-run") {
       options.dryRun = true;
-    } else if (arg === '--help' || arg === '-h') {
-      console.log('Usage: node scripts/approve-copilot-prs.mjs [--dry-run]');
-      console.log('');
-      console.log('Options:');
-      console.log('  --dry-run        Preview actions without making changes');
-      console.log('  --help, -h       Show this help message');
+    } else if (arg === "--help" || arg === "-h") {
+      console.log("Usage: node scripts/approve-copilot-prs.mjs [--dry-run]");
+      console.log("");
+      console.log("Options:");
+      console.log("  --dry-run        Preview actions without making changes");
+      console.log("  --help, -h       Show this help message");
       process.exit(0);
     }
   }
@@ -46,23 +46,27 @@ function parseArgs() {
 function getRepositoryInfo() {
   // Try environment variable first
   if (process.env.GITHUB_REPOSITORY) {
-    const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/');
+    const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
     return { owner, repo };
   }
 
   // Fallback to git remote origin
   try {
-    const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf8' }).trim();
+    const remoteUrl = execSync("git remote get-url origin", {
+      encoding: "utf8",
+    }).trim();
     const match = remoteUrl.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
-    
+
     if (match) {
       return { owner: match[1], repo: match[2] };
     }
   } catch (error) {
-    console.error('ERROR: Could not determine repository from git remote');
+    console.error("ERROR: Could not determine repository from git remote");
   }
 
-  throw new Error('Could not determine GitHub repository. Set GITHUB_REPOSITORY environment variable.');
+  throw new Error(
+    "Could not determine GitHub repository. Set GITHUB_REPOSITORY environment variable."
+  );
 }
 
 /**
@@ -70,14 +74,18 @@ function getRepositoryInfo() {
  */
 function validateEnvironment() {
   if (!process.env.GITHUB_TOKEN) {
-    console.error('ERROR: GITHUB_TOKEN environment variable is required');
-    console.error('');
-    console.error('Set it in your shell:');
-    console.error('  Windows (PowerShell): $env:GITHUB_TOKEN="your_token_here"');
-    console.error('  macOS/Linux (Bash):   export GITHUB_TOKEN="your_token_here"');
-    console.error('');
-    console.error('Create a token at: https://github.com/settings/tokens');
-    console.error('Required scopes: repo, pull_requests');
+    console.error("ERROR: GITHUB_TOKEN environment variable is required");
+    console.error("");
+    console.error("Set it in your shell:");
+    console.error(
+      '  Windows (PowerShell): $env:GITHUB_TOKEN="your_token_here"'
+    );
+    console.error(
+      '  macOS/Linux (Bash):   export GITHUB_TOKEN="your_token_here"'
+    );
+    console.error("");
+    console.error("Create a token at: https://github.com/settings/tokens");
+    console.error("Required scopes: repo, pull_requests");
     process.exit(1);
   }
 }
@@ -88,7 +96,7 @@ function validateEnvironment() {
 async function approvePR(octokit, owner, repo, prNumber, prTitle, dryRun) {
   if (dryRun) {
     console.log(`DRY-RUN: Would approve PR #${prNumber}: "${prTitle}"`);
-    return { approved: true, reason: 'Dry run - no changes made' };
+    return { approved: true, reason: "Dry run - no changes made" };
   }
 
   try {
@@ -98,8 +106,8 @@ This pull request has been approved as part of bulk approval for Copilot-generat
 
 **Approval details:**
 ✅ Verified Copilot authorship
-✅ Part of automated development pipeline  
-✅ Bulk approval requested on ${new Date().toISOString().split('T')[0]}
+✅ Part of automated development pipeline
+✅ Bulk approval requested on ${new Date().toISOString().split("T")[0]}
 
 ---
 *Automated by Copilot PR Bulk Approval • ${new Date().toISOString()}*`;
@@ -108,13 +116,12 @@ This pull request has been approved as part of bulk approval for Copilot-generat
       owner,
       repo,
       pull_number: prNumber,
-      event: 'APPROVE',
+      event: "APPROVE",
       body: reviewBody,
     });
 
     console.log(`SUCCESS: Approved PR #${prNumber}: "${prTitle}"`);
-    return { approved: true, reason: 'Successfully approved' };
-
+    return { approved: true, reason: "Successfully approved" };
   } catch (error) {
     console.error(`ERROR: Failed to approve PR #${prNumber}:`, error.message);
     return { approved: false, reason: `Error: ${error.message}` };
@@ -126,10 +133,10 @@ This pull request has been approved as part of bulk approval for Copilot-generat
  */
 async function bulkApproveCopilotPRs(options) {
   try {
-    console.log('Copilot PR Bulk Approval');
-    console.log('========================');
-    console.log(`Mode: ${options.dryRun ? 'DRY RUN' : 'LIVE'}`);
-    
+    console.log("Copilot PR Bulk Approval");
+    console.log("========================");
+    console.log(`Mode: ${options.dryRun ? "DRY RUN" : "LIVE"}`);
+
     // Initialize Octokit
     const octokit = new Octokit({
       auth: process.env.GITHUB_TOKEN,
@@ -140,22 +147,22 @@ async function bulkApproveCopilotPRs(options) {
     console.log(`Repository: ${owner}/${repo}`);
 
     // Fetch open PRs from Copilot
-    console.log('\nINFO: Fetching open Copilot PRs...');
+    console.log("\nINFO: Fetching open Copilot PRs...");
     const { data: prs } = await octokit.rest.pulls.list({
       owner,
       repo,
-      state: 'open',
+      state: "open",
       per_page: 100,
     });
 
-    // Filter for Copilot PRs
-    const copilotPRs = prs.filter(pr => pr.user.login === 'Copilot');
+    // Filter for Copilot PRs (app/copilot-swe-agent)
+    const copilotPRs = prs.filter((pr) => pr.user.login === "app/copilot-swe-agent");
 
     console.log(`INFO: Found ${prs.length} total open PRs`);
     console.log(`INFO: Found ${copilotPRs.length} Copilot PRs`);
 
     if (copilotPRs.length === 0) {
-      console.log('INFO: No Copilot PRs found to approve');
+      console.log("INFO: No Copilot PRs found to approve");
       return;
     }
 
@@ -166,7 +173,7 @@ async function bulkApproveCopilotPRs(options) {
       errors: 0,
     };
 
-    console.log('\nINFO: Processing Copilot PRs...');
+    console.log("\nINFO: Processing Copilot PRs...");
     for (const pr of copilotPRs) {
       console.log(`\nINFO: Processing PR #${pr.number}: "${pr.title}"`);
       console.log(`INFO: Created: ${pr.created_at}`);
@@ -180,9 +187,10 @@ async function bulkApproveCopilotPRs(options) {
           pull_number: pr.number,
         });
 
-        const alreadyApproved = reviews.some(review => 
-          review.state === 'APPROVED' && 
-          review.user.login === (process.env.GITHUB_ACTOR || 'unknown')
+        const alreadyApproved = reviews.some(
+          (review) =>
+            review.state === "APPROVED" &&
+            review.user.login === (process.env.GITHUB_ACTOR || "unknown")
         );
 
         if (alreadyApproved) {
@@ -190,13 +198,21 @@ async function bulkApproveCopilotPRs(options) {
           results.skipped++;
           continue;
         }
-
       } catch (error) {
-        console.log(`WARNING: Could not check existing reviews for PR #${pr.number}`);
+        console.log(
+          `WARNING: Could not check existing reviews for PR #${pr.number}`
+        );
       }
 
-      const result = await approvePR(octokit, owner, repo, pr.number, pr.title, options.dryRun);
-      
+      const result = await approvePR(
+        octokit,
+        owner,
+        repo,
+        pr.number,
+        pr.title,
+        options.dryRun
+      );
+
       if (result.approved) {
         results.approved++;
       } else {
@@ -205,28 +221,29 @@ async function bulkApproveCopilotPRs(options) {
     }
 
     // Summary
-    console.log('\n========================');
-    console.log('Bulk Approval Summary');
-    console.log('========================');
+    console.log("\n========================");
+    console.log("Bulk Approval Summary");
+    console.log("========================");
     console.log(`Approved: ${results.approved}`);
     console.log(`Skipped: ${results.skipped}`);
     console.log(`Errors: ${results.errors}`);
     console.log(`Total Copilot PRs: ${copilotPRs.length}`);
 
     if (options.dryRun) {
-      console.log('\nINFO: This was a dry run - no actual changes were made');
-      console.log('INFO: Remove --dry-run flag to apply changes');
+      console.log("\nINFO: This was a dry run - no actual changes were made");
+      console.log("INFO: Remove --dry-run flag to apply changes");
+    }
+  } catch (error) {
+    console.error("ERROR: Bulk approval failed:", error.message);
+
+    if (error.status === 401) {
+      console.error("HINT: Check your GITHUB_TOKEN permissions");
+    } else if (error.status === 403) {
+      console.error(
+        "HINT: Token might not have sufficient permissions (need: repo, pull_requests)"
+      );
     }
 
-  } catch (error) {
-    console.error('ERROR: Bulk approval failed:', error.message);
-    
-    if (error.status === 401) {
-      console.error('HINT: Check your GITHUB_TOKEN permissions');
-    } else if (error.status === 403) {
-      console.error('HINT: Token might not have sufficient permissions (need: repo, pull_requests)');
-    }
-    
     process.exit(1);
   }
 }
@@ -234,12 +251,11 @@ async function bulkApproveCopilotPRs(options) {
 // Main execution
 if (import.meta.url === `file://${process.argv[1]}`) {
   const options = parseArgs();
-  
+
   validateEnvironment();
-  
-  bulkApproveCopilotPRs(options)
-    .catch(error => {
-      console.error('ERROR: Unexpected error:', error);
-      process.exit(1);
-    });
+
+  bulkApproveCopilotPRs(options).catch((error) => {
+    console.error("ERROR: Unexpected error:", error);
+    process.exit(1);
+  });
 }
