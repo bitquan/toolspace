@@ -12,9 +12,11 @@ class QrMakerScreen extends StatefulWidget {
 class _QrMakerScreenState extends State<QrMakerScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _batchTextController = TextEditingController();
 
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
+  late TabController _tabController;
 
   String _qrData = '';
   QrType _selectedType = QrType.text;
@@ -22,10 +24,14 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   Color _foregroundColor = Colors.black;
   Color _backgroundColor = Colors.white;
   bool _isGenerating = false;
+  List<String> _batchItems = [];
+  int _generatedCount = 0;
 
   @override
   void initState() {
     super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
 
     _bounceController = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -42,6 +48,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   @override
   void dispose() {
     _textController.dispose();
+    _batchTextController.dispose();
+    _tabController.dispose();
     _bounceController.dispose();
     super.dispose();
   }
@@ -89,6 +97,55 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     });
   }
 
+  void _processBatchGeneration() {
+    final input = _batchTextController.text.trim();
+    if (input.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter items (one per line)'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
+    final items = input.split('\n').where((line) => line.trim().isNotEmpty).toList();
+    
+    setState(() {
+      _batchItems = items;
+      _generatedCount = items.length;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Generated ${items.length} QR codes!'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _downloadAllBatchQrs() {
+    if (_batchItems.isEmpty) return;
+
+    // In a real implementation, this would generate and download all QR codes
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Downloading ${_batchItems.length} QR codes...'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _clearBatch() {
+    _batchTextController.clear();
+    setState(() {
+      _batchItems = [];
+      _generatedCount = 0;
+    });
+  }
+
   void _useQuickTemplate(String template) {
     _textController.text = template;
   }
@@ -133,28 +190,47 @@ class _QrMakerScreenState extends State<QrMakerScreen>
               ),
             ),
             const SizedBox(width: 12),
-            const Text('QR Maker'),
+            const Text('QR Maker v2'),
           ],
         ),
         actions: [
           IconButton(
-            onPressed: _clearData,
+            onPressed: _tabController.index == 0 ? _clearData : _clearBatch,
             icon: const Icon(Icons.clear_all),
             tooltip: 'Clear All',
           ),
+          if (_tabController.index == 0)
+            IconButton(
+              onPressed: _copyQrData,
+              icon: const Icon(Icons.copy),
+              tooltip: 'Copy Data',
+            ),
           IconButton(
-            onPressed: _copyQrData,
-            icon: const Icon(Icons.copy),
-            tooltip: 'Copy Data',
-          ),
-          IconButton(
-            onPressed: _downloadQr,
+            onPressed: _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
             icon: const Icon(Icons.download),
-            tooltip: 'Download QR',
+            tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.qr_code_2), text: 'Single QR'),
+            Tab(icon: Icon(Icons.qr_code_scanner), text: 'Batch Generation'),
+          ],
+        ),
       ),
-      body: Row(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildSingleQrTab(theme),
+          _buildBatchGenerationTab(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSingleQrTab(ThemeData theme) {
+    return Row(
         children: [
           // Input panel
           Expanded(
@@ -415,6 +491,204 @@ class _QrMakerScreenState extends State<QrMakerScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBatchGenerationTab(ThemeData theme) {
+    return Row(
+      children: [
+        // Input panel
+        Expanded(
+          flex: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
+                ),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Batch QR Generation',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Enter multiple items (one per line) to generate QR codes in bulk.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: _batchTextController,
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3\n...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _processBatchGeneration,
+                          icon: const Icon(Icons.auto_awesome),
+                          label: const Text('Generate All'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: const Color(0xFFFF5722),
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_generatedCount > 0) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Generated $_generatedCount QR codes',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // Preview panel
+        Expanded(
+          flex: 1,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Preview',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (_batchItems.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.qr_code_scanner,
+                            size: 80,
+                            color: theme.colorScheme.onSurface.withOpacity(0.3),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No QR codes generated yet',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: _batchItems.length,
+                      itemBuilder: (context, index) {
+                        final item = _batchItems[index];
+                        return Card(
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: _QrCodePreview(
+                                    data: item,
+                                    size: 120,
+                                    foregroundColor: _foregroundColor,
+                                    backgroundColor: _backgroundColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  item.length > 30 ? '${item.substring(0, 30)}...' : item,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontFamily: 'monospace',
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'QR #${index + 1}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
