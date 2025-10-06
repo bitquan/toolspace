@@ -6,7 +6,7 @@ on:
       confirmation:
         description: "Type 'DELETE_ALL_WORKFLOWS' to confirm nuclear cleanup"
         required: true
-        default: "I_UNDERSTAND_THIS_DELETES_EVERYTHING"
+        default: "DELETE_ALL_WORKFLOWS"
         type: string
       keep_recent:
         description: "Keep the most recent N runs (0 = delete everything)"
