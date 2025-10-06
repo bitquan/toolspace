@@ -20,7 +20,7 @@ export default {
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
   moduleFileExtensions: ["ts", "js", "json"],
-  moduleNameMapping: {
+  moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
 };
