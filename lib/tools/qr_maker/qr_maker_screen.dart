@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/services/shared_data_service.dart';
+import '../../core/ui/import_data_button.dart';
+import '../../core/ui/share_data_button.dart';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {
@@ -137,6 +140,12 @@ class _QrMakerScreenState extends State<QrMakerScreen>
           ],
         ),
         actions: [
+          ShareDataButton(
+            data: _qrData,
+            type: SharedDataType.text,
+            sourceTool: 'QR Maker',
+            compact: true,
+          ),
           IconButton(
             onPressed: _clearData,
             icon: const Icon(Icons.clear_all),
@@ -225,20 +234,41 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                     ),
                     const SizedBox(height: 16),
 
-                    // Quick templates
-                    if (_textController.text.isEmpty)
-                      ElevatedButton.icon(
-                        onPressed: () =>
-                            _useQuickTemplate(_getQuickTemplate(_selectedType)),
-                        icon: const Icon(Icons.auto_fix_high),
-                        label: Text(
-                            'Use ${_getTypeLabel(_selectedType)} Template'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF5722).withOpacity(0.1),
-                          foregroundColor: const Color(0xFFFF5722),
+                    // Import and quick template buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ImportDataButton(
+                            acceptedTypes: const [
+                              SharedDataType.text,
+                              SharedDataType.url,
+                            ],
+                            onImport: (data, type, source) {
+                              setState(() {
+                                _textController.text = data;
+                              });
+                            },
+                            label: 'Import Data',
+                          ),
                         ),
-                      ),
+                        if (_textController.text.isEmpty) ...[
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _useQuickTemplate(
+                                  _getQuickTemplate(_selectedType)),
+                              icon: const Icon(Icons.auto_fix_high),
+                              label: const Text('Template'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color(0xFFFF5722).withOpacity(0.1),
+                                foregroundColor: const Color(0xFFFF5722),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
 
                     const SizedBox(height: 24),
 
