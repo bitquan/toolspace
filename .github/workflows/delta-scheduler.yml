@@ -254,3 +254,16 @@ jobs:
                       } catch (error) {
                         core.info(`Could not trigger roadmap sync: ${error.message}`);
                       }
+
+            - name: Send scheduler notification
+              if: github.event_name == 'schedule' && github.event.inputs.dry_run != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Sending sprint scheduler notification..."
+                  gh workflow run delta-notify.yml \
+                    -f event_type="sprint_scheduled" \
+                    -f title="📅 Sprint Scheduling Complete" \
+                    -f message="Daily sprint scheduling has completed. Ready queue has been updated with prioritized issues." \
+                    -f severity="info" \
+                    -f dry_run="false"

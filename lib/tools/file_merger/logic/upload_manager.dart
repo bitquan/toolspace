@@ -4,8 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Manages file uploads to Firebase Storage for the File Merger tool
 class UploadManager {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late final FirebaseStorage _storage;
+  late final FirebaseAuth _auth;
+
+  UploadManager() {
+    try {
+      _storage = FirebaseStorage.instance;
+      _auth = FirebaseAuth.instance;
+    } catch (e) {
+      // Firebase not properly initialized - handle gracefully
+      throw Exception(
+          'Firebase not properly configured. Please check your setup.');
+    }
+  }
 
   /// Upload a file to Firebase Storage
   /// Returns the full path of the uploaded file
@@ -133,7 +144,7 @@ class FileUpload {
     String? contentType,
   }) {
     // Infer content type from file extension if not provided
-    final inferredType = contentType ?? _inferContentType(name);
+    final inferredType = contentType ?? inferContentType(name);
 
     return FileUpload(
       bytes: bytes,
@@ -144,7 +155,7 @@ class FileUpload {
   }
 
   /// Infer content type from file extension
-  static String _inferContentType(String fileName) {
+  static String inferContentType(String fileName) {
     final extension = fileName.split('.').last.toLowerCase();
     switch (extension) {
       case 'pdf':

@@ -13,10 +13,10 @@ class _TextDiffScreenState extends State<TextDiffScreen>
     with TickerProviderStateMixin {
   final TextEditingController _text1Controller = TextEditingController();
   final TextEditingController _text2Controller = TextEditingController();
-  
+
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  
+
   List<DiffLine> _diffLines = [];
   bool _isComparing = false;
   DiffStats _stats = DiffStats.empty();
@@ -24,16 +24,16 @@ class _TextDiffScreenState extends State<TextDiffScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
-    
+
     _text1Controller.addListener(_onTextChanged);
     _text2Controller.addListener(_onTextChanged);
   }
@@ -71,18 +71,19 @@ class _TextDiffScreenState extends State<TextDiffScreen>
     // Simple line-by-line comparison
     final lines1 = _text1Controller.text.split('\n');
     final lines2 = _text2Controller.text.split('\n');
-    
+
     final List<DiffLine> diffLines = [];
-    final maxLines = lines1.length > lines2.length ? lines1.length : lines2.length;
-    
+    final maxLines =
+        lines1.length > lines2.length ? lines1.length : lines2.length;
+
     int additions = 0;
     int deletions = 0;
     int unchanged = 0;
-    
+
     for (int i = 0; i < maxLines; i++) {
       final line1 = i < lines1.length ? lines1[i] : '';
       final line2 = i < lines2.length ? lines2[i] : '';
-      
+
       if (line1 == line2) {
         if (line1.isNotEmpty) {
           diffLines.add(DiffLine(text: line1, type: DiffType.equal));
@@ -102,7 +103,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
 
     final stats = DiffStats(
       additions: additions,
-      deletions: deletions, 
+      deletions: deletions,
       unchanged: unchanged,
     );
 
@@ -156,7 +157,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -236,7 +237,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                 ],
               ),
             ),
-          
+
           // Input panels
           Expanded(
             flex: 1,
@@ -258,7 +259,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                            color: theme.colorScheme.surfaceVariant
+                                .withOpacity(0.3),
                           ),
                           child: Text(
                             'Original Text',
@@ -293,7 +295,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                     ),
                   ),
                 ),
-                
+
                 // Text 2
                 Expanded(
                   child: Column(
@@ -302,7 +304,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                          color:
+                              theme.colorScheme.surfaceVariant.withOpacity(0.3),
                         ),
                         child: Text(
                           'Modified Text',
@@ -339,7 +342,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
               ],
             ),
           ),
-          
+
           // Diff results
           if (_diffLines.isNotEmpty)
             Expanded(
@@ -359,7 +362,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+                        color:
+                            theme.colorScheme.primaryContainer.withOpacity(0.5),
                       ),
                       child: Text(
                         'Differences (Line by Line)',
@@ -396,7 +400,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
         Color? backgroundColor;
         Color? textColor = Theme.of(context).colorScheme.onSurface;
         String prefix = '  ';
-        
+
         switch (diff.type) {
           case DiffType.insert:
             backgroundColor = Colors.green.withOpacity(0.2);
@@ -511,14 +515,14 @@ class DiffStats {
   });
 
   factory DiffStats.empty() => const DiffStats(
-    additions: 0,
-    deletions: 0,
-    unchanged: 0,
-  );
+        additions: 0,
+        deletions: 0,
+        unchanged: 0,
+      );
 
   int get totalChanges => additions + deletions;
   int get totalLines => additions + deletions + unchanged;
-  
+
   double get similarity {
     if (totalLines == 0) return 100.0;
     return (unchanged / totalLines) * 100;

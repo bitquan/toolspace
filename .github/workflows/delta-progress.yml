@@ -297,3 +297,16 @@ jobs:
 
                       await core.summary.write();
                       core.info(`🎯 Progress tracking complete - Processed ${processedIssues.length} issues`);
+
+            - name: Send progress notification
+              if: github.event.pull_request.merged == true && github.event.inputs.dry_run != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Sending progress tracking notification..."
+                  gh workflow run delta-notify.yml \
+                    -f event_type="progress_update" \
+                    -f title="📈 Sprint Progress Updated" \
+                    -f message="PR #${{ github.event.pull_request.number }} '${{ github.event.pull_request.title }}' has been processed. Issues closed and progress tracked." \
+                    -f severity="info" \
+                    -f dry_run="false"

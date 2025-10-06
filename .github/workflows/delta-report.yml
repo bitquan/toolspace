@@ -158,3 +158,16 @@ jobs:
                       }
 
                       await core.summary.write();
+
+            - name: Send report notification
+              if: ${{ github.event.inputs.dry_run != 'true' }}
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Sending weekly report notification..."
+                  gh workflow run delta-notify.yml \
+                    -f event_type="report_generated" \
+                    -f title="📊 Weekly Sprint Report Generated" \
+                    -f message="Sprint summary and velocity charts have been updated. Check docs/reports/sprint-summary.md for the latest insights." \
+                    -f severity="info" \
+                    -f dry_run="false"

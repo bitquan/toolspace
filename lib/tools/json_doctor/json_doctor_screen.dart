@@ -14,10 +14,10 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
     with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _outputController = TextEditingController();
-  
+
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  
+
   JsonDoctorStatus _status = JsonDoctorStatus.empty;
   String _errorMessage = '';
   int _indentLevel = 2;
@@ -26,12 +26,12 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
   void initState() {
     super.initState();
     _inputController.addListener(_validateJson);
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    
+
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -47,7 +47,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
   void _validateJson() {
     final input = _inputController.text.trim();
-    
+
     if (input.isEmpty) {
       setState(() {
         _status = JsonDoctorStatus.empty;
@@ -59,17 +59,17 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
     try {
       final dynamic jsonData = jsonDecode(input);
-      final String formatted = const JsonEncoder.withIndent('  ').convert(jsonData);
-      
+      final String formatted =
+          const JsonEncoder.withIndent('  ').convert(jsonData);
+
       setState(() {
         _status = JsonDoctorStatus.valid;
         _outputController.text = formatted;
         _errorMessage = '';
       });
-      
+
       // Pulse animation for success
       _pulseController.forward().then((_) => _pulseController.reverse());
-      
     } catch (e) {
       setState(() {
         _status = JsonDoctorStatus.invalid;
@@ -87,7 +87,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
         .replaceAll('False', 'false') // Python False to JSON false
         .replaceAll('None', 'null') // Python None to JSON null
         .replaceAll(RegExp(r'(\w+):'), r'"\1":'); // Unquoted keys
-    
+
     try {
       final dynamic jsonData = jsonDecode(fixed);
       return 'Auto-fixed:\n\n${const JsonEncoder.withIndent('  ').convert(jsonData)}';
@@ -125,7 +125,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -180,7 +180,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                   animation: _pulseAnimation,
                   builder: (context, child) {
                     return Transform.scale(
-                      scale: _status == JsonDoctorStatus.valid ? _pulseAnimation.value : 1.0,
+                      scale: _status == JsonDoctorStatus.valid
+                          ? _pulseAnimation.value
+                          : 1.0,
                       child: Icon(
                         _getStatusIcon(),
                         color: _getStatusColor(theme),
@@ -216,7 +218,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
               ],
             ),
           ),
-          
+
           // Input/Output panels
           Expanded(
             child: Row(
@@ -256,7 +258,8 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                 fontSize: 14,
                               ),
                               decoration: InputDecoration(
-                                hintText: 'Paste your JSON here...\n\nTip: I can fix common issues like:\n• Single quotes\n• Unquoted keys\n• Python-style booleans',
+                                hintText:
+                                    'Paste your JSON here...\n\nTip: I can fix common issues like:\n• Single quotes\n• Unquoted keys\n• Python-style booleans',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -270,7 +273,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                     ),
                   ),
                 ),
-                
+
                 // Output panel
                 Expanded(
                   child: Column(

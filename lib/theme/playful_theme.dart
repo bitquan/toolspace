@@ -13,7 +13,7 @@ class PlayfulTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      
+
       // Typography with playful feel
       textTheme: const TextTheme(
         displayLarge: TextStyle(

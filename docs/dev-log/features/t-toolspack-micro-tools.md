@@ -73,10 +73,10 @@ class ToolScreen extends StatefulWidget {
   void _onInputChanged() {
     Future.delayed(Duration(milliseconds: 500), _processInput);
   }
-  
+
   // Animated feedback for user actions
   AnimationController _feedbackController;
-  
+
   // Consistent error handling
   void _showFeedback(String message) {
     ScaffoldMessenger.showSnackBar(...);
@@ -103,18 +103,21 @@ class ToolScreen extends StatefulWidget {
 ### JSON Doctor
 
 #### Validation Engine
+
 - Syntax error detection
 - Structure validation
 - Type checking
 - Format suggestions
 
 #### Auto-Repair Features
+
 - Single to double quotes conversion
 - Python boolean conversion (True/False → true/false)
 - Unquoted key detection and fixing
 - Trailing comma removal
 
 #### User Interface
+
 - Split-pane design (input/output)
 - Real-time status indicator
 - Pulse animation on success
@@ -123,18 +126,21 @@ class ToolScreen extends StatefulWidget {
 ### Text Diff
 
 #### Comparison Algorithm
+
 - Line-by-line difference detection
 - Simple but effective algorithm
 - Statistical analysis
 - Performance optimized for large texts
 
 #### Visualization
+
 - Color-coded differences (green/red)
 - Side-by-side comparison
 - Unified diff view
 - Statistical summary
 
 #### Utility Features
+
 - Swap texts functionality
 - Copy diff results
 - Clear all data
@@ -143,6 +149,7 @@ class ToolScreen extends StatefulWidget {
 ### QR Maker
 
 #### QR Types Supported
+
 1. **Text** - Plain text content
 2. **URL** - Website links
 3. **Email** - Mailto links
@@ -152,6 +159,7 @@ class ToolScreen extends StatefulWidget {
 7. **vCard** - Contact information
 
 #### Customization Options
+
 - Size adjustment (100-500px)
 - Foreground color selection
 - Background color selection
@@ -159,6 +167,7 @@ class ToolScreen extends StatefulWidget {
 - Template quick-start
 
 #### Export Features
+
 - Download as image
 - Copy QR data
 - Share functionality
@@ -192,11 +201,13 @@ class ToolScreen extends StatefulWidget {
 ### Most Common Use Cases
 
 1. **JSON Doctor**
+
    - API response validation
    - Configuration file formatting
    - Data structure debugging
 
 2. **Text Diff**
+
    - Document comparison
    - Code review assistance
    - Version control visualization
@@ -218,11 +229,13 @@ class ToolScreen extends StatefulWidget {
 ### Phase 2 Features
 
 1. **JSON Doctor Pro**
+
    - Schema validation
    - JSONPath queries
    - Bulk processing
 
 2. **Text Diff Advanced**
+
    - Word-level diffing
    - Three-way merge
    - File comparison

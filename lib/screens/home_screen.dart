@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Tools Grid
           SliverFillRemaining(
             child: AnimatedToolsGrid(
@@ -100,7 +100,8 @@ class HomeScreen extends StatelessWidget {
     ToolItem(
       id: 'text-tools',
       name: 'Text Tools',
-      description: 'Case conversion, cleaning, JSON formatting, and more text utilities',
+      description:
+          'Case conversion, cleaning, JSON formatting, and more text utilities',
       icon: Icons.text_fields,
       screen: const TextToolsScreen(),
       color: PlayfulTheme.toolColors[0],

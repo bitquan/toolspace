@@ -14,10 +14,10 @@ class QrMakerScreen extends StatefulWidget {
 class _QrMakerScreenState extends State<QrMakerScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
-  
+
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
-  
+
   String _qrData = '';
   QrType _selectedType = QrType.text;
   int _qrSize = 200;
@@ -28,16 +28,16 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _bounceController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _bounceAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.elasticOut),
     );
-    
+
     _textController.addListener(_onTextChanged);
   }
 
@@ -52,7 +52,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     setState(() {
       _qrData = _textController.text;
     });
-    
+
     if (_qrData.isNotEmpty) {
       _bounceController.forward().then((_) => _bounceController.reverse());
     }
@@ -60,11 +60,11 @@ class _QrMakerScreenState extends State<QrMakerScreen>
 
   void _generateQr() {
     if (_qrData.isEmpty) return;
-    
+
     setState(() {
       _isGenerating = true;
     });
-    
+
     // Simulate QR generation (in real app, use qr_flutter package)
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
@@ -75,7 +75,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
 
   void _downloadQr() {
     if (_qrData.isEmpty) return;
-    
+
     // In a real implementation, this would generate and download the QR code
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -132,7 +132,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -213,13 +213,14 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                               _useQuickTemplate(_getQuickTemplate(type));
                             }
                           },
-                          selectedColor: const Color(0xFFFF5722).withOpacity(0.2),
+                          selectedColor:
+                              const Color(0xFFFF5722).withOpacity(0.2),
                           checkmarkColor: const Color(0xFFFF5722),
                         );
                       }).toList(),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Input field
                     Text(
                       'Content',
@@ -240,21 +241,24 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Quick templates
                     if (_textController.text.isEmpty)
                       ElevatedButton.icon(
-                        onPressed: () => _useQuickTemplate(_getQuickTemplate(_selectedType)),
+                        onPressed: () =>
+                            _useQuickTemplate(_getQuickTemplate(_selectedType)),
                         icon: const Icon(Icons.auto_fix_high),
-                        label: Text('Use ${_getTypeLabel(_selectedType)} Template'),
+                        label: Text(
+                            'Use ${_getTypeLabel(_selectedType)} Template'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
+                          backgroundColor:
+                              const Color(0xFFFF5722).withOpacity(0.1),
                           foregroundColor: const Color(0xFFFF5722),
                         ),
                       ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Customization
                     Text(
                       'Customization',
@@ -263,7 +267,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Size slider
                     Text('Size: ${_qrSize}px'),
                     Slider(
@@ -277,9 +281,9 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         });
                       },
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Color selection
                     Row(
                       children: [
@@ -325,7 +329,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
               ),
             ),
           ),
-          
+
           // QR Preview panel
           Expanded(
             flex: 1,
@@ -340,7 +344,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   Expanded(
                     child: Center(
                       child: _isGenerating
@@ -357,8 +361,10 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                                     const SizedBox(height: 16),
                                     Text(
                                       'Enter content to generate QR code',
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: theme.colorScheme.onSurfaceVariant,
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -380,15 +386,16 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                                 ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Generation info
                   if (_qrData.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                        color:
+                            theme.colorScheme.surfaceVariant.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(

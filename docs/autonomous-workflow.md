@@ -297,11 +297,37 @@ You can always:
 
 ## 🔮 Future Enhancements
 
-- **Slack/Discord notifications** for major events
-- **Deployment automation** for production releases
-- **Metrics dashboard** for workflow analytics
-- **Advanced merge strategies** for complex changes
 - **AI-powered code review** integration
+- **Deployment automation** for production releases
+- **Advanced merge strategies** for complex changes
+- **Multi-repository support** for larger organizations
+
+## 📊 OPS-Epsilon: Notification & Analytics Layer
+
+**Status**: ✅ Active (v1.0)
+
+The autonomous workflow system includes a comprehensive notification and analytics layer that provides:
+
+### Real-time Notifications
+
+- **Discord/Slack Integration**: Instant alerts for workflow events
+- **Severity-based Routing**: Critical alerts, warnings, and info updates
+- **Rich Formatting**: Embedded messages with context and actionable links
+
+### Performance Analytics
+
+- **Sprint Velocity Tracking**: Automated calculation of team performance
+- **Bottleneck Detection**: Identification of workflow delays and issues
+- **Trend Analysis**: Predictive insights for planning and optimization
+- **Health Scoring**: Overall system health assessment
+
+### Periodic Reporting
+
+- **Weekly Digests**: Sprint summaries with key metrics
+- **Monthly Reports**: Long-term trend analysis and recommendations
+- **Custom Insights**: Advanced analytics with machine learning
+
+For detailed setup and configuration, see: [`docs/automation/ops-epsilon.md`](./automation/ops-epsilon.md)
 
 ## 📋 Workflow Files Reference
 

@@ -171,7 +171,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return MouseRegion(
       onEnter: (_) => _onHover(true),
       onExit: (_) => _onHover(false),
@@ -216,7 +216,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Tool name
                       Text(
                         widget.tool.name,
@@ -228,7 +228,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Tool description
                       Expanded(
                         child: Text(

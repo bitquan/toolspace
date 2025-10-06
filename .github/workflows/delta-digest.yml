@@ -1,0 +1,346 @@
+name: OPS-Epsilon Digest
+
+on:
+    schedule:
+        - cron: "0 18 * * FRI" # Fridays at 6 PM UTC (weekly digest)
+        - cron: "0 9 1 * *" # 1st of month at 9 AM UTC (monthly digest)
+    workflow_dispatch:
+        inputs:
+            digest_type:
+                description: "Type of digest to generate"
+                required: true
+                default: "weekly"
+                type: choice
+                options:
+                    - weekly
+                    - monthly
+                    - custom
+            period_days:
+                description: "Custom period in days (only for custom digest)"
+                required: false
+                default: "7"
+                type: string
+            dry_run:
+                description: "Dry run (true/false)"
+                required: false
+                default: "true"
+                type: string
+
+permissions:
+    contents: read
+    issues: read
+    actions: read
+
+jobs:
+    generate-digest:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Generate digest and insights
+              id: digest
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_REPOSITORY: ${{ github.repository }}
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const dry = '${{ inputs.dry_run }}' !== 'false';
+                      const digestType = '${{ inputs.digest_type }}' || 'weekly';
+                      const customDays = parseInt('${{ inputs.period_days }}' || '7');
+
+                      // Determine period based on digest type and schedule
+                      let periodDays;
+                      let digestTitle;
+
+                      if (digestType === 'custom') {
+                        periodDays = customDays;
+                        digestTitle = `${periodDays}-Day Digest`;
+                      } else if (digestType === 'monthly' || context.eventName === 'schedule' && context.schedule === '0 9 1 * *') {
+                        periodDays = 30;
+                        digestTitle = 'Monthly Digest';
+                      } else {
+                        periodDays = 7;
+                        digestTitle = 'Weekly Digest';
+                      }
+
+                      core.info(`📊 OPS-Epsilon Digest Starting`);
+                      core.info(`Type: ${digestTitle} (${periodDays} days) | Dry Run: ${dry}`);
+
+                      // Calculate date range
+                      const endDate = new Date();
+                      const startDate = new Date();
+                      startDate.setDate(startDate.getDate() - periodDays);
+
+                      const formatDate = (date) => date.toISOString().split('T')[0];
+
+                      core.info(`📅 Period: ${formatDate(startDate)} to ${formatDate(endDate)}`);
+
+                      // Import dayjs for ISO week calculations
+                      const dayjs = require('dayjs');
+                      const isoWeek = require('dayjs/plugin/isoWeek');
+                      dayjs.extend(isoWeek);
+
+                      function getCurrentSprintName(d = new Date()) {
+                        const y = d.getFullYear().toString().slice(-2);
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const week = String(dayjs(d).isoWeek()).padStart(2, '0');
+                        return `Sprint-${y}${month}-W${week}`;
+                      }
+
+                      // Fetch recent issues (completed)
+                      const { data: recentIssues } = await github.rest.issues.listForRepo({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        state: 'closed',
+                        since: startDate.toISOString(),
+                        per_page: 100
+                      });
+
+                      // Filter for done issues in our time range
+                      const completedIssues = recentIssues.filter(issue =>
+                        !issue.pull_request &&
+                        issue.labels.some(label => label.name === 'done') &&
+                        new Date(issue.closed_at) >= startDate &&
+                        new Date(issue.closed_at) <= endDate
+                      );
+
+                      // Fetch recent PRs
+                      const { data: recentPRs } = await github.rest.pulls.list({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        state: 'closed',
+                        per_page: 100
+                      });
+
+                      const mergedPRs = recentPRs.filter(pr =>
+                        pr.merged_at &&
+                        new Date(pr.merged_at) >= startDate &&
+                        new Date(pr.merged_at) <= endDate
+                      );
+
+                      // Fetch workflow runs for health metrics
+                      const { data: workflowRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        per_page: 100
+                      });
+
+                      const deltaWorkflowRuns = workflowRuns.workflow_runs.filter(run =>
+                        run.name.includes('Delta') &&
+                        new Date(run.created_at) >= startDate &&
+                        new Date(run.created_at) <= endDate
+                      );
+
+                      // Calculate metrics
+                      const metrics = {
+                        period: {
+                          days: periodDays,
+                          start: formatDate(startDate),
+                          end: formatDate(endDate),
+                          type: digestTitle
+                        },
+                        sprint: {
+                          current: getCurrentSprintName(),
+                          previous: getCurrentSprintName(startDate)
+                        },
+                        velocity: {
+                          issuesCompleted: completedIssues.length,
+                          prsTotal: mergedPRs.length,
+                          totalPoints: completedIssues.reduce((sum, issue) => {
+                            const estimate = parseEstimate(issue);
+                            return sum + estimate;
+                          }, 0)
+                        },
+                        health: {
+                          totalWorkflows: deltaWorkflowRuns.length,
+                          successfulWorkflows: deltaWorkflowRuns.filter(run => run.conclusion === 'success').length,
+                          failedWorkflows: deltaWorkflowRuns.filter(run => run.conclusion === 'failure').length,
+                          successRate: deltaWorkflowRuns.length > 0 ?
+                            Math.round((deltaWorkflowRuns.filter(run => run.conclusion === 'success').length / deltaWorkflowRuns.length) * 100) : 0
+                        },
+                        priorities: {},
+                        tools: {},
+                        trends: {}
+                      };
+
+                      // Helper function to parse estimates
+                      function parseEstimate(issue) {
+                        const bodyMatch = (issue.body || '').match(/estimate[:\s]*(\d+(?:\.\d+)?)\s*d/i);
+                        if (bodyMatch) return parseFloat(bodyMatch[1]);
+
+                        const labels = (issue.labels || []).map(l => l.name).join(' ');
+                        const labelMatch = labels.match(/est:([\d\.]+)d/i);
+                        if (labelMatch) return parseFloat(labelMatch[1]);
+
+                        return 1.0;
+                      }
+
+                      // Analyze priority distribution
+                      completedIssues.forEach(issue => {
+                        const priority = issue.labels.find(l => l.name.match(/^P[0-2]/))?.name || 'P2';
+                        metrics.priorities[priority] = (metrics.priorities[priority] || 0) + 1;
+                      });
+
+                      // Analyze tool distribution
+                      completedIssues.forEach(issue => {
+                        const tool = issue.labels.find(l => l.name.startsWith('tool:'))?.name.replace('tool:', '') || 'general';
+                        metrics.tools[tool] = (metrics.tools[tool] || 0) + 1;
+                      });
+
+                      // Calculate trends (compare with previous period for weekly/monthly)
+                      if (digestType !== 'custom' && periodDays >= 7) {
+                        const previousPeriodStart = new Date(startDate);
+                        previousPeriodStart.setDate(previousPeriodStart.getDate() - periodDays);
+
+                        const { data: previousIssues } = await github.rest.issues.listForRepo({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          state: 'closed',
+                          since: previousPeriodStart.toISOString(),
+                          per_page: 100
+                        });
+
+                        const previousCompleted = previousIssues.filter(issue =>
+                          !issue.pull_request &&
+                          issue.labels.some(label => label.name === 'done') &&
+                          new Date(issue.closed_at) >= previousPeriodStart &&
+                          new Date(issue.closed_at) < startDate
+                        );
+
+                        const previousPoints = previousCompleted.reduce((sum, issue) => sum + parseEstimate(issue), 0);
+
+                        metrics.trends = {
+                          issuesTrend: metrics.velocity.issuesCompleted - previousCompleted.length,
+                          pointsTrend: Math.round((metrics.velocity.totalPoints - previousPoints) * 10) / 10,
+                          velocityChange: previousCompleted.length > 0 ?
+                            Math.round(((metrics.velocity.issuesCompleted / previousCompleted.length) - 1) * 100) : 0
+                        };
+                      }
+
+                      // Generate insights
+                      const insights = [];
+
+                      // Velocity insights
+                      if (metrics.velocity.issuesCompleted === 0) {
+                        insights.push('⚠️ No issues completed this period - consider reviewing ready queue');
+                      } else if (metrics.velocity.issuesCompleted >= 10) {
+                        insights.push('🚀 High velocity period - excellent progress!');
+                      }
+
+                      // Health insights
+                      if (metrics.health.successRate < 80) {
+                        insights.push(`⚠️ Workflow success rate is ${metrics.health.successRate}% - may need attention`);
+                      } else if (metrics.health.successRate >= 95) {
+                        insights.push('✅ Excellent workflow reliability this period');
+                      }
+
+                      // Priority insights
+                      const p0Count = metrics.priorities['P0-blocker'] || 0;
+                      if (p0Count > 0) {
+                        insights.push(`🚨 ${p0Count} P0 blocker(s) resolved - great crisis management`);
+                      }
+
+                      // Trend insights
+                      if (metrics.trends.issuesTrend > 0) {
+                        insights.push(`📈 Velocity increased by ${metrics.trends.issuesTrend} issues vs previous period`);
+                      } else if (metrics.trends.issuesTrend < -2) {
+                        insights.push(`📉 Velocity decreased by ${Math.abs(metrics.trends.issuesTrend)} issues - monitor workload`);
+                      }
+
+                      // Build digest message
+                      const digestEmoji = digestType === 'monthly' ? '📊' : '📈';
+                      const digestMessage = buildDigestMessage(digestEmoji, digestTitle, metrics, insights);
+
+                      core.info('📋 Generated digest summary');
+                      core.info(`Completed Issues: ${metrics.velocity.issuesCompleted}`);
+                      core.info(`Total Points: ${metrics.velocity.totalPoints}`);
+                      core.info(`Workflow Success Rate: ${metrics.health.successRate}%`);
+
+                      // Set outputs for notification workflow
+                      core.setOutput('digest_message', digestMessage);
+                      core.setOutput('metrics_json', JSON.stringify(metrics));
+                      core.setOutput('insights_count', insights.length);
+
+                      // Generate summary
+                      core.summary.addHeading(`${digestEmoji} ${digestTitle} - OPS-Delta Performance`, 2);
+                      core.summary.addTable([
+                        ['Metric', 'Value', 'Trend'],
+                        ['Period', `${metrics.period.start} to ${metrics.period.end}`, ''],
+                        ['Issues Completed', metrics.velocity.issuesCompleted.toString(), metrics.trends.issuesTrend ? `${metrics.trends.issuesTrend > 0 ? '+' : ''}${metrics.trends.issuesTrend}` : ''],
+                        ['Points Delivered', metrics.velocity.totalPoints.toString(), metrics.trends.pointsTrend ? `${metrics.trends.pointsTrend > 0 ? '+' : ''}${metrics.trends.pointsTrend}` : ''],
+                        ['PRs Merged', metrics.velocity.prsTotal.toString(), ''],
+                        ['Workflow Success Rate', `${metrics.health.successRate}%`, ''],
+                        ['Insights Generated', insights.length.toString(), '']
+                      ]);
+
+                      if (Object.keys(metrics.priorities).length > 0) {
+                        core.summary.addHeading('Priority Breakdown', 3);
+                        const priorityTable = [['Priority', 'Issues Completed']];
+                        Object.entries(metrics.priorities).forEach(([priority, count]) => {
+                          priorityTable.push([priority, count.toString()]);
+                        });
+                        core.summary.addTable(priorityTable);
+                      }
+
+                      if (insights.length > 0) {
+                        core.summary.addHeading('Key Insights', 3);
+                        core.summary.addList(insights);
+                      }
+
+                      await core.summary.write();
+
+                      function buildDigestMessage(emoji, title, metrics, insights) {
+                        const lines = [
+                          `${emoji} **${title}** • ${metrics.period.start} to ${metrics.period.end}`,
+                          '',
+                          '**📊 Performance Summary**',
+                          `• Issues Completed: **${metrics.velocity.issuesCompleted}** ${metrics.trends.issuesTrend ? `(${metrics.trends.issuesTrend > 0 ? '+' : ''}${metrics.trends.issuesTrend})` : ''}`,
+                          `• Points Delivered: **${metrics.velocity.totalPoints}** ${metrics.trends.pointsTrend ? `(${metrics.trends.pointsTrend > 0 ? '+' : ''}${metrics.trends.pointsTrend})` : ''}`,
+                          `• PRs Merged: **${metrics.velocity.prsTotal}**`,
+                          `• Workflow Health: **${metrics.health.successRate}%** success rate`,
+                          ''
+                        ];
+
+                        if (Object.keys(metrics.priorities).length > 0) {
+                          lines.push('**🎯 Priority Distribution**');
+                          Object.entries(metrics.priorities).forEach(([priority, count]) => {
+                            lines.push(`• ${priority}: **${count}** issues`);
+                          });
+                          lines.push('');
+                        }
+
+                        if (insights.length > 0) {
+                          lines.push('**💡 Key Insights**');
+                          insights.forEach(insight => lines.push(`• ${insight}`));
+                          lines.push('');
+                        }
+
+                        lines.push(`🤖 *Generated by OPS-Epsilon • Sprint: ${metrics.sprint.current}*`);
+
+                        return lines.join('\\n');
+                      }
+
+            - name: Send digest notification
+              if: steps.digest.outputs.digest_message != ''
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Trigger notification workflow
+                  echo "Triggering digest notification..."
+                  gh workflow run delta-notify.yml \
+                    -f event_type="digest_summary" \
+                    -f title="Performance Digest" \
+                    -f message="${{ steps.digest.outputs.digest_message }}" \
+                    -f severity="info" \
+                    -f dry_run="${{ inputs.dry_run }}"
