@@ -33,9 +33,7 @@ class ResizeProgress extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  isUploading
-                      ? 'Uploading images...'
-                      : 'Resizing images...',
+                  isUploading ? 'Uploading images...' : 'Resizing images...',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 16,

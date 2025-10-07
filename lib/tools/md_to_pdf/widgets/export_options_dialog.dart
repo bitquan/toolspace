@@ -74,10 +74,11 @@ class _ExportOptionsDialogState extends State<ExportOptionsDialog> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _selectedPageSize,
+                initialValue: _selectedPageSize,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'a4', child: Text('A4')),
@@ -129,7 +130,8 @@ class _ExportOptionsDialogState extends State<ExportOptionsDialog> {
                     child: _buildMarginField(
                       label: 'Bottom',
                       value: _bottomMargin,
-                      onChanged: (value) => setState(() => _bottomMargin = value),
+                      onChanged: (value) =>
+                          setState(() => _bottomMargin = value),
                     ),
                   ),
                 ],
@@ -149,7 +151,8 @@ class _ExportOptionsDialogState extends State<ExportOptionsDialog> {
                     child: _buildMarginField(
                       label: 'Right',
                       value: _rightMargin,
-                      onChanged: (value) => setState(() => _rightMargin = value),
+                      onChanged: (value) =>
+                          setState(() => _rightMargin = value),
                     ),
                   ),
                 ],

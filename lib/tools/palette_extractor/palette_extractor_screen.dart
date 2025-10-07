@@ -74,7 +74,8 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
       _image = frame.image;
 
       // Get pixel data
-      final byteData = await _image!.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final byteData =
+          await _image!.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (byteData == null) {
         throw Exception('Failed to get image pixel data');
       }
@@ -148,7 +149,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
       // For web, trigger download
       // Note: This is a simplified version. In a real implementation,
       // you'd use a package like 'universal_html' for web downloads
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -391,7 +392,8 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 1.2,
                         crossAxisSpacing: 12,
@@ -399,8 +401,10 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                       ),
                       itemCount: _palette.length,
                       itemBuilder: (context, index) {
-                        final totalPixels = _frequencies.fold(0, (sum, f) => sum + f);
-                        final percentage = (_frequencies[index] / totalPixels) * 100;
+                        final totalPixels =
+                            _frequencies.fold(0, (sum, f) => sum + f);
+                        final percentage =
+                            (_frequencies[index] / totalPixels) * 100;
 
                         return ColorSwatchCard(
                           color: _palette[index],
@@ -412,7 +416,9 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                   ],
 
                   // Empty state
-                  if (_palette.isEmpty && !_isExtracting && _imageBytes == null) ...[
+                  if (_palette.isEmpty &&
+                      !_isExtracting &&
+                      _imageBytes == null) ...[
                     const SizedBox(height: 48),
                     Center(
                       child: Column(
@@ -434,7 +440,8 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                           Text(
                             'The tool will extract the most dominant colors using k-means clustering',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withOpacity(0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),

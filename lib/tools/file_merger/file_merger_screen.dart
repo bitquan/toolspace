@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import 'logic/upload_manager.dart';
-import 'widgets/file_upload_zone.dart';
 import 'widgets/file_list.dart';
-import 'widgets/quota_banner.dart';
+import 'widgets/file_upload_zone.dart';
 import 'widgets/merge_progress.dart';
+import 'widgets/quota_banner.dart';
 
 /// Main screen for the File Merger tool
 class FileMergerScreen extends StatefulWidget {
@@ -21,8 +23,9 @@ class FileMergerScreen extends StatefulWidget {
 class _FileMergerScreenState extends State<FileMergerScreen> {
   final UploadManager _uploadManager = UploadManager();
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
+  final BillingService _billingService = BillingService();
 
-  List<FileUpload> _files = [];
+  final List<FileUpload> _files = [];
   bool _isUploading = false;
   bool _isMerging = false;
   String? _downloadUrl;
@@ -110,9 +113,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
     }
 
     // Check quota
-    if (_quotaStatus != null &&
-        !_quotaStatus!.isPro &&
-        _quotaStatus!.mergesRemaining <= 0) {
+    if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0) {
       _showErrorSnackBar('Free quota exceeded. Please upgrade to Pro.');
       return;
     }
@@ -140,6 +141,9 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
         _isMerging = false;
         _downloadUrl = result.data['downloadUrl'];
       });
+
+      // Track heavy operation
+      await _billingService.trackHeavyOp();
 
       // Refresh quota status
       await _loadQuotaStatus();
@@ -181,179 +185,190 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('File Merger'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+    // Calculate max file size and batch size for paywall guard
+    final maxFileBytes =
+        _files.isEmpty ? null : _files.map((f) => f.bytes.length).reduce((a, b) => a > b ? a : b);
+    final batchSize = _files.length;
+
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: ToolPermission(
+        toolId: 'file_merger',
+        requiresHeavyOp: true,
+        fileSize: maxFileBytes,
+        batchSize: batchSize > 0 ? batchSize : null,
       ),
-      body: Column(
-        children: [
-          // Quota banner
-          if (_quotaStatus != null &&
-              !_quotaStatus!.isPro &&
-              _quotaStatus!.mergesRemaining <= 0)
-            QuotaBanner(quotaStatus: _quotaStatus!),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('File Merger'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Column(
+          children: [
+            // Quota banner
+            if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0)
+              QuotaBanner(quotaStatus: _quotaStatus!),
 
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Upload zone
-                  FileUploadZone(
-                    onFilesSelected: _pickFiles,
-                    isEnabled: !_isUploading && !_isMerging,
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // File list
-                  if (_files.isNotEmpty) ...[
-                    Text(
-                      'Files to Merge (${_files.length})',
-                      style: Theme.of(context).textTheme.titleMedium,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Upload zone
+                    FileUploadZone(
+                      onFilesSelected: _pickFiles,
+                      isEnabled: !_isUploading && !_isMerging,
                     ),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: FileList(
-                        files: _files,
-                        onRemove: _removeFile,
-                        onReorder: _reorderFiles,
-                        isEnabled: !_isUploading && !_isMerging,
+
+                    const SizedBox(height: 16),
+
+                    // File list
+                    if (_files.isNotEmpty) ...[
+                      Text(
+                        'Files to Merge (${_files.length})',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                    ),
-                  ] else ...[
-                    const Expanded(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.file_copy_outlined,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'No files selected',
-                              style: TextStyle(
-                                fontSize: 18,
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: FileList(
+                          files: _files,
+                          onRemove: _removeFile,
+                          onReorder: _reorderFiles,
+                          isEnabled: !_isUploading && !_isMerging,
+                        ),
+                      ),
+                    ] else ...[
+                      const Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.file_copy_outlined,
+                                size: 64,
                                 color: Colors.grey,
                               ),
+                              SizedBox(height: 16),
+                              Text(
+                                'No files selected',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Tap the upload zone above to add PDF or image files',
+                                style: TextStyle(color: Colors.grey),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 16),
+
+                    // Progress indicator
+                    if (_isUploading || _isMerging)
+                      MergeProgress(
+                        isUploading: _isUploading,
+                        isMerging: _isMerging,
+                      ),
+
+                    // Download section
+                    if (_downloadUrl != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.green),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Merge Complete',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Tap the upload zone above to add PDF or image files',
-                              style: TextStyle(color: Colors.grey),
-                              textAlign: TextAlign.center,
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () => _launchUrl(_downloadUrl!),
+                                    icon: const Icon(Icons.download),
+                                    label: const Text('Download PDF'),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton.icon(
+                                  onPressed: _copyLink,
+                                  icon: const Icon(Icons.copy),
+                                  label: const Text('Copy Link'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey.shade100,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Progress indicator
-                  if (_isUploading || _isMerging)
-                    MergeProgress(
-                      isUploading: _isUploading,
-                      isMerging: _isMerging,
-                    ),
-
-                  // Download section
-                  if (_downloadUrl != null) ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green.shade200),
+                    // Merge button
+                    ElevatedButton(
+                      onPressed:
+                          _files.isNotEmpty && !_isUploading && !_isMerging ? _mergeFiles : null,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.check_circle, color: Colors.green),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Merge Complete',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _launchUrl(_downloadUrl!),
-                                  icon: const Icon(Icons.download),
-                                  label: const Text('Download PDF'),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              ElevatedButton.icon(
-                                onPressed: _copyLink,
-                                icon: const Icon(Icons.copy),
-                                label: const Text('Copy Link'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey.shade100,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      child: Text(
+                        _isUploading
+                            ? 'Uploading...'
+                            : _isMerging
+                                ? 'Merging...'
+                                : 'Merge Files',
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
+
+                    // Quota status
+                    if (_quotaStatus != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _quotaStatus!.isPro
+                            ? 'Pro account: Unlimited merges'
+                            : 'Free: ${_quotaStatus!.mergesRemaining} merges remaining',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ],
-
-                  const SizedBox(height: 16),
-
-                  // Merge button
-                  ElevatedButton(
-                    onPressed: _files.isNotEmpty && !_isUploading && !_isMerging
-                        ? _mergeFiles
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text(
-                      _isUploading
-                          ? 'Uploading...'
-                          : _isMerging
-                              ? 'Merging...'
-                              : 'Merge Files',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
-
-                  // Quota status
-                  if (_quotaStatus != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _quotaStatus!.isPro
-                          ? 'Pro account: Unlimited merges'
-                          : 'Free: ${_quotaStatus!.mergesRemaining} merges remaining',
-                      style: Theme.of(context).textTheme.bodySmall,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   void _launchUrl(String url) async {

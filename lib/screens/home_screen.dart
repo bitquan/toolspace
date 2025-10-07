@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../tools/text_tools/text_tools_screen.dart';
 import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
@@ -169,7 +169,8 @@ class HomeScreen extends StatelessWidget {
     ToolItem(
       id: 'time-convert',
       name: 'Time Converter',
-      description: 'Convert timestamps between formats and parse natural language',
+      description:
+          'Convert timestamps between formats and parse natural language',
       icon: Icons.schedule,
       screen: const TimeConvertScreen(),
       color: PlayfulTheme.toolColors[12 % PlayfulTheme.toolColors.length],
@@ -177,7 +178,8 @@ class HomeScreen extends StatelessWidget {
     ToolItem(
       id: 'regex-tester',
       name: 'Regex Tester',
-      description: 'Test regex patterns with live match highlighting and capture groups',
+      description:
+          'Test regex patterns with live match highlighting and capture groups',
       icon: Icons.pattern,
       screen: const RegexTesterScreen(),
       color: PlayfulTheme.toolColors[13 % PlayfulTheme.toolColors.length],
@@ -193,7 +195,8 @@ class HomeScreen extends StatelessWidget {
     ToolItem(
       id: 'palette-extractor',
       name: 'Palette Extractor',
-      description: 'Extract dominant colors from images using k-means clustering',
+      description:
+          'Extract dominant colors from images using k-means clustering',
       icon: Icons.palette,
       screen: const PaletteExtractorScreen(),
       color: PlayfulTheme.toolColors[9 % PlayfulTheme.toolColors.length],
@@ -230,15 +233,14 @@ class HomeScreen extends StatelessWidget {
       screen: const PasswordGenScreen(),
       color: PlayfulTheme.toolColors[8 % PlayfulTheme.toolColors.length],
     ),
-    ToolItem(
+    const ToolItem(
       id: 'json-flatten',
       name: 'JSON Flatten',
       description:
           'Flatten nested JSON to CSV with field selection and preview',
       icon: Icons.table_chart,
-      screen: const JsonFlattenScreen(),
-      color: const Color(0xFF6A1B9A),
+      screen: JsonFlattenScreen(),
+      color: Color(0xFF6A1B9A),
     ),
   ];
 }
-

@@ -20,7 +20,7 @@ void main() {
     test('rejects invalid URLs', () {
       final invalidUrls = [
         'not-a-url',
-        'example.com',  // Missing protocol in strict validation
+        'example.com', // Missing protocol in strict validation
         'htp://example.com',
         'https:/example.com',
         'https://example',
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('rejects too long URLs', () {
-      final longUrl = 'https://example.com/' + 'a' * 2500;
+      final longUrl = 'https://example.com/${'a' * 2500}';
       expect(isValidUrl(longUrl), false);
     });
 
@@ -111,20 +111,39 @@ bool isValidUrl(String url) {
     return true; // Empty is considered valid (no error state)
   }
 
-  final urlPattern = RegExp(
-    r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$',
-    caseSensitive: false,
-  );
-
-  if (!urlPattern.hasMatch(url)) {
+  // Require protocol (https or http)
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return false;
   }
 
-  if (url.length > 2048) {
+  // Use Uri.parse for robust validation
+  try {
+    final uri = Uri.parse(url);
+
+    // Must have scheme and host
+    if (!uri.hasScheme || uri.host.isEmpty) {
+      return false;
+    }
+
+    // Must be http or https
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return false;
+    }
+
+    // Must have valid TLD (at least one dot in host)
+    if (!uri.host.contains('.')) {
+      return false;
+    }
+
+    // Check length
+    if (url.length > 2048) {
+      return false;
+    }
+
+    return true;
+  } catch (e) {
     return false;
   }
-
-  return true;
 }
 
 String? getValidationError(String url) {
@@ -144,8 +163,7 @@ String? getValidationError(String url) {
 }
 
 String generateShortCode() {
-  const chars =
-      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   return String.fromCharCodes(
     Iterable.generate(
       6,

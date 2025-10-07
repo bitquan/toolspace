@@ -1,6 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'dart:typed_data';
-import '../../../lib/tools/codec_lab/logic/codec_engine.dart';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:toolspace/tools/codec_lab/logic/codec_engine.dart';
 
 void main() {
   group('Base64 Encoding/Decoding Tests', () {
@@ -108,7 +109,7 @@ void main() {
         throwsA(isA<CodecException>()),
       );
       expect(
-        () => CodecEngine.decodeHex('48656c'),
+        () => CodecEngine.decodeHex('48656'), // Odd length (5 chars)
         throwsA(isA<CodecException>()),
       );
       expect(
@@ -313,8 +314,8 @@ void main() {
         false,
       );
       expect(
-        CodecEngine.isValid('48656c', CodecFormat.hex),
-        false, // Odd length
+        CodecEngine.isValid('48656', CodecFormat.hex),
+        false, // Odd length (5 chars)
       );
     });
 

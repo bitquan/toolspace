@@ -53,7 +53,7 @@ class RegexEngine {
   /// Extract all capture groups from a match
   static List<CaptureGroup> _extractGroups(RegExpMatch match) {
     final groups = <CaptureGroup>[];
-    
+
     // Add all numbered groups (starting from 1, as 0 is the full match)
     for (var i = 1; i <= match.groupCount; i++) {
       final value = match.group(i);
@@ -68,8 +68,9 @@ class RegexEngine {
 
     // Add named groups if available
     try {
-      final namedGroupNames = match.pattern.pattern
-          .allMatches(RegExp(r'\(\?<(\w+)>'))
+      final patternString = match.pattern.pattern.toString();
+      final namedGroupNames = RegExp(r'\(\?<(\w+)>')
+          .allMatches(patternString)
           .map((m) => m.group(1))
           .where((name) => name != null)
           .cast<String>()
@@ -102,7 +103,7 @@ class RegexEngine {
       error = error.replaceFirst('FormatException: ', '');
       error = error.split('\n').first;
     }
-    
+
     // Common error patterns
     if (error.contains('Unterminated group')) {
       return 'Unterminated group - check your parentheses';
@@ -111,14 +112,14 @@ class RegexEngine {
     } else if (error.contains('Unmatched')) {
       return 'Unmatched bracket or parenthesis';
     }
-    
+
     return error.isEmpty ? 'Invalid regex pattern' : error;
   }
 
   /// Validate regex pattern syntax
   static bool isValidPattern(String pattern) {
     if (pattern.isEmpty) return true;
-    
+
     try {
       RegExp(pattern);
       return true;

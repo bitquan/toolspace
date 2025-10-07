@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'logic/json_flattener.dart';
+
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
+import 'logic/json_flattener.dart';
 
 /// JSON CSV Flattener - Flatten nested JSON to CSV with field selection
 class JsonFlattenScreen extends StatefulWidget {
@@ -14,10 +16,10 @@ class JsonFlattenScreen extends StatefulWidget {
   State<JsonFlattenScreen> createState() => _JsonFlattenScreenState();
 }
 
-class _JsonFlattenScreenState extends State<JsonFlattenScreen>
-    with TickerProviderStateMixin {
+class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _csvController = TextEditingController();
+  final BillingService _billingService = BillingService();
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -148,14 +150,17 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
     }
   }
 
-  void _downloadCSV() {
+  Future<void> _downloadCSV() async {
     if (_csvController.text.isNotEmpty) {
+      // Track heavy operation (CSV export)
+      await _billingService.trackHeavyOp();
+
       // On web, this would trigger a download
       // For now, we'll just copy to clipboard with a message
       Clipboard.setData(ClipboardData(text: _csvController.text));
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('CSV ready! (Copied to clipboard)'),
+        const SnackBar(
+          content: Text('CSV ready! (Copied to clipboard)'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -176,254 +181,164 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final stats = _flattenResult != null
-        ? JsonFlattener.getStatistics(_flattenResult!)
-        : null;
+    final stats = _flattenResult != null ? JsonFlattener.getStatistics(_flattenResult!) : null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6A1B9A).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
+    // Calculate input size for paywall (large JSON exports are heavy ops)
+    final inputBytes = _inputController.text.length;
+    final outputRows = _flattenResult?.rows.length ?? 0;
+
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: ToolPermission(
+        toolId: 'json_flatten',
+        requiresHeavyOp: outputRows > 100, // Heavy if exporting >100 rows
+        fileSize: inputBytes > 0 ? inputBytes : null,
+        batchSize: outputRows > 0 ? outputRows : null,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6A1B9A).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.table_chart,
+                  color: Color(0xFF6A1B9A),
+                  size: 20,
+                ),
               ),
-              child: const Icon(
-                Icons.table_chart,
-                color: Color(0xFF6A1B9A),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text('JSON CSV Flattener'),
-          ],
-        ),
-        actions: [
-          ImportDataButton(
-            acceptedTypes: const [SharedDataType.json, SharedDataType.text],
-            onImport: (data, type, source) {
-              setState(() {
-                _inputController.text = data;
-              });
-            },
-            compact: true,
+              const SizedBox(width: 12),
+              const Text('JSON CSV Flattener'),
+            ],
           ),
-          if (_csvController.text.isNotEmpty)
-            ShareDataButton(
-              data: _csvController.text,
-              type: SharedDataType.text,
-              sourceTool: 'JSON Flatten',
+          actions: [
+            ImportDataButton(
+              acceptedTypes: const [SharedDataType.json, SharedDataType.text],
+              onImport: (data, type, source) {
+                setState(() {
+                  _inputController.text = data;
+                });
+              },
               compact: true,
             ),
-          IconButton(
-            onPressed: _clearAll,
-            icon: const Icon(Icons.clear_all),
-            tooltip: 'Clear All',
-          ),
-          IconButton(
-            onPressed: _copyCSV,
-            icon: const Icon(Icons.copy),
-            tooltip: 'Copy CSV',
-          ),
-          IconButton(
-            onPressed: _downloadCSV,
-            icon: const Icon(Icons.download),
-            tooltip: 'Download CSV',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Status bar with stats
-          if (_flattenResult != null && _flattenResult!.success)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
-                  ),
-                ),
+            if (_csvController.text.isNotEmpty)
+              ShareDataButton(
+                data: _csvController.text,
+                type: SharedDataType.text,
+                sourceTool: 'JSON Flatten',
+                compact: true,
               ),
-              child: AnimatedBuilder(
-                animation: _pulseAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _pulseAnimation.value,
-                    child: Wrap(
-                      spacing: 24,
-                      runSpacing: 8,
-                      children: [
-                        _buildStatItem(
-                          theme,
-                          Icons.table_rows,
-                          '${stats!['rows']} rows',
-                        ),
-                        _buildStatItem(
-                          theme,
-                          Icons.view_column,
-                          '${stats['columns']} columns',
-                        ),
-                        _buildStatItem(
-                          theme,
-                          Icons.grid_on,
-                          '${stats['totalCells']} cells',
-                        ),
-                        _buildStatItem(
-                          theme,
-                          Icons.layers,
-                          'Depth: ${stats['maxDepth']}',
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+            IconButton(
+              onPressed: _clearAll,
+              icon: const Icon(Icons.clear_all),
+              tooltip: 'Clear All',
             ),
-
-          // Error message
-          if (_errorMessage != null)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer.withOpacity(0.3),
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.error.withOpacity(0.3),
+            IconButton(
+              onPressed: _copyCSV,
+              icon: const Icon(Icons.copy),
+              tooltip: 'Copy CSV',
+            ),
+            IconButton(
+              onPressed: _downloadCSV,
+              icon: const Icon(Icons.download),
+              tooltip: 'Download CSV',
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // Status bar with stats
+            if (_flattenResult != null && _flattenResult!.success)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: theme.colorScheme.outline.withOpacity(0.3),
+                    ),
                   ),
                 ),
+                child: AnimatedBuilder(
+                  animation: _pulseAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _pulseAnimation.value,
+                      child: Wrap(
+                        spacing: 24,
+                        runSpacing: 8,
+                        children: [
+                          _buildStatItem(
+                            theme,
+                            Icons.table_rows,
+                            '${stats!['rows']} rows',
+                          ),
+                          _buildStatItem(
+                            theme,
+                            Icons.view_column,
+                            '${stats['columns']} columns',
+                          ),
+                          _buildStatItem(
+                            theme,
+                            Icons.grid_on,
+                            '${stats['totalCells']} cells',
+                          ),
+                          _buildStatItem(
+                            theme,
+                            Icons.layers,
+                            'Depth: ${stats['maxDepth']}',
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
+
+            // Error message
+            if (_errorMessage != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer.withOpacity(0.3),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: theme.colorScheme.error.withOpacity(0.3),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Main content
+            Expanded(
               child: Row(
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(width: 12),
+                  // Left panel: JSON Input
                   Expanded(
-                    child: Text(
-                      _errorMessage!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // Main content
-          Expanded(
-            child: Row(
-              children: [
-                // Left panel: JSON Input
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                          color: theme.colorScheme.outline.withOpacity(0.3),
-                        ),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Text(
-                                'JSON Input',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Spacer(),
-                              SegmentedButton<NotationStyle>(
-                                segments: const [
-                                  ButtonSegment(
-                                    value: NotationStyle.dot,
-                                    label: Text('Dot'),
-                                    icon: Icon(Icons.circle, size: 8),
-                                  ),
-                                  ButtonSegment(
-                                    value: NotationStyle.bracket,
-                                    label: Text('Bracket'),
-                                    icon: Icon(Icons.code, size: 16),
-                                  ),
-                                ],
-                                selected: {_notationStyle},
-                                onSelectionChanged: (Set<NotationStyle> value) {
-                                  setState(() {
-                                    _notationStyle = value.first;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: TextField(
-                              controller: _inputController,
-                              maxLines: null,
-                              expands: true,
-                              textAlignVertical: TextAlignVertical.top,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 14,
-                              ),
-                              decoration: InputDecoration(
-                                hintText:
-                                    'Paste your JSON here...\n\n[\n  {"name": "Alice", "age": 30, "address": {"city": "NYC"}},\n  {"name": "Bob", "age": 25, "address": {"city": "LA"}}\n]',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                contentPadding: const EdgeInsets.all(16),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton.icon(
-                              onPressed: _isFlattening ? null : _flattenJson,
-                              icon: _isFlattening
-                                  ? const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.transform),
-                              label: Text(
-                                _isFlattening
-                                    ? 'Flattening...'
-                                    : 'Flatten to CSV',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Middle panel: Field Selector
-                if (_flattenResult != null && _flattenResult!.success)
-                  Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border(
@@ -440,67 +355,77 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                             child: Row(
                               children: [
                                 Text(
-                                  'Fields',
+                                  'JSON Input',
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 const Spacer(),
-                                Text(
-                                  '${_selectedKeys.length}/${_flattenResult!.allKeys.length}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
+                                SegmentedButton<NotationStyle>(
+                                  segments: const [
+                                    ButtonSegment(
+                                      value: NotationStyle.dot,
+                                      label: Text('Dot'),
+                                      icon: Icon(Icons.circle, size: 8),
+                                    ),
+                                    ButtonSegment(
+                                      value: NotationStyle.bracket,
+                                      label: Text('Bracket'),
+                                      icon: Icon(Icons.code, size: 16),
+                                    ),
+                                  ],
+                                  selected: {_notationStyle},
+                                  onSelectionChanged: (Set<NotationStyle> value) {
+                                    setState(() {
+                                      _notationStyle = value.first;
+                                    });
+                                  },
                                 ),
                               ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: TextField(
+                                controller: _inputController,
+                                maxLines: null,
+                                expands: true,
+                                textAlignVertical: TextAlignVertical.top,
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 14,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText:
+                                      'Paste your JSON here...\n\n[\n  {"name": "Alice", "age": 30, "address": {"city": "NYC"}},\n  {"name": "Bob", "age": 25, "address": {"city": "LA"}}\n]',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                              ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: _selectAllKeys,
-                                    child: const Text('Select All'),
-                                  ),
+                            padding: const EdgeInsets.all(16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: FilledButton.icon(
+                                onPressed: _isFlattening ? null : _flattenJson,
+                                icon: _isFlattening
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.transform),
+                                label: Text(
+                                  _isFlattening ? 'Flattening...' : 'Flatten to CSV',
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: _deselectAllKeys,
-                                    child: const Text('Deselect All'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: ListView.builder(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: _flattenResult!.allKeys.length,
-                              itemBuilder: (context, index) {
-                                final key = _flattenResult!.allKeys[index];
-                                final isSelected = _selectedKeys.contains(key);
-                                return CheckboxListTile(
-                                  value: isSelected,
-                                  onChanged: (bool? value) {
-                                    _toggleKey(key);
-                                  },
-                                  title: Text(
-                                    key,
-                                    style: const TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  dense: true,
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                );
-                              },
+                              ),
                             ),
                           ),
                         ],
@@ -508,55 +433,141 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                     ),
                   ),
 
-                // Right panel: CSV Preview
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'CSV Preview',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                  // Middle panel: Field Selector
+                  if (_flattenResult != null && _flattenResult!.success)
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.3),
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: TextField(
-                            controller: _csvController,
-                            maxLines: null,
-                            expands: true,
-                            readOnly: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            style: const TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 14,
-                            ),
-                            decoration: InputDecoration(
-                              hintText:
-                                  'CSV output will appear here after flattening...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Fields',
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    '${_selectedKeys.length}/${_flattenResult!.allKeys.length}',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              contentPadding: const EdgeInsets.all(16),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: _selectAllKeys,
+                                      child: const Text('Select All'),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: _deselectAllKeys,
+                                      child: const Text('Deselect All'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Expanded(
+                              child: ListView.builder(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                itemCount: _flattenResult!.allKeys.length,
+                                itemBuilder: (context, index) {
+                                  final key = _flattenResult!.allKeys[index];
+                                  final isSelected = _selectedKeys.contains(key);
+                                  return CheckboxListTile(
+                                    value: isSelected,
+                                    onChanged: (bool? value) {
+                                      _toggleKey(key);
+                                    },
+                                    title: Text(
+                                      key,
+                                      style: const TextStyle(
+                                        fontFamily: 'monospace',
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    dense: true,
+                                    controlAffinity: ListTileControlAffinity.leading,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // Right panel: CSV Preview
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            'CSV Preview',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: TextField(
+                              controller: _csvController,
+                              maxLines: null,
+                              expands: true,
+                              readOnly: true,
+                              textAlignVertical: TextAlignVertical.top,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 14,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'CSV output will appear here after flattening...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.all(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildStatItem(ThemeData theme, IconData icon, String label) {

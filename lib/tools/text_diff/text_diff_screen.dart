@@ -261,7 +261,9 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             icon: const Icon(Icons.clear_all),
             tooltip: 'Clear All',
           ),
-          if (_diffLines.isNotEmpty || _wordDiffs.isNotEmpty || _mergeResult != null)
+          if (_diffLines.isNotEmpty ||
+              _wordDiffs.isNotEmpty ||
+              _mergeResult != null)
             IconButton(
               onPressed: _copyDiff,
               icon: const Icon(Icons.copy),
@@ -290,133 +292,74 @@ class _TextDiffScreenState extends State<TextDiffScreen>
 
   Widget _buildLineDiffTab(ThemeData theme) {
     return Column(
-        children: [
-          // Stats panel
-          if (_stats.totalChanges > 0)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
-                    width: 1,
-                  ),
+      children: [
+        // Stats panel
+        if (_stats.totalChanges > 0)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  width: 1,
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _StatChip(
-                    label: 'Additions',
-                    value: _stats.additions.toString(),
-                    color: Colors.green,
-                    icon: Icons.add,
-                  ),
-                  _StatChip(
-                    label: 'Deletions',
-                    value: _stats.deletions.toString(),
-                    color: Colors.red,
-                    icon: Icons.remove,
-                  ),
-                  _StatChip(
-                    label: 'Similarity',
-                    value: '${_stats.similarity.toStringAsFixed(1)}%',
-                    color: theme.colorScheme.primary,
-                    icon: Icons.analytics,
-                  ),
-                ],
               ),
             ),
-
-          // Input panels
-          Expanded(
-            flex: 1,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Text 1
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                          color: theme.colorScheme.outline.withOpacity(0.3),
-                        ),
+                _StatChip(
+                  label: 'Additions',
+                  value: _stats.additions.toString(),
+                  color: Colors.green,
+                  icon: Icons.add,
+                ),
+                _StatChip(
+                  label: 'Deletions',
+                  value: _stats.deletions.toString(),
+                  color: Colors.red,
+                  icon: Icons.remove,
+                ),
+                _StatChip(
+                  label: 'Similarity',
+                  value: '${_stats.similarity.toStringAsFixed(1)}%',
+                  color: theme.colorScheme.primary,
+                  icon: Icons.analytics,
+                ),
+              ],
+            ),
+          ),
+
+        // Input panels
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              // Text 1
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: theme.colorScheme.outline.withOpacity(0.3),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceVariant
-                                .withOpacity(0.3),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Original Text',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Spacer(),
-                              ImportDataButton(
-                                acceptedTypes: const [SharedDataType.text],
-                                onImport: (data, type, source) {
-                                  setState(() {
-                                    _text1Controller.text = data;
-                                  });
-                                },
-                                compact: true,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: TextField(
-                              controller: _text1Controller,
-                              maxLines: null,
-                              expands: true,
-                              textAlignVertical: TextAlignVertical.top,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 14,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Paste original text here...',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                contentPadding: const EdgeInsets.all(16),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-
-                // Text 2
-                Expanded(
                   child: Column(
                     children: [
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color:
-                              theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withOpacity(0.3),
                         ),
                         child: Row(
                           children: [
                             Text(
-                              'Modified Text',
+                              'Original Text',
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -426,7 +369,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                               acceptedTypes: const [SharedDataType.text],
                               onImport: (data, type, source) {
                                 setState(() {
-                                  _text2Controller.text = data;
+                                  _text1Controller.text = data;
                                 });
                               },
                               compact: true,
@@ -438,7 +381,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: TextField(
-                            controller: _text2Controller,
+                            controller: _text1Controller,
                             maxLines: null,
                             expands: true,
                             textAlignVertical: TextAlignVertical.top,
@@ -447,7 +390,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                               fontSize: 14,
                             ),
                             decoration: InputDecoration(
-                              hintText: 'Paste modified text here...',
+                              hintText: 'Paste original text here...',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -459,56 +402,114 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // Diff results
-          if (_diffLines.isNotEmpty)
-            Expanded(
-              flex: 1,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
-                      width: 2,
-                    ),
-                  ),
-                ),
+              // Text 2
+              Expanded(
                 child: Column(
                   children: [
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.primaryContainer.withOpacity(0.5),
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withOpacity(0.3),
                       ),
-                      child: Text(
-                        'Differences (Line by Line)',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Modified Text',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                          ImportDataButton(
+                            acceptedTypes: const [SharedDataType.text],
+                            onImport: (data, type, source) {
+                              setState(() {
+                                _text2Controller.text = data;
+                              });
+                            },
+                            compact: true,
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: _isComparing
-                              ? const Center(child: CircularProgressIndicator())
-                              : _buildDiffView(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          controller: _text2Controller,
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 14,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Paste modified text here...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+
+        // Diff results
+        if (_diffLines.isNotEmpty)
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color:
+                          theme.colorScheme.primaryContainer.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      'Differences (Line by Line)',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _isComparing
+                            ? const Center(child: CircularProgressIndicator())
+                            : _buildDiffView(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
@@ -567,7 +568,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
               border: Border(
                 bottom: BorderSide(
                   color: theme.colorScheme.outline.withOpacity(0.3),
@@ -621,7 +622,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant
+                          color: theme.colorScheme.surfaceContainerHighest
                               .withOpacity(0.3),
                         ),
                         child: Text(
@@ -666,8 +667,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withOpacity(0.3),
                       ),
                       child: Text(
                         'Modified Text',
@@ -848,7 +849,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant
+                          color: theme.colorScheme.surfaceContainerHighest
                               .withOpacity(0.3),
                         ),
                         child: Text(
@@ -1041,7 +1042,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant
+                          color: theme.colorScheme.surfaceContainerHighest
                               .withOpacity(0.3),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(

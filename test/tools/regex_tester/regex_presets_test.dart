@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/regex_tester/logic/regex_presets.dart';
+import 'package:toolspace/tools/regex_tester/logic/regex_presets.dart';
 
 void main() {
   group('RegexPresets Tests', () {
@@ -8,7 +8,7 @@ void main() {
 
       expect(categories, isNotEmpty);
       expect(categories.length, greaterThanOrEqualTo(4));
-      
+
       // Check for expected categories
       expect(
         categories.any((c) => c.name == 'Basic'),
@@ -77,7 +77,7 @@ void main() {
 
       expect(results, isNotEmpty);
       expect(
-        results.any((p) => 
+        results.any((p) =>
           p.name.toLowerCase().contains('phone') ||
           p.description.toLowerCase().contains('phone')
         ),
@@ -156,7 +156,7 @@ void main() {
       );
 
       expect(basicCategory.presets, isNotEmpty);
-      
+
       // Basic category should have common patterns
       final presetNames = basicCategory.presets.map((p) => p.name.toLowerCase());
       expect(

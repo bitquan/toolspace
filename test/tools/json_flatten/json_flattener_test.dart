@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/json_flatten/logic/json_flattener.dart';
+import 'package:toolspace/tools/json_flatten/logic/json_flattener.dart';
 
 void main() {
   group('JsonFlattener Tests', () {

@@ -1,9 +1,9 @@
 export { health } from "./api/health.js";
-export {
-  createSubscription,
-  cancelSubscription,
-  getBillingStatus,
-} from "./billing/index.js";
+
+// Billing v1 (Stripe)
+export { createCheckoutSession } from "./billing/createCheckoutSession.js";
+export { createPortalLink } from "./billing/createPortalLink.js";
+export { webhook } from "./billing/webhook.js";
 
 // File Merger Tool
 export { mergePdfs } from "./tools/file_merger/merge_pdfs.js";

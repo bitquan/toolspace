@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
-import 'theme/playful_theme.dart';
+import 'screens/neo_home_screen.dart';
+import 'screens/billing/billing_success_screen.dart';
+import 'screens/billing/billing_cancel_screen.dart';
+import 'core/ui/neo_playground_theme.dart';
 
 class ToolspaceApp extends StatelessWidget {
   const ToolspaceApp({super.key});
@@ -8,11 +10,15 @@ class ToolspaceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Toolspace - Playful Tools Hub',
-      theme: PlayfulTheme.lightTheme,
-      darkTheme: PlayfulTheme.darkTheme,
+      title: 'Toolspace ⚙️ - Neo Playground',
+      theme: NeoPlaygroundTheme.lightTheme(),
+      darkTheme: NeoPlaygroundTheme.darkTheme(),
       themeMode: ThemeMode.system,
-      home: const HomeScreen(),
+      home: const NeoHomeScreen(),
+      routes: {
+        '/billing/success': (context) => const BillingSuccessScreen(),
+        '/billing/cancel': (context) => const BillingCancelScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }

@@ -6,7 +6,7 @@ import 'color_utils.dart';
 /// Export palette in various formats
 class PaletteExporter {
   /// Export palette as JSON
-  /// 
+  ///
   /// Format:
   /// ```json
   /// {
@@ -17,14 +17,17 @@ class PaletteExporter {
   ///   ]
   /// }
   /// ```
-  static String exportJson(List<Color> colors, {String name = 'Extracted Palette'}) {
-    final colorData = colors.map((color) => {
-      'hex': ColorUtils.toHex(color),
-      'rgb': ColorUtils.toRgb(color),
-      'r': color.red,
-      'g': color.green,
-      'b': color.blue,
-    }).toList();
+  static String exportJson(List<Color> colors,
+      {String name = 'Extracted Palette'}) {
+    final colorData = colors
+        .map((color) => {
+              'hex': ColorUtils.toHex(color),
+              'rgb': ColorUtils.toRgb(color),
+              'r': color.red,
+              'g': color.green,
+              'b': color.blue,
+            })
+        .toList();
 
     final palette = {
       'name': name,
@@ -37,11 +40,11 @@ class PaletteExporter {
   }
 
   /// Export palette as Adobe Color (.aco) format
-  /// 
+  ///
   /// ACO format specification:
   /// - Version 1: Simple color list
   /// - Version 2: With color names (optional)
-  /// 
+  ///
   /// We export Version 1 format which is simpler and widely compatible
   static Uint8List exportAco(List<Color> colors) {
     final bytes = ByteData(4 + colors.length * 10);
@@ -74,7 +77,7 @@ class PaletteExporter {
   }
 
   /// Export palette as CSS variables
-  /// 
+  ///
   /// Format:
   /// ```css
   /// :root {
@@ -96,7 +99,7 @@ class PaletteExporter {
   }
 
   /// Export palette as SCSS variables
-  /// 
+  ///
   /// Format:
   /// ```scss
   /// $color-1: #FF5733;

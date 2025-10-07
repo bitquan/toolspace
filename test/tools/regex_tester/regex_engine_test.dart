@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/regex_tester/logic/regex_engine.dart';
+import 'package:toolspace/tools/regex_tester/logic/regex_engine.dart';
 
 void main() {
   group('RegexEngine Tests', () {
@@ -55,8 +55,8 @@ void main() {
     });
 
     test('respects case sensitivity flag', () {
-      final pattern = r'hello';
-      final text = 'Hello HELLO hello';
+      const pattern = r'hello';
+      const text = 'Hello HELLO hello';
 
       final caseSensitive = RegexEngine.test(
         pattern,
@@ -74,8 +74,8 @@ void main() {
     });
 
     test('respects multiline flag', () {
-      final pattern = r'^line';
-      final text = 'line 1\nline 2\nline 3';
+      const pattern = r'^line';
+      const text = 'line 1\nline 2\nline 3';
 
       final singleLine = RegexEngine.test(
         pattern,
@@ -115,11 +115,11 @@ void main() {
       expect(result.hasMatches, true);
       final match = result.matches.first;
       expect(match.hasGroups, true);
-      
+
       // Should have both numbered and named groups
       final namedGroups = match.groups.where((g) => g.isNamed).toList();
       expect(namedGroups.isNotEmpty, true);
-      
+
       final areaGroup = namedGroups.firstWhere(
         (g) => g.name == 'area',
         orElse: () => namedGroups.first,
@@ -132,7 +132,7 @@ void main() {
       expect(RegexEngine.isValidPattern(r'[a-z]+'), true);
       expect(RegexEngine.isValidPattern(r'(?<name>\w+)'), true);
       expect(RegexEngine.isValidPattern(''), true);
-      
+
       expect(RegexEngine.isValidPattern(r'[unclosed'), false);
       expect(RegexEngine.isValidPattern(r'(?<incomplete'), false);
     });

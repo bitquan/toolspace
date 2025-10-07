@@ -1,0 +1,3 @@
+# Suppress VM service debug errors
+FLUTTER_LOG_LEVEL=error
+SILENCE_VM_SERVICE=true

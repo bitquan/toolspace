@@ -6,7 +6,7 @@ class CharacterSets {
   static const lowercase = 'abcdefghijklmnopqrstuvwxyz';
   static const digits = '0123456789';
   static const symbols = '!@#\$%^&*()_+-=[]{}|;:,.<>?';
-  
+
   // Ambiguous characters that can be confused
   static const ambiguousChars = '0O1lI';
 }
@@ -32,33 +32,39 @@ class PasswordConfig {
   /// Get the character set based on the configuration
   String getCharacterSet() {
     var charset = '';
-    
+
     if (includeUppercase) charset += CharacterSets.uppercase;
     if (includeLowercase) charset += CharacterSets.lowercase;
     if (includeDigits) charset += CharacterSets.digits;
     if (includeSymbols) charset += CharacterSets.symbols;
-    
+
     if (avoidAmbiguous && charset.isNotEmpty) {
       for (var char in CharacterSets.ambiguousChars.split('')) {
         charset = charset.replaceAll(char, '');
       }
     }
-    
+
     return charset;
   }
 
   /// Check if the configuration is valid
   bool isValid() {
-    return length >= 8 && 
-           length <= 128 && 
-           (includeUppercase || includeLowercase || includeDigits || includeSymbols);
+    return length >= 8 &&
+        length <= 128 &&
+        (includeUppercase ||
+            includeLowercase ||
+            includeDigits ||
+            includeSymbols);
   }
 
   /// Get validation error message
   String? getValidationError() {
     if (length < 8) return 'Password length must be at least 8 characters';
     if (length > 128) return 'Password length must be at most 128 characters';
-    if (!includeUppercase && !includeLowercase && !includeDigits && !includeSymbols) {
+    if (!includeUppercase &&
+        !includeLowercase &&
+        !includeDigits &&
+        !includeSymbols) {
       return 'At least one character set must be selected';
     }
     return null;
@@ -108,7 +114,7 @@ class PasswordGenerator {
     // Calculate Shannon entropy
     double entropy = 0.0;
     final length = password.length;
-    
+
     for (var count in frequency.values) {
       final probability = count / length;
       entropy -= probability * (log(probability) / ln2);
@@ -122,7 +128,7 @@ class PasswordGenerator {
   static double calculateCharsetEntropy(PasswordConfig config) {
     final charset = config.getCharacterSet();
     if (charset.isEmpty) return 0.0;
-    
+
     // Entropy = log2(charset_size) * length
     return (log(charset.length) / ln2) * config.length;
   }

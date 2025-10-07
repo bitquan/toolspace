@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/csv_cleaner/csv_cleaner_screen.dart';
+import 'package:toolspace/tools/csv_cleaner/csv_cleaner_screen.dart';
 
 void main() {
   group('CsvCleanerScreen Widget Tests', () {

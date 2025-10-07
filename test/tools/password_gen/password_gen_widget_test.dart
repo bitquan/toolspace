@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/password_gen/password_gen_screen.dart';
+import 'package:toolspace/tools/password_gen/password_gen_screen.dart';
 
 void main() {
   testWidgets('Password generator screen loads correctly', (WidgetTester tester) async {
@@ -12,10 +12,10 @@ void main() {
 
     // Check that the screen title is present
     expect(find.text('Password Generator'), findsOneWidget);
-    
+
     // Check that settings card is present
     expect(find.text('Password Settings'), findsOneWidget);
-    
+
     // Check that character set options are present
     expect(find.text('Uppercase (A-Z)'), findsOneWidget);
     expect(find.text('Lowercase (a-z)'), findsOneWidget);
@@ -137,13 +137,13 @@ void main() {
     // Uncheck all character sets
     await tester.tap(find.text('Uppercase (A-Z)'));
     await tester.pumpAndSettle();
-    
+
     await tester.tap(find.text('Lowercase (a-z)'));
     await tester.pumpAndSettle();
-    
+
     await tester.tap(find.text('Digits (0-9)'));
     await tester.pumpAndSettle();
-    
+
     await tester.tap(find.text('Symbols (!@#\$%^&*)'));
     await tester.pumpAndSettle();
 
@@ -180,7 +180,7 @@ void main() {
 
     // Check that the list is present
     expect(find.byType(ListTile), findsWidgets);
-    
+
     // Check for "Copy All" button
     expect(find.text('Copy All'), findsWidgets);
   });

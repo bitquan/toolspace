@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/json_doctor/logic/schema_validator.dart';
-import '../../lib/tools/json_doctor/logic/jsonpath_query.dart';
+import 'package:toolspace/tools/json_doctor/logic/schema_validator.dart';
+import 'package:toolspace/tools/json_doctor/logic/jsonpath_query.dart';
 
 void main() {
   group('SchemaValidator Tests', () {
     test('validates correct data type', () {
       final schema = {'type': 'string'};
       final result = SchemaValidator.validate('test', schema);
-      
+
       expect(result.isValid, true);
       expect(result.errors, isEmpty);
     });
@@ -15,7 +15,7 @@ void main() {
     test('detects type mismatch', () {
       final schema = {'type': 'string'};
       final result = SchemaValidator.validate(123, schema);
-      
+
       expect(result.isValid, false);
       expect(result.errors, isNotEmpty);
       expect(result.errors.first.expectedType, 'string');
@@ -31,11 +31,11 @@ void main() {
           'age': {'type': 'integer'},
         }
       };
-      
+
       final validData = {'name': 'John', 'age': 30};
       final result1 = SchemaValidator.validate(validData, schema);
       expect(result1.isValid, true);
-      
+
       final invalidData = {'name': 'John'};
       final result2 = SchemaValidator.validate(invalidData, schema);
       expect(result2.isValid, false);
@@ -47,11 +47,11 @@ void main() {
         'type': 'array',
         'items': {'type': 'integer'}
       };
-      
+
       final validData = [1, 2, 3];
       final result1 = SchemaValidator.validate(validData, schema);
       expect(result1.isValid, true);
-      
+
       final invalidData = [1, 'two', 3];
       final result2 = SchemaValidator.validate(invalidData, schema);
       expect(result2.isValid, false);
@@ -63,14 +63,14 @@ void main() {
         'minLength': 3,
         'maxLength': 10
       };
-      
+
       final result1 = SchemaValidator.validate('test', schema);
       expect(result1.isValid, true);
-      
+
       final result2 = SchemaValidator.validate('ab', schema);
       expect(result2.isValid, false);
       expect(result2.errors.first.message.contains('too short'), true);
-      
+
       final result3 = SchemaValidator.validate('verylongstring', schema);
       expect(result3.isValid, false);
       expect(result3.errors.first.message.contains('too long'), true);
@@ -82,13 +82,13 @@ void main() {
         'minimum': 0,
         'maximum': 100
       };
-      
+
       final result1 = SchemaValidator.validate(50, schema);
       expect(result1.isValid, true);
-      
+
       final result2 = SchemaValidator.validate(-1, schema);
       expect(result2.isValid, false);
-      
+
       final result3 = SchemaValidator.validate(101, schema);
       expect(result3.isValid, false);
     });
@@ -98,10 +98,10 @@ void main() {
         'type': 'string',
         'enum': ['red', 'green', 'blue']
       };
-      
+
       final result1 = SchemaValidator.validate('red', schema);
       expect(result1.isValid, true);
-      
+
       final result2 = SchemaValidator.validate('yellow', schema);
       expect(result2.isValid, false);
       expect(result2.errors.first.message.contains('enum'), true);
@@ -114,9 +114,9 @@ void main() {
         'active': true,
         'tags': ['developer', 'designer']
       };
-      
+
       final schema = SchemaValidator.generateSchema(data);
-      
+
       expect(schema['type'], 'object');
       expect(schema['properties'], isNotNull);
       expect(schema['properties']['name']['type'], 'string');
@@ -131,7 +131,7 @@ void main() {
     test('queries root element', () {
       final data = {'name': 'test'};
       final result = JsonPathQuery.query(data, r'$');
-      
+
       expect(result.success, true);
       expect(result.value, equals(data));
     });
@@ -139,7 +139,7 @@ void main() {
     test('queries simple property', () {
       final data = {'name': 'John', 'age': 30};
       final result = JsonPathQuery.query(data, r'$.name');
-      
+
       expect(result.success, true);
       expect(result.value, 'John');
     });
@@ -152,7 +152,7 @@ void main() {
         }
       };
       final result = JsonPathQuery.query(data, r'$.user.address.city');
-      
+
       expect(result.success, true);
       expect(result.value, 'New York');
     });
@@ -162,7 +162,7 @@ void main() {
         'users': ['Alice', 'Bob', 'Charlie']
       };
       final result = JsonPathQuery.query(data, r'$.users[1]');
-      
+
       expect(result.success, true);
       expect(result.value, 'Bob');
     });
@@ -175,7 +175,7 @@ void main() {
         ]
       };
       final result = JsonPathQuery.query(data, r'$.users[*].name');
-      
+
       expect(result.success, true);
       expect(result.matches.length, 2);
       expect(result.matches, containsAll(['Alice', 'Bob']));
@@ -187,7 +187,7 @@ void main() {
         'user2': {'name': 'Bob'}
       };
       final result = JsonPathQuery.query(data, r'$.*. name');
-      
+
       expect(result.success, true);
       expect(result.matches.length, 2);
     });
@@ -195,7 +195,7 @@ void main() {
     test('handles invalid path gracefully', () {
       final data = {'name': 'test'};
       final result = JsonPathQuery.query(data, r'$.nonexistent');
-      
+
       expect(result.success, true);
       expect(result.matches, isEmpty);
     });
@@ -215,9 +215,9 @@ void main() {
         'age': 30,
         'address': {'city': 'NYC', 'zip': '10001'}
       };
-      
+
       final paths = JsonPathQuery.getAllPaths(data);
-      
+
       expect(paths, contains(r'$.name'));
       expect(paths, contains(r'$.age'));
       expect(paths, contains(r'$.address'));
@@ -227,7 +227,7 @@ void main() {
 
     test('gets example paths', () {
       final examples = JsonPathQuery.getExamplePaths();
-      
+
       expect(examples, isNotEmpty);
       expect(examples, contains(r'$'));
       expect(examples, contains(r'$.name'));

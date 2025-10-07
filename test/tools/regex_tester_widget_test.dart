@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/regex_tester/regex_tester_screen.dart';
+import 'package:toolspace/tools/regex_tester/regex_tester_screen.dart';
 
 void main() {
   group('RegexTesterScreen Widget Tests', () {
@@ -177,11 +177,11 @@ void main() {
       // Enter a pattern
       final patternField = find.widgetWithText(TextField, 'Regex Pattern');
       await tester.enterText(patternField, r'\d+');
-      
+
       // Enter test text
       final testFields = find.byType(TextField);
       await tester.enterText(testFields.last, 'test 123');
-      
+
       await tester.pumpAndSettle();
 
       // Status should update to show success
@@ -198,11 +198,11 @@ void main() {
       // Enter an invalid pattern
       final patternField = find.widgetWithText(TextField, 'Regex Pattern');
       await tester.enterText(patternField, r'[unclosed');
-      
+
       // Enter test text
       final testFields = find.byType(TextField);
       await tester.enterText(testFields.last, 'test');
-      
+
       await tester.pumpAndSettle();
 
       // Status should show error
@@ -262,11 +262,11 @@ void main() {
       // Enter pattern that won't match
       final patternField = find.widgetWithText(TextField, 'Regex Pattern');
       await tester.enterText(patternField, r'\d+');
-      
+
       // Enter text without numbers
       final testFields = find.byType(TextField);
       await tester.enterText(testFields.last, 'no numbers');
-      
+
       await tester.pumpAndSettle();
 
       // Should show no matches message

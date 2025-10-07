@@ -219,13 +219,16 @@ class JsonFlattener {
 
     // Write rows
     for (var row in rows) {
-      final List<String> values = selectedKeys.map((key) {
-        final value = row[key];
-        if (value == null) {
-          return '';
-        }
-        return value.toString();
-      }).map(_escapeCSV).toList();
+      final List<String> values = selectedKeys
+          .map((key) {
+            final value = row[key];
+            if (value == null) {
+              return '';
+            }
+            return value.toString();
+          })
+          .map(_escapeCSV)
+          .toList();
 
       buffer.writeln(values.join(delimiter));
     }
@@ -304,7 +307,7 @@ class JsonFlattener {
   /// Validate JSON before flattening
   static ValidationResult validateJson(String jsonString) {
     if (jsonString.trim().isEmpty) {
-      return ValidationResult(
+      return const ValidationResult(
         isValid: false,
         error: 'JSON string is empty',
         line: 1,
@@ -314,7 +317,7 @@ class JsonFlattener {
 
     try {
       jsonDecode(jsonString);
-      return ValidationResult(isValid: true);
+      return const ValidationResult(isValid: true);
     } catch (e) {
       // Try to extract line and column info from error
       final errorStr = e.toString();

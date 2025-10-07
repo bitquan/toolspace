@@ -75,7 +75,8 @@ class JsonPathQuery {
       segments.add(current);
     }
 
-    return segments.where((s) => s.isNotEmpty).toList();
+    // Trim whitespace from segments and filter empty ones
+    return segments.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   }
 
   /// Evaluate path segments against data

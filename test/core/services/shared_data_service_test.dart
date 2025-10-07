@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/core/services/shared_data_service.dart';
+import 'package:toolspace/core/services/shared_data_service.dart';
 
 void main() {
   group('SharedDataService Tests', () {

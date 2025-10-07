@@ -1,9 +1,12 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'widgets/export_options_dialog.dart';
+
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import 'logic/pdf_exporter.dart';
+import 'widgets/export_options_dialog.dart';
 
 class MdToPdfScreen extends StatefulWidget {
   const MdToPdfScreen({super.key});
@@ -15,7 +18,8 @@ class MdToPdfScreen extends StatefulWidget {
 class _MdToPdfScreenState extends State<MdToPdfScreen> {
   final TextEditingController _markdownController = TextEditingController();
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
-  
+  final BillingService _billingService = BillingService();
+
   bool _isExporting = false;
   String? _downloadUrl;
   String? _errorMessage;
@@ -44,11 +48,11 @@ Welcome to the **Markdown to PDF** converter!
 
 ### Code Example
 
-\`\`\`dart
+```dart
 void main() {
   print('Hello, World!');
 }
-\`\`\`
+```
 
 ### Lists
 
@@ -60,7 +64,7 @@ void main() {
 ### Quote
 
 > This is a blockquote
-> 
+>
 > It can span multiple lines
 
 **Enjoy your PDF export!**
@@ -104,6 +108,9 @@ void main() {
         _downloadUrl = result.data['downloadUrl'] as String;
       });
 
+      // Track heavy operation
+      await _billingService.trackHeavyOp();
+
       if (mounted) {
         _showSuccessDialog();
       }
@@ -126,13 +133,13 @@ void main() {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('PDF Ready'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Your PDF has been generated successfully!'),
-            const SizedBox(height: 16),
-            const Text('The download link is valid for 7 days.'),
+            Text('Your PDF has been generated successfully!'),
+            SizedBox(height: 16),
+            Text('The download link is valid for 7 days.'),
           ],
         ),
         actions: [
@@ -176,43 +183,54 @@ void main() {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Markdown to PDF'),
-        backgroundColor: theme.colorScheme.inversePrimary,
-        actions: [
-          if (_isExporting)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: FilledButton.icon(
-                onPressed: _showExportDialog,
-                icon: const Icon(Icons.picture_as_pdf),
-                label: const Text('Export to PDF'),
-              ),
-            ),
-        ],
+    // Calculate file size (markdown content size in bytes)
+    final markdownBytes = _markdownController.text.length;
+
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: ToolPermission(
+        toolId: 'md_to_pdf',
+        requiresHeavyOp: true,
+        fileSize: markdownBytes > 0 ? markdownBytes : null,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 800;
-          
-          if (isWide) {
-            return _buildSplitPane(theme);
-          } else {
-            return _buildSinglePane(theme);
-          }
-        },
-      ),
-    );
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Markdown to PDF'),
+          backgroundColor: theme.colorScheme.inversePrimary,
+          actions: [
+            if (_isExporting)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: FilledButton.icon(
+                  onPressed: _showExportDialog,
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text('Export to PDF'),
+                ),
+              ),
+          ],
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 800;
+
+            if (isWide) {
+              return _buildSplitPane(theme);
+            } else {
+              return _buildSinglePane(theme);
+            }
+          },
+        ),
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildSplitPane(ThemeData theme) {
@@ -278,7 +296,7 @@ void main() {
               controller: _markdownController,
               maxLines: null,
               expands: true,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 14,
               ),

@@ -35,7 +35,7 @@ class _ClipboardButtonState extends State<ClipboardButton> {
     // Show feedback
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Copied to clipboard!'),
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
@@ -47,7 +47,7 @@ class _ClipboardButtonState extends State<ClipboardButton> {
     widget.onCopied?.call();
 
     // Reset copied state after delay
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _copied = false;

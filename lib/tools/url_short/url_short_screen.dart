@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../theme/playful_theme.dart';
 
 /// URL Shortener - Create and manage short URLs (dev-only)
 class UrlShortScreen extends StatefulWidget {
@@ -14,18 +13,18 @@ class _UrlShortScreenState extends State<UrlShortScreen>
     with TickerProviderStateMixin {
   final TextEditingController _urlController = TextEditingController();
   final List<ShortUrl> _urls = [];
-  
+
   bool _isLoading = false;
-  bool _isDevUser = true; // TODO: Implement actual dev user check
+  final bool _isDevUser = true; // TODO: Implement actual dev user check
   String? _validationError;
-  
+
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
 
   @override
   void initState() {
     super.initState();
-    
+
     _bounceController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -56,27 +55,27 @@ class _UrlShortScreenState extends State<UrlShortScreen>
     if (url.isEmpty) {
       return null;
     }
-    
+
     // Basic URL validation
     final urlPattern = RegExp(
       r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$',
       caseSensitive: false,
     );
-    
+
     if (!urlPattern.hasMatch(url)) {
       return 'Please enter a valid URL';
     }
-    
+
     if (url.length > 2048) {
       return 'URL is too long (max 2048 characters)';
     }
-    
+
     return null;
   }
 
   Future<void> _loadUrls() async {
     if (!_isDevUser) return;
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -92,7 +91,7 @@ class _UrlShortScreenState extends State<UrlShortScreen>
   Future<void> _shortenUrl() async {
     final url = _urlController.text.trim();
     final error = _validateUrl(url);
-    
+
     if (error != null) {
       _showError(error);
       return;
@@ -105,7 +104,7 @@ class _UrlShortScreenState extends State<UrlShortScreen>
     try {
       // TODO: Call backend to create short URL
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Generate mock short code
       final shortCode = _generateShortCode();
       final shortUrl = ShortUrl(
@@ -148,7 +147,8 @@ class _UrlShortScreenState extends State<UrlShortScreen>
 
   String _generateShortCode() {
     // Simple random code generator (6 characters)
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     return String.fromCharCodes(
       Iterable.generate(
         6,
@@ -162,7 +162,7 @@ class _UrlShortScreenState extends State<UrlShortScreen>
   void _copyToClipboard(ShortUrl url) {
     final shortUrl = 'https://toolspace.app/u/${url.shortCode}';
     Clipboard.setData(ClipboardData(text: shortUrl));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Short URL copied to clipboard!'),

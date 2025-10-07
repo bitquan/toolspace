@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/md_to_pdf/md_to_pdf_screen.dart';
+import 'package:toolspace/tools/md_to_pdf/md_to_pdf_screen.dart';
 
 void main() {
   group('MdToPdfScreen Widget Tests', () {
@@ -18,7 +18,7 @@ void main() {
     testWidgets('should show split pane on wide screen', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
-      
+
       await tester.pumpWidget(
         const MaterialApp(
           home: MdToPdfScreen(),
@@ -34,7 +34,7 @@ void main() {
     testWidgets('should show tabs on narrow screen', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(600, 800);
       tester.view.devicePixelRatio = 1.0;
-      
+
       await tester.pumpWidget(
         const MaterialApp(
           home: MdToPdfScreen(),
@@ -91,7 +91,7 @@ void main() {
 
       // Initially should not show progress
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      
+
       // Note: Testing the export flow requires mocking Firebase functions
       // which is beyond the scope of this simple test
     });

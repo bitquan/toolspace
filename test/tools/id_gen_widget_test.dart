@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/id_gen/id_gen_screen.dart';
+import 'package:toolspace/tools/id_gen/id_gen_screen.dart';
 
 void main() {
   group('IdGenScreen Widget Tests', () {

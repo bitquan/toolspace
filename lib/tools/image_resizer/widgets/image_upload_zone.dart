@@ -16,7 +16,7 @@ class ImageUploadZone extends StatefulWidget {
 }
 
 class _ImageUploadZoneState extends State<ImageUploadZone> {
-  bool _isDragOver = false;
+  final bool _isDragOver = false;
 
   @override
   Widget build(BuildContext context) {
