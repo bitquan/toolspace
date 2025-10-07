@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/text_tools/logic/uuid_gen.dart';
-import '../../lib/tools/text_tools/logic/nanoid_gen.dart';
+import 'package:toolspace/tools/text_tools/logic/uuid_gen.dart';
+import 'package:toolspace/tools/text_tools/logic/nanoid_gen.dart';
 
 void main() {
   group('ID Generator Integration Tests', () {

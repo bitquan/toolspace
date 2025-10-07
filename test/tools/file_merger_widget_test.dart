@@ -38,16 +38,16 @@ void main() {
     testWidgets('should display file constraints correctly',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                const Text('PDF, PNG, JPG files'),
-                const Text('Max 10MB each'),
-                const Text('Up to 20 files'),
+                Text('PDF, PNG, JPG files'),
+                Text('Max 10MB each'),
+                Text('Up to 20 files'),
                 ElevatedButton(
                   onPressed: null, // Disabled when no files
-                  child: const Text('Merge Files'),
+                  child: Text('Merge Files'),
                 ),
               ],
             ),

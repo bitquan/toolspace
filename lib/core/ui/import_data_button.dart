@@ -36,8 +36,8 @@ class ImportDataButton extends StatelessWidget {
     if (!acceptedTypes.contains(currentData.type)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Cannot import ${currentData.type.name} data in this tool'),
+          content:
+              Text('Cannot import ${currentData.type.name} data in this tool'),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),

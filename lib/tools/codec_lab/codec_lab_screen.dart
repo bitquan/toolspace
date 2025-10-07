@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'logic/codec_engine.dart';
 import '../../core/ui/clipboard_btn.dart';
@@ -108,7 +107,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
       setState(() {
         _outputController.text = result;
         _errorMessage = null;
-        _successMessage = '${_isEncoding ? 'Encoded' : 'Decoded'} successfully!';
+        _successMessage =
+            '${_isEncoding ? 'Encoded' : 'Decoded'} successfully!';
       });
 
       _successController.forward().then((_) => _successController.reverse());
@@ -182,7 +182,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
             break;
           case CodecFormat.url:
             // URL encoding doesn't make sense for binary files
-            throw const CodecException('URL encoding is not supported for files');
+            throw const CodecException(
+                'URL encoding is not supported for files');
           case CodecFormat.unknown:
             result = '';
         }
@@ -304,7 +305,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                      style:
+                          TextStyle(color: theme.colorScheme.onErrorContainer),
                     ),
                   ),
                   IconButton(
@@ -329,7 +331,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
                     padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
-                        Icon(Icons.check_circle_outline, color: Colors.green.shade700),
+                        Icon(Icons.check_circle_outline,
+                            color: Colors.green.shade700),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -436,7 +439,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.input, size: 20, color: theme.colorScheme.primary),
+                        Icon(Icons.input,
+                            size: 20, color: theme.colorScheme.primary),
                         const SizedBox(width: 8),
                         Text(
                           'Input',
@@ -491,7 +495,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.output, size: 20, color: theme.colorScheme.secondary),
+                        Icon(Icons.output,
+                            size: 20, color: theme.colorScheme.secondary),
                         const SizedBox(width: 8),
                         Text(
                           'Output',
@@ -650,7 +655,8 @@ class _CodecLabScreenState extends State<CodecLabScreen>
             const SizedBox(height: 16),
 
             // Process Button
-            if ((_isEncoding && _fileBytes != null) || (!_isEncoding && _inputController.text.isNotEmpty))
+            if ((_isEncoding && _fileBytes != null) ||
+                (!_isEncoding && _inputController.text.isNotEmpty))
               FilledButton.icon(
                 onPressed: _isProcessing ? null : _processFile,
                 icon: _isProcessing

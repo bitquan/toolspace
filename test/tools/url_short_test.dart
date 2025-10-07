@@ -33,7 +33,7 @@ void main() {
     });
 
     test('rejects too long URLs', () {
-      final longUrl = 'https://example.com/' + 'a' * 2500;
+      final longUrl = 'https://example.com/${'a' * 2500}';
       expect(isValidUrl(longUrl), false);
     });
 

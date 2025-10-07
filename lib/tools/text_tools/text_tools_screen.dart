@@ -152,7 +152,8 @@ class _TextToolsScreenState extends State<TextToolsScreen>
           } else {
             final errorMsg = StringBuffer('Invalid JSON ✗\n${result.error}');
             if (result.errorLine != null && result.errorColumn != null) {
-              errorMsg.write('\n\nError at Line ${result.errorLine}, Column ${result.errorColumn}');
+              errorMsg.write(
+                  '\n\nError at Line ${result.errorLine}, Column ${result.errorColumn}');
             }
             _outputController.text = errorMsg.toString();
           }

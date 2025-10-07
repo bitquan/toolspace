@@ -17,10 +17,10 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
   bool _includeDigits = true;
   bool _includeSymbols = true;
   bool _avoidAmbiguous = false;
-  
+
   String _generatedPassword = '';
   List<String> _batchPasswords = [];
-  
+
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -65,7 +65,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
       _generatedPassword = PasswordGenerator.generate(_config);
       _batchPasswords = [];
     });
-    
+
     _animationController.forward(from: 0);
   }
 
@@ -78,7 +78,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
       _batchPasswords = PasswordGenerator.generateBatch(_config, count: 20);
       _generatedPassword = '';
     });
-    
+
     _animationController.forward(from: 0);
   }
 
@@ -121,7 +121,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
                       style: theme.textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Length Slider
                     Text('Length: $_length characters'),
                     Slider(
@@ -137,7 +137,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
                       },
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Character Set Toggles
                     Text(
                       'Character Sets',
@@ -241,7 +241,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
                   ),
                 ),
               ),
-            
+
             // Validation Error
             if (validationError != null)
               Padding(
@@ -265,7 +265,7 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
                   ),
                 ),
               ),
-            
+
             const SizedBox(height: 16),
 
             // Action Buttons
@@ -355,7 +355,8 @@ class _PasswordGenScreenState extends State<PasswordGenScreen>
                           child: ListView.separated(
                             shrinkWrap: true,
                             itemCount: _batchPasswords.length,
-                            separatorBuilder: (context, index) => const Divider(height: 1),
+                            separatorBuilder: (context, index) =>
+                                const Divider(height: 1),
                             itemBuilder: (context, index) {
                               final password = _batchPasswords[index];
                               return ListTile(

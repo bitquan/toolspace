@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'logic/json_flattener.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 
 /// JSON CSV Flattener - Flatten nested JSON to CSV with field selection
 class JsonFlattenScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
     with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _csvController = TextEditingController();
+  final BillingService _billingService = BillingService();
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -148,14 +150,17 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
     }
   }
 
-  void _downloadCSV() {
+  Future<void> _downloadCSV() async {
     if (_csvController.text.isNotEmpty) {
+      // Track heavy operation (CSV export)
+      await _billingService.trackHeavyOp();
+
       // On web, this would trigger a download
       // For now, we'll just copy to clipboard with a message
       Clipboard.setData(ClipboardData(text: _csvController.text));
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('CSV ready! (Copied to clipboard)'),
+        const SnackBar(
+          content: Text('CSV ready! (Copied to clipboard)'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -180,9 +185,15 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
         ? JsonFlattener.getStatistics(_flattenResult!)
         : null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: const ToolPermission(
+        toolId: 'json_flatten',
+        requiresHeavyOp: true,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
@@ -556,7 +567,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
           ),
         ],
       ),
-    );
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildStatItem(ThemeData theme, IconData icon, String label) {

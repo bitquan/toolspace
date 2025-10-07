@@ -1,0 +1,144 @@
+name: 📸 UI Screenshots Automation
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "lib/**"
+            - "web/**"
+            - ".github/workflows/ui-screenshots.yml"
+    workflow_dispatch:
+
+concurrency:
+    group: screenshots-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    capture_screenshots:
+        name: Capture Tool Screenshots
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: 🎯 Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+                  cache: true
+
+            - name: 📦 Get dependencies
+              run: flutter pub get
+
+            - name: 🏗️ Build web app
+              run: flutter build web --release
+
+            - name: 🌐 Setup Chrome
+              uses: browser-actions/setup-chrome@latest
+
+            - name: 🚀 Start local server
+              run: |
+                  cd build/web
+                  python3 -m http.server 8080 &
+                  echo $! > server.pid
+                  sleep 5
+
+            - name: 📸 Capture screenshots
+              run: |
+                  mkdir -p docs/screenshots
+
+                  # Tool routes to capture
+                  tools=(
+                    "home"
+                    "text-tools"
+                    "file-merger"
+                    "json-doctor"
+                    "text-diff"
+                    "qr-maker"
+                    "url-short"
+                    "codec-lab"
+                    "time-convert"
+                    "regex-tester"
+                    "id-gen"
+                    "palette-extractor"
+                    "md-to-pdf"
+                    "csv-cleaner"
+                    "image-resizer"
+                    "password-gen"
+                    "json-flatten"
+                    "unit-converter"
+                  )
+
+                  # Install playwright
+                  npm install -g playwright
+                  npx playwright install chromium
+
+                  # Capture each tool
+                  for tool in "${tools[@]}"; do
+                    echo "📷 Capturing $tool..."
+
+                    if [ "$tool" = "home" ]; then
+                      url="http://localhost:8080"
+                      output="docs/screenshots/home.png"
+                    else
+                      url="http://localhost:8080/#/tools/$tool"
+                      output="docs/screenshots/$tool.png"
+                    fi
+
+                    npx playwright screenshot \
+                      --browser chromium \
+                      --viewport-size 1280,800 \
+                      --wait-for-timeout 3000 \
+                      "$url" \
+                      "$output"
+
+                    echo "✅ Saved $output"
+                  done
+
+            - name: 🔍 Optimize images
+              run: |
+                  # Install imagemagick
+                  sudo apt-get update
+                  sudo apt-get install -y imagemagick
+
+                  # Optimize PNGs
+                  for img in docs/screenshots/*.png; do
+                    echo "Optimizing $img..."
+                    convert "$img" -quality 85 -strip "$img"
+                  done
+
+            - name: 📊 Screenshot report
+              run: |
+                  echo "## 📸 Screenshots Generated" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+
+                  for img in docs/screenshots/*.png; do
+                    name=$(basename "$img" .png)
+                    size=$(du -h "$img" | cut -f1)
+                    echo "- **$name**: $size" >> $GITHUB_STEP_SUMMARY
+                  done
+
+            - name: 💾 Commit screenshots
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+                  git add docs/screenshots/*.png
+
+                  if git diff --staged --quiet; then
+                    echo "No changes to commit"
+                  else
+                    git commit -m "docs: update UI screenshots [skip ci]"
+                    git push
+                  fi
+
+            - name: 🧹 Cleanup
+              if: always()
+              run: |
+                  if [ -f build/web/server.pid ]; then
+                    kill $(cat build/web/server.pid) || true
+                  fi

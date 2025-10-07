@@ -9,7 +9,7 @@ class ConversionHistory {
   static void add(ConversionPair pair) {
     // Remove if already exists
     _history.removeWhere((p) => p == pair);
-    
+
     // Add to front with timestamp
     _history.insert(
       0,

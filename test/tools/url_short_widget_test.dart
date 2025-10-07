@@ -207,7 +207,7 @@ void main() {
       );
 
       // Enter very long URL
-      final longUrl = 'https://example.com/' + 'a' * 2500;
+      final longUrl = 'https://example.com/${'a' * 2500}';
       await tester.enterText(find.byType(TextField), longUrl);
       await tester.pump();
 
@@ -249,10 +249,10 @@ void main() {
 
       // Should display original URL
       expect(find.textContaining('https://example.com/test'), findsOneWidget);
-      
+
       // Should display short code
       expect(find.textContaining('/u/'), findsOneWidget);
-      
+
       // Should display time
       expect(find.text('Just now'), findsOneWidget);
     });

@@ -8,6 +8,8 @@ import 'logic/upload_manager.dart';
 import 'widgets/image_upload_zone.dart';
 import 'widgets/image_list.dart';
 import 'widgets/resize_progress.dart';
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 
 /// Main screen for the Image Resizer tool
 class ImageResizerScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class ImageResizerScreen extends StatefulWidget {
 class _ImageResizerScreenState extends State<ImageResizerScreen> {
   final UploadManager _uploadManager = UploadManager();
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
+  final BillingService _billingService = BillingService();
 
   List<ImageUpload> _images = [];
   bool _isUploading = false;
@@ -36,14 +39,20 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Image Resizer'),
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: const ToolPermission(
+        toolId: 'image_resizer',
+        requiresHeavyOp: true,
       ),
-      body: Padding(
+      child: Scaffold(
+        backgroundColor: theme.colorScheme.surface,
+        appBar: AppBar(
+          title: const Text('Image Resizer'),
+          backgroundColor: theme.colorScheme.surface,
+          elevation: 0,
+        ),
+        body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,9 +158,10 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
                 ),
               ),
           ],
-        ),
-      ),
-    );
+        ), // Column
+      ), // Padding (body)
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildResizeSettings(ThemeData theme) {
@@ -345,11 +355,9 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
         }
 
         // Validate all files
-        final invalidFiles =
-            newImages.where((file) => !file.isValid).toList();
+        final invalidFiles = newImages.where((file) => !file.isValid).toList();
         if (invalidFiles.isNotEmpty) {
-          _showErrorSnackBar(
-              'Some files are invalid or exceed 20MB limit');
+          _showErrorSnackBar('Some files are invalid or exceed 20MB limit');
           return;
         }
 
@@ -405,8 +413,8 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
 
       // Add preset or custom dimensions
       if (_customWidth != null || _customHeight != null) {
-        if (_customWidth != null) requestData['customWidth'] = _customWidth;
-        if (_customHeight != null) requestData['customHeight'] = _customHeight;
+        if (_customWidth != null) requestData['customWidth'] = _customWidth!;
+        if (_customHeight != null) requestData['customHeight'] = _customHeight!;
       } else {
         requestData['preset'] = _selectedPreset;
       }
@@ -424,6 +432,11 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
         _resizedImages = results;
         _images = []; // Clear uploaded images
       });
+
+      // Track heavy operation (one per image resized)
+      for (var i = 0; i < results.length; i++) {
+        await _billingService.trackHeavyOp();
+      }
 
       _showSuccessSnackBar('Images resized successfully!');
     } catch (e) {

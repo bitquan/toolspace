@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/password_gen/logic/password_generator.dart';
+import 'package:toolspace/tools/password_gen/logic/password_generator.dart';
 
 void main() {
   group('PasswordConfig Tests', () {
@@ -11,7 +11,7 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       expect(config.isValid(), true);
       expect(config.getValidationError(), null);
     });
@@ -21,7 +21,7 @@ void main() {
         length: 7,
         includeUppercase: true,
       );
-      
+
       expect(config.isValid(), false);
       expect(config.getValidationError(), 'Password length must be at least 8 characters');
     });
@@ -31,7 +31,7 @@ void main() {
         length: 129,
         includeUppercase: true,
       );
-      
+
       expect(config.isValid(), false);
       expect(config.getValidationError(), 'Password length must be at most 128 characters');
     });
@@ -44,7 +44,7 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       expect(config.isValid(), false);
       expect(config.getValidationError(), 'At least one character set must be selected');
     });
@@ -57,7 +57,7 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final charset = config.getCharacterSet();
       expect(charset.contains('A'), true);
       expect(charset.contains('a'), true);
@@ -74,14 +74,14 @@ void main() {
         includeSymbols: true,
         avoidAmbiguous: true,
       );
-      
+
       final charset = config.getCharacterSet();
       expect(charset.contains('0'), false); // Excluded
       expect(charset.contains('O'), false); // Excluded
       expect(charset.contains('1'), false); // Excluded
       expect(charset.contains('l'), false); // Excluded
       expect(charset.contains('I'), false); // Excluded
-      
+
       // Other characters should still be present
       expect(charset.contains('A'), true);
       expect(charset.contains('a'), true);
@@ -96,7 +96,7 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       final charset = config.getCharacterSet();
       expect(charset, CharacterSets.uppercase);
     });
@@ -111,7 +111,7 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final password = PasswordGenerator.generate(config);
       expect(password.length, 16);
     });
@@ -124,9 +124,9 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       final password = PasswordGenerator.generate(config);
-      
+
       // Check that all characters are uppercase letters
       for (var char in password.split('')) {
         expect(CharacterSets.uppercase.contains(char), true);
@@ -141,10 +141,10 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final password1 = PasswordGenerator.generate(config);
       final password2 = PasswordGenerator.generate(config);
-      
+
       // While technically possible for two random passwords to be the same,
       // the probability is extremely low for 16-character passwords
       expect(password1, isNot(equals(password2)));
@@ -155,7 +155,7 @@ void main() {
         length: 5, // Too short
         includeUppercase: true,
       );
-      
+
       expect(() => PasswordGenerator.generate(config), throwsArgumentError);
     });
 
@@ -167,16 +167,16 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final passwords = PasswordGenerator.generateBatch(config, count: 20);
-      
+
       expect(passwords.length, 20);
-      
+
       // Check that all passwords have correct length
       for (var password in passwords) {
         expect(password.length, 16);
       }
-      
+
       // Check that passwords are different
       final uniquePasswords = passwords.toSet();
       expect(uniquePasswords.length, 20); // All should be unique
@@ -191,9 +191,9 @@ void main() {
         includeSymbols: false,
         avoidAmbiguous: true,
       );
-      
+
       final password = PasswordGenerator.generate(config);
-      
+
       // Check that ambiguous characters are not present
       expect(password.contains('0'), false);
       expect(password.contains('O'), false);
@@ -214,7 +214,7 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       final entropy = PasswordGenerator.calculateCharsetEntropy(config);
       expect(entropy, closeTo(37.6, 0.5));
     });
@@ -229,7 +229,7 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final entropy = PasswordGenerator.calculateCharsetEntropy(config);
       expect(entropy, greaterThan(100));
     });
@@ -242,7 +242,7 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       final entropy = PasswordGenerator.calculateCharsetEntropy(config);
       expect(entropy, 0.0);
     });
@@ -250,7 +250,7 @@ void main() {
     test('calculates Shannon entropy for actual password', () {
       const password = 'aaabbbccc'; // 3 chars, each appearing 3 times
       final entropy = PasswordGenerator.calculateEntropy(password);
-      
+
       // Should have some entropy but less than fully random
       expect(entropy, greaterThan(0));
       expect(entropy, lessThan(password.length * 6.64)); // Max for 100 unique chars
@@ -301,11 +301,11 @@ void main() {
         includeDigits: false,
         includeSymbols: false,
       );
-      
+
       final weakEntropy = PasswordGenerator.calculateCharsetEntropy(weakConfig);
       final weakScore = PasswordGenerator.getStrengthScore(weakEntropy);
       expect(weakScore, lessThan(50));
-      
+
       const strongConfig = PasswordConfig(
         length: 20,
         includeUppercase: true,
@@ -313,7 +313,7 @@ void main() {
         includeDigits: true,
         includeSymbols: true,
       );
-      
+
       final strongEntropy = PasswordGenerator.calculateCharsetEntropy(strongConfig);
       final strongScore = PasswordGenerator.getStrengthScore(strongEntropy);
       expect(strongScore, greaterThan(80));

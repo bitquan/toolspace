@@ -43,7 +43,9 @@ class ColorUtils {
 
   /// Get contrasting text color (black or white) for given background
   static Color getContrastColor(Color backgroundColor) {
-    return isLight(backgroundColor) ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+    return isLight(backgroundColor)
+        ? const Color(0xFF000000)
+        : const Color(0xFFFFFFFF);
   }
 
   /// Mix two colors with given weight (0.0 to 1.0)

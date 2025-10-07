@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/md_to_pdf/logic/pdf_exporter.dart';
+import 'package:toolspace/tools/md_to_pdf/logic/pdf_exporter.dart';
 
 void main() {
   group('ExportOptions Tests', () {
@@ -10,7 +10,7 @@ void main() {
         left: 15,
         right: 15,
       );
-      
+
       const options = ExportOptions(
         theme: 'github',
         pageSize: 'a4',
@@ -31,7 +31,7 @@ void main() {
         left: 15,
         right: 15,
       );
-      
+
       const options = ExportOptions(
         theme: 'clean',
         pageSize: 'letter',

@@ -1,9 +1,10 @@
 /// Unit conversion engine supporting multiple categories
 class UnitConverter {
   /// Convert value from one unit to another
-  static double convert(double value, String fromUnit, String toUnit, String category) {
+  static double convert(
+      double value, String fromUnit, String toUnit, String category) {
     if (fromUnit == toUnit) return value;
-    
+
     // Convert to base unit first, then to target unit
     final baseValue = _toBaseUnit(value, fromUnit, category);
     return _fromBaseUnit(baseValue, toUnit, category);
@@ -108,7 +109,8 @@ class UnitConverter {
   }
 
   /// Special handling for temperature conversion
-  static double convertTemperature(double value, String fromUnit, String toUnit) {
+  static double convertTemperature(
+      double value, String fromUnit, String toUnit) {
     if (fromUnit == toUnit) return value;
 
     // Convert to Celsius first

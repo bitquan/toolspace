@@ -4,6 +4,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'widgets/export_options_dialog.dart';
 import 'logic/pdf_exporter.dart';
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 
 class MdToPdfScreen extends StatefulWidget {
   const MdToPdfScreen({super.key});
@@ -15,7 +17,8 @@ class MdToPdfScreen extends StatefulWidget {
 class _MdToPdfScreenState extends State<MdToPdfScreen> {
   final TextEditingController _markdownController = TextEditingController();
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
-  
+  final BillingService _billingService = BillingService();
+
   bool _isExporting = false;
   String? _downloadUrl;
   String? _errorMessage;
@@ -44,11 +47,11 @@ Welcome to the **Markdown to PDF** converter!
 
 ### Code Example
 
-\`\`\`dart
+```dart
 void main() {
   print('Hello, World!');
 }
-\`\`\`
+```
 
 ### Lists
 
@@ -60,7 +63,7 @@ void main() {
 ### Quote
 
 > This is a blockquote
-> 
+>
 > It can span multiple lines
 
 **Enjoy your PDF export!**
@@ -92,7 +95,8 @@ void main() {
     });
 
     try {
-      final result = await _functions.httpsCallable('generatePdfFromMarkdown').call({
+      final result =
+          await _functions.httpsCallable('generatePdfFromMarkdown').call({
         'markdown': _markdownController.text,
         'theme': options.theme,
         'pageSize': options.pageSize,
@@ -103,6 +107,9 @@ void main() {
       setState(() {
         _downloadUrl = result.data['downloadUrl'] as String;
       });
+
+      // Track heavy operation
+      await _billingService.trackHeavyOp();
 
       if (mounted) {
         _showSuccessDialog();
@@ -126,13 +133,13 @@ void main() {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('PDF Ready'),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Your PDF has been generated successfully!'),
-            const SizedBox(height: 16),
-            const Text('The download link is valid for 7 days.'),
+            Text('Your PDF has been generated successfully!'),
+            SizedBox(height: 16),
+            Text('The download link is valid for 7 days.'),
           ],
         ),
         actions: [
@@ -176,10 +183,16 @@ void main() {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Markdown to PDF'),
-        backgroundColor: theme.colorScheme.inversePrimary,
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: const ToolPermission(
+        toolId: 'md_to_pdf',
+        requiresHeavyOp: true,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Markdown to PDF'),
+          backgroundColor: theme.colorScheme.inversePrimary,
         actions: [
           if (_isExporting)
             const Padding(
@@ -204,7 +217,7 @@ void main() {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWide = constraints.maxWidth > 800;
-          
+
           if (isWide) {
             return _buildSplitPane(theme);
           } else {
@@ -212,7 +225,8 @@ void main() {
           }
         },
       ),
-    );
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildSplitPane(ThemeData theme) {
@@ -278,7 +292,7 @@ void main() {
               controller: _markdownController,
               maxLines: null,
               expands: true,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 14,
               ),

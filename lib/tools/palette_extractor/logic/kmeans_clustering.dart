@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
-import 'color_utils.dart';
 
 /// Result of k-means clustering with dominant colors and their frequencies
 class PaletteResult {
@@ -38,18 +37,19 @@ class KMeansClustering {
   static const double convergenceThreshold = 0.01;
 
   /// Extract dominant colors from image pixels using k-means clustering
-  /// 
+  ///
   /// [pixels] - List of colors from the image
   /// [k] - Number of colors to extract (default: 10)
   /// [sampleSize] - Maximum number of pixels to use for clustering (for performance)
-  /// 
+  ///
   /// Returns a [PaletteResult] with the dominant colors and their frequencies
   static Future<PaletteResult> extractPalette(
     List<Color> pixels, {
     int k = 10,
     int? sampleSize,
   }) async {
-    return compute(_extractPaletteIsolate, _ExtractParams(pixels, k, sampleSize));
+    return compute(
+        _extractPaletteIsolate, _ExtractParams(pixels, k, sampleSize));
   }
 
   /// Run k-means clustering in an isolate for better performance
@@ -135,7 +135,8 @@ class KMeansClustering {
     final centroids = <_ColorVector>[];
 
     // Choose first centroid randomly
-    centroids.add(_ColorVector.fromColor(pixels[random.nextInt(pixels.length)]));
+    centroids
+        .add(_ColorVector.fromColor(pixels[random.nextInt(pixels.length)]));
 
     // Choose remaining centroids with probability proportional to distance squared
     while (centroids.length < k) {
@@ -185,7 +186,8 @@ class KMeansClustering {
   }
 
   /// Check if assignments have converged
-  static bool _hasConverged(List<int> oldAssignments, List<int> newAssignments) {
+  static bool _hasConverged(
+      List<int> oldAssignments, List<int> newAssignments) {
     var changes = 0;
     for (var i = 0; i < oldAssignments.length; i++) {
       if (oldAssignments[i] != newAssignments[i]) {
