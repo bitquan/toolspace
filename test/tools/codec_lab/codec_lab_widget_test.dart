@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/codec_lab/codec_lab_screen.dart';
+import 'package:toolspace/tools/codec_lab/codec_lab_screen.dart';
 
 void main() {
   group('CodecLabScreen Widget Tests', () {
@@ -84,6 +84,10 @@ void main() {
       await tester.enterText(inputField, 'Hello World');
       await tester.pump();
 
+      // Wait for debounce timer (2 seconds)
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
       // Check that output is generated
       final outputField = find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
@@ -106,6 +110,10 @@ void main() {
       await tester.enterText(inputField, 'SGVsbG8gV29ybGQ=');
       await tester.pump();
 
+      // Wait for debounce timer (2 seconds)
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
       // Check output
       final outputField = find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
@@ -127,6 +135,10 @@ void main() {
       final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
+
+      // Wait for debounce timer (2 seconds)
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Check hex output
       final outputField = find.widgetWithText(TextField, 'Output will appear here...');
@@ -212,8 +224,12 @@ void main() {
       await tester.enterText(inputField, 'SGVsbG8gV29ybGQ=');
       await tester.pump();
 
+      // Wait for debounce timer (2 seconds)
+      await tester.pump(const Duration(seconds: 2));
+
       // Tap auto-detect button
       await tester.tap(find.text('Auto-detect'));
+      await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
 
       // Format should be detected and decoded
@@ -233,6 +249,10 @@ void main() {
       final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
+
+      // Wait for debounce timer (2 seconds)
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       // Check for success icon
       expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);

@@ -4,13 +4,16 @@ import 'package:toolspace/tools/url_short/url_short_screen.dart';
 
 void main() {
   group('UrlShortScreen Widget Tests', () {
-    testWidgets('displays dev access badge in app bar',
-        (WidgetTester tester) async {
+    testWidgets('displays dev access badge in app bar', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
         ),
       );
+
+      // Wait for _loadUrls timer (500ms)
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
 
       expect(find.text('DEV'), findsOneWidget);
       expect(find.byIcon(Icons.code), findsOneWidget);
@@ -25,8 +28,7 @@ void main() {
 
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('Enter URL to shorten'), findsOneWidget);
-      expect(
-          find.text('https://example.com/very/long/url'), findsOneWidget);
+      expect(find.text('https://example.com/very/long/url'), findsOneWidget);
     });
 
     testWidgets('displays shorten button', (WidgetTester tester) async {
@@ -68,8 +70,7 @@ void main() {
       expect(find.text('Please enter a valid URL'), findsOneWidget);
 
       // Enter valid URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
 
       expect(find.text('Please enter a valid URL'), findsNothing);
@@ -83,8 +84,7 @@ void main() {
       );
 
       // Enter valid URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
 
       // Tap shorten button
@@ -101,8 +101,7 @@ void main() {
       expect(find.textContaining('Short URL created'), findsOneWidget);
     });
 
-    testWidgets('displays URL cards after creation',
-        (WidgetTester tester) async {
+    testWidgets('displays URL cards after creation', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -110,8 +109,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
@@ -122,8 +120,7 @@ void main() {
       expect(find.text('Delete'), findsOneWidget);
     });
 
-    testWidgets('copy button copies URL to clipboard',
-        (WidgetTester tester) async {
+    testWidgets('copy button copies URL to clipboard', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -131,8 +128,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -141,12 +137,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show success message
-      expect(
-          find.text('Short URL copied to clipboard!'), findsOneWidget);
+      expect(find.text('Short URL copied to clipboard!'), findsOneWidget);
     });
 
-    testWidgets('delete button shows confirmation dialog',
-        (WidgetTester tester) async {
+    testWidgets('delete button shows confirmation dialog', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -154,8 +148,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -168,8 +161,7 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('delete confirmation removes URL',
-        (WidgetTester tester) async {
+    testWidgets('delete confirmation removes URL', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -177,8 +169,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -207,19 +198,16 @@ void main() {
       );
 
       // Enter very long URL
-      final longUrl = 'https://example.com/' + 'a' * 2500;
+      final longUrl = 'https://example.com/${'a' * 2500}';
       await tester.enterText(find.byType(TextField), longUrl);
       await tester.pump();
 
-      expect(
-          find.text('URL is too long (max 2048 characters)'),
-          findsOneWidget);
+      expect(find.text('URL is too long (max 2048 characters)'), findsOneWidget);
     });
   });
 
   group('UrlShortScreen Dev Access', () {
-    testWidgets('shows locked screen for non-dev users',
-        (WidgetTester tester) async {
+    testWidgets('shows locked screen for non-dev users', (WidgetTester tester) async {
       // Note: This test would need proper state management
       // to actually test non-dev access. For now, it's a placeholder.
       await tester.pumpWidget(
@@ -242,17 +230,16 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com/test');
+      await tester.enterText(find.byType(TextField), 'https://example.com/test');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
       // Should display original URL
       expect(find.textContaining('https://example.com/test'), findsOneWidget);
-      
+
       // Should display short code
       expect(find.textContaining('/u/'), findsOneWidget);
-      
+
       // Should display time
       expect(find.text('Just now'), findsOneWidget);
     });
