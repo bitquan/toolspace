@@ -130,8 +130,8 @@ void main() {
       await tester.drag(batchSlider, const Offset(50, 0));
       await tester.pumpAndSettle();
 
-      // Generate IDs
-      await tester.tap(find.widgetWithIcon(ElevatedButton, Icons.auto_awesome));
+      // Generate IDs - use byIcon instead of widgetWithIcon for ElevatedButton.icon
+      await tester.tap(find.byIcon(Icons.auto_awesome));
       await tester.pumpAndSettle();
 
       // Should show multiple IDs
@@ -237,8 +237,7 @@ void main() {
       // No error should occur
     });
 
-    testWidgets('Custom alphabet field appears when Custom preset selected',
-        (tester) async {
+    testWidgets('Custom alphabet field appears when Custom preset selected', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: IdGenScreen(),
