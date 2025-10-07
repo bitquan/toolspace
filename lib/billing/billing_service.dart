@@ -5,6 +5,7 @@
 /// - users/{uid}/usage/{yyyy-mm-dd}
 ///
 /// Provides streams for reactive UI updates.
+library;
 
 import 'dart:async';
 import 'dart:convert';

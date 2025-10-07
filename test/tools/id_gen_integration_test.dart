@@ -20,7 +20,10 @@ void main() {
       // All should be valid UUIDs
       for (final uuid in uuids) {
         expect(UuidGenerator.isValid(uuid), true);
-        expect(uuid, matches(RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
+        expect(
+            uuid,
+            matches(RegExp(
+                r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
       }
 
       // All should be unique
@@ -43,7 +46,10 @@ void main() {
       // All should be valid UUID v7
       for (final uuid in uuids) {
         expect(UuidGenerator.isValid(uuid), true);
-        expect(uuid, matches(RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
+        expect(
+            uuid,
+            matches(RegExp(
+                r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
       }
 
       // All should be unique
@@ -146,8 +152,7 @@ void main() {
 
       // Check for any duplicates
       final uniqueIds = ids.toSet();
-      expect(uniqueIds.length, 1000,
-          reason: 'All 1000 UUIDs should be unique');
+      expect(uniqueIds.length, 1000, reason: 'All 1000 UUIDs should be unique');
 
       // Verify no two consecutive UUIDs are the same
       for (int i = 0; i < ids.length - 1; i++) {

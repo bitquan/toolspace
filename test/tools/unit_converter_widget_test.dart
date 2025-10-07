@@ -111,7 +111,8 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('displays conversions history or popular', (WidgetTester tester) async {
+    testWidgets('displays conversions history or popular',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UnitConverterScreen(),
@@ -124,7 +125,9 @@ void main() {
       final recentText = find.text('Recent Conversions');
       final popularText = find.text('Popular Conversions');
 
-      expect(recentText.evaluate().isNotEmpty || popularText.evaluate().isNotEmpty, true);
+      expect(
+          recentText.evaluate().isNotEmpty || popularText.evaluate().isNotEmpty,
+          true);
     });
 
     testWidgets('can switch categories', (WidgetTester tester) async {
@@ -174,7 +177,8 @@ void main() {
       expect(find.text('To'), findsOneWidget);
     });
 
-    testWidgets('has floating action button for search', (WidgetTester tester) async {
+    testWidgets('has floating action button for search',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UnitConverterScreen(),
@@ -187,7 +191,8 @@ void main() {
       expect(find.byIcon(Icons.search), findsOneWidget);
     });
 
-    testWidgets('clears input when clear button pressed', (WidgetTester tester) async {
+    testWidgets('clears input when clear button pressed',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UnitConverterScreen(),
@@ -268,7 +273,8 @@ void main() {
       expect(find.byType(UnitConverterScreen), findsOneWidget);
     });
 
-    testWidgets('popular conversion selection works', (WidgetTester tester) async {
+    testWidgets('popular conversion selection works',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UnitConverterScreen(),

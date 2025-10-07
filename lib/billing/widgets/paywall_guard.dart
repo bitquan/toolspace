@@ -6,6 +6,7 @@
 /// - File size or batch size exceeds plan limits
 ///
 /// Shows QuotaBanner when approaching limits.
+library;
 
 import 'package:flutter/material.dart';
 import '../billing_service.dart';

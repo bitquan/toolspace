@@ -128,6 +128,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       await _billingService.trackHeavyOp();
     }
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Generated ${items.length} QR codes!'),
@@ -194,63 +195,65 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       child: Scaffold(
         appBar: AppBar(
           title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5722).withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF5722).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.qr_code,
+                  color: Color(0xFFFF5722),
+                  size: 20,
+                ),
               ),
-              child: const Icon(
-                Icons.qr_code,
-                color: Color(0xFFFF5722),
-                size: 20,
-              ),
+              const SizedBox(width: 12),
+              const Text('QR Maker v2'),
+            ],
+          ),
+          actions: [
+            ShareDataButton(
+              data: _qrData,
+              type: SharedDataType.text,
+              sourceTool: 'QR Maker',
+              compact: true,
             ),
-            const SizedBox(width: 12),
-            const Text('QR Maker v2'),
-          ],
-        ),
-        actions: [
-          ShareDataButton(
-            data: _qrData,
-            type: SharedDataType.text,
-            sourceTool: 'QR Maker',
-            compact: true,
-          ),
-          IconButton(
-            onPressed: _tabController.index == 0 ? _clearData : _clearBatch,
-            icon: const Icon(Icons.clear_all),
-            tooltip: 'Clear All',
-          ),
-          if (_tabController.index == 0)
             IconButton(
-              onPressed: _copyQrData,
-              icon: const Icon(Icons.copy),
-              tooltip: 'Copy Data',
+              onPressed: _tabController.index == 0 ? _clearData : _clearBatch,
+              icon: const Icon(Icons.clear_all),
+              tooltip: 'Clear All',
             ),
-          IconButton(
-            onPressed:
-                _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
-            icon: const Icon(Icons.download),
-            tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
+            if (_tabController.index == 0)
+              IconButton(
+                onPressed: _copyQrData,
+                icon: const Icon(Icons.copy),
+                tooltip: 'Copy Data',
+              ),
+            IconButton(
+              onPressed: _tabController.index == 0
+                  ? _downloadQr
+                  : _downloadAllBatchQrs,
+              icon: const Icon(Icons.download),
+              tooltip:
+                  _tabController.index == 0 ? 'Download QR' : 'Download All',
+            ),
+          ],
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(icon: Icon(Icons.qr_code_2), text: 'Single QR'),
+              Tab(icon: Icon(Icons.qr_code_scanner), text: 'Batch Generation'),
+            ],
           ),
-        ],
-        bottom: TabBar(
+        ),
+        body: TabBarView(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.qr_code_2), text: 'Single QR'),
-            Tab(icon: Icon(Icons.qr_code_scanner), text: 'Batch Generation'),
+          children: [
+            _buildSingleQrTab(theme),
+            _buildBatchGenerationTab(theme),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildSingleQrTab(theme),
-          _buildBatchGenerationTab(theme),
-        ],
-      ),
       ), // Scaffold
     ); // PaywallGuard
   }

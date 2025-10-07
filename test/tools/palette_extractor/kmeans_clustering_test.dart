@@ -26,7 +26,9 @@ void main() {
       expect(result.totalPixels, equals(100));
     });
 
-    test('extracts correct number of colors when k is smaller than unique colors', () async {
+    test(
+        'extracts correct number of colors when k is smaller than unique colors',
+        () async {
       final pixels = [
         ...List.filled(25, const Color(0xFFFF0000)), // Red
         ...List.filled(25, const Color(0xFF00FF00)), // Green
@@ -56,7 +58,8 @@ void main() {
 
       final result = await KMeansClustering.extractPalette(pixels, k: 5);
 
-      expect(result.frequencies.first, greaterThanOrEqualTo(result.frequencies.last));
+      expect(result.frequencies.first,
+          greaterThanOrEqualTo(result.frequencies.last));
     });
 
     test('calculates percentage correctly', () async {
@@ -97,7 +100,8 @@ void main() {
       expect(totalFreq, equals(pixels.length));
     });
 
-    test('extracts similar colors when k is larger than unique colors', () async {
+    test('extracts similar colors when k is larger than unique colors',
+        () async {
       final pixels = List.filled(100, const Color(0xFFFF0000));
 
       final result = await KMeansClustering.extractPalette(pixels, k: 10);

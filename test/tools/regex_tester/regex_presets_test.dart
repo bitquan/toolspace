@@ -56,9 +56,12 @@ void main() {
 
       for (final preset in presets) {
         expect(preset.name, isNotEmpty, reason: 'Preset should have name');
-        expect(preset.pattern, isNotEmpty, reason: 'Preset should have pattern');
-        expect(preset.description, isNotEmpty, reason: 'Preset should have description');
-        expect(preset.example, isNotEmpty, reason: 'Preset should have example');
+        expect(preset.pattern, isNotEmpty,
+            reason: 'Preset should have pattern');
+        expect(preset.description, isNotEmpty,
+            reason: 'Preset should have description');
+        expect(preset.example, isNotEmpty,
+            reason: 'Preset should have example');
       }
     });
 
@@ -78,9 +81,8 @@ void main() {
       expect(results, isNotEmpty);
       expect(
         results.any((p) =>
-          p.name.toLowerCase().contains('phone') ||
-          p.description.toLowerCase().contains('phone')
-        ),
+            p.name.toLowerCase().contains('phone') ||
+            p.description.toLowerCase().contains('phone')),
         true,
       );
     });
@@ -144,7 +146,8 @@ void main() {
       final categories = RegexPresets.getAllCategories();
 
       for (final category in categories) {
-        expect(category.icon, isNotEmpty, reason: '${category.name} should have icon');
+        expect(category.icon, isNotEmpty,
+            reason: '${category.name} should have icon');
       }
     });
 
@@ -158,9 +161,11 @@ void main() {
       expect(basicCategory.presets, isNotEmpty);
 
       // Basic category should have common patterns
-      final presetNames = basicCategory.presets.map((p) => p.name.toLowerCase());
+      final presetNames =
+          basicCategory.presets.map((p) => p.name.toLowerCase());
       expect(
-        presetNames.any((name) => name.contains('email') || name.contains('url')),
+        presetNames
+            .any((name) => name.contains('email') || name.contains('url')),
         true,
       );
     });

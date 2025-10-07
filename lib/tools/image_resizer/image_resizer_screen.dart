@@ -53,113 +53,113 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
           elevation: 0,
         ),
         body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Upload zone
-            ImageUploadZone(
-              onImagesSelected: _pickImages,
-              isEnabled: !_isUploading && !_isResizing,
-            ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Upload zone
+              ImageUploadZone(
+                onImagesSelected: _pickImages,
+                isEnabled: !_isUploading && !_isResizing,
+              ),
 
-            const SizedBox(height: 16),
-
-            // Resize settings
-            if (_images.isNotEmpty) ...[
-              _buildResizeSettings(theme),
               const SizedBox(height: 16),
-            ],
 
-            // Progress indicator
-            ResizeProgress(
-              isUploading: _isUploading,
-              isResizing: _isResizing,
-            ),
+              // Resize settings
+              if (_images.isNotEmpty) ...[
+                _buildResizeSettings(theme),
+                const SizedBox(height: 16),
+              ],
 
-            // Image list
-            if (_images.isNotEmpty) ...[
-              Text(
-                'Selected Images (${_images.length})',
-                style: theme.textTheme.titleMedium,
+              // Progress indicator
+              ResizeProgress(
+                isUploading: _isUploading,
+                isResizing: _isResizing,
               ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: ImageList(
-                  images: _images,
-                  onRemove: _removeImage,
-                  isEnabled: !_isUploading && !_isResizing,
+
+              // Image list
+              if (_images.isNotEmpty) ...[
+                Text(
+                  'Selected Images (${_images.length})',
+                  style: theme.textTheme.titleMedium,
                 ),
-              ),
-            ] else if (_resizedImages.isEmpty) ...[
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ImageList(
+                    images: _images,
+                    onRemove: _removeImage,
+                    isEnabled: !_isUploading && !_isResizing,
+                  ),
+                ),
+              ] else if (_resizedImages.isEmpty) ...[
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.photo_size_select_large,
+                          size: 64,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No images selected',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Upload images to resize them',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
+              // Resized images results
+              if (_resizedImages.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Resized Images (${_resizedImages.length})',
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: _buildResizedImagesList(),
+                ),
+              ],
+
+              // Action buttons
+              if (_images.isNotEmpty && !_isUploading && !_isResizing)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Row(
                     children: [
-                      Icon(
-                        Icons.photo_size_select_large,
-                        size: 64,
-                        color: Colors.grey.shade400,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No images selected',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.grey.shade600,
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _clearImages,
+                          child: const Text('Clear All'),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Upload images to resize them',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey.shade600,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _resizeImages,
+                          child: const Text('Resize Images'),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
             ],
-
-            // Resized images results
-            if (_resizedImages.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text(
-                'Resized Images (${_resizedImages.length})',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: _buildResizedImagesList(),
-              ),
-            ],
-
-            // Action buttons
-            if (_images.isNotEmpty && !_isUploading && !_isResizing)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _clearImages,
-                        child: const Text('Clear All'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: _resizeImages,
-                        child: const Text('Resize Images'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ), // Column
-      ), // Padding (body)
+          ), // Column
+        ), // Padding (body)
       ), // Scaffold
     ); // PaywallGuard
   }

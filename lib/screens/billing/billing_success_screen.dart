@@ -1,6 +1,7 @@
 /// Billing Success Screen - shown after successful Stripe checkout.
 ///
 /// Celebrates upgrade with confetti-style animation and feature highlights.
+library;
 
 import 'package:flutter/material.dart';
 

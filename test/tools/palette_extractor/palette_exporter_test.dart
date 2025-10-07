@@ -23,7 +23,8 @@ void main() {
     });
 
     test('exports JSON with custom name', () {
-      final json = PaletteExporter.exportJson(testColors, name: 'My Custom Palette');
+      final json =
+          PaletteExporter.exportJson(testColors, name: 'My Custom Palette');
       final decoded = jsonDecode(json);
 
       expect(decoded['name'], equals('My Custom Palette'));
@@ -82,19 +83,25 @@ void main() {
     });
 
     test('returns correct file extension for each format', () {
-      expect(PaletteExporter.getFileExtension(ExportFormat.json), equals('json'));
+      expect(
+          PaletteExporter.getFileExtension(ExportFormat.json), equals('json'));
       expect(PaletteExporter.getFileExtension(ExportFormat.aco), equals('aco'));
       expect(PaletteExporter.getFileExtension(ExportFormat.css), equals('css'));
-      expect(PaletteExporter.getFileExtension(ExportFormat.scss), equals('scss'));
+      expect(
+          PaletteExporter.getFileExtension(ExportFormat.scss), equals('scss'));
       expect(PaletteExporter.getFileExtension(ExportFormat.txt), equals('txt'));
     });
 
     test('returns correct MIME type for each format', () {
-      expect(PaletteExporter.getMimeType(ExportFormat.json), equals('application/json'));
-      expect(PaletteExporter.getMimeType(ExportFormat.aco), equals('application/octet-stream'));
+      expect(PaletteExporter.getMimeType(ExportFormat.json),
+          equals('application/json'));
+      expect(PaletteExporter.getMimeType(ExportFormat.aco),
+          equals('application/octet-stream'));
       expect(PaletteExporter.getMimeType(ExportFormat.css), equals('text/css'));
-      expect(PaletteExporter.getMimeType(ExportFormat.scss), equals('text/css'));
-      expect(PaletteExporter.getMimeType(ExportFormat.txt), equals('text/plain'));
+      expect(
+          PaletteExporter.getMimeType(ExportFormat.scss), equals('text/css'));
+      expect(
+          PaletteExporter.getMimeType(ExportFormat.txt), equals('text/plain'));
     });
 
     test('handles empty color list', () {

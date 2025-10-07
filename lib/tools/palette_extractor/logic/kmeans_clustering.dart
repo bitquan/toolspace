@@ -117,7 +117,6 @@ class KMeansClustering {
       return pixels;
     }
 
-    final random = Random(42); // Use fixed seed for reproducibility
     final sampled = <Color>[];
     final step = pixels.length / maxSamples;
 

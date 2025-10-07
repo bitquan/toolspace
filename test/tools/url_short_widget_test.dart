@@ -25,8 +25,7 @@ void main() {
 
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('Enter URL to shorten'), findsOneWidget);
-      expect(
-          find.text('https://example.com/very/long/url'), findsOneWidget);
+      expect(find.text('https://example.com/very/long/url'), findsOneWidget);
     });
 
     testWidgets('displays shorten button', (WidgetTester tester) async {
@@ -40,7 +39,8 @@ void main() {
       expect(find.byIcon(Icons.content_cut), findsOneWidget);
     });
 
-    testWidgets('displays empty state when no URLs', (WidgetTester tester) async {
+    testWidgets('displays empty state when no URLs',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -68,8 +68,7 @@ void main() {
       expect(find.text('Please enter a valid URL'), findsOneWidget);
 
       // Enter valid URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
 
       expect(find.text('Please enter a valid URL'), findsNothing);
@@ -83,8 +82,7 @@ void main() {
       );
 
       // Enter valid URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
 
       // Tap shorten button
@@ -110,8 +108,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.pump();
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
@@ -131,8 +128,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -141,8 +137,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show success message
-      expect(
-          find.text('Short URL copied to clipboard!'), findsOneWidget);
+      expect(find.text('Short URL copied to clipboard!'), findsOneWidget);
     });
 
     testWidgets('delete button shows confirmation dialog',
@@ -154,8 +149,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -168,8 +162,7 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('delete confirmation removes URL',
-        (WidgetTester tester) async {
+    testWidgets('delete confirmation removes URL', (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -177,8 +170,7 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(
-          find.byType(TextField), 'https://example.com');
+      await tester.enterText(find.byType(TextField), 'https://example.com');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 
@@ -212,8 +204,7 @@ void main() {
       await tester.pump();
 
       expect(
-          find.text('URL is too long (max 2048 characters)'),
-          findsOneWidget);
+          find.text('URL is too long (max 2048 characters)'), findsOneWidget);
     });
   });
 

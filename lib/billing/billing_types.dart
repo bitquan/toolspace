@@ -1,6 +1,7 @@
 /// Billing types matching backend schema.
 ///
 /// Keep in sync with functions/src/types/billing.ts
+library;
 
 /// Subscription plan IDs
 enum PlanId {
@@ -174,8 +175,9 @@ class Entitlements {
   /// Get human-readable file size limit
   String get maxFileSizeFormatted {
     if (maxFileSize < 1024) return '$maxFileSize B';
-    if (maxFileSize < 1024 * 1024)
+    if (maxFileSize < 1024 * 1024) {
       return '${(maxFileSize / 1024).toStringAsFixed(0)} KB';
+    }
     return '${(maxFileSize / (1024 * 1024)).toStringAsFixed(0)} MB';
   }
 }
@@ -258,7 +260,7 @@ class BillingProfile {
   bool get isInGracePeriod {
     if (currentPeriodEnd == null) return false;
     final now = DateTime.now();
-    final gracePeriod = Duration(days: 3); // matches backend
+    const gracePeriod = Duration(days: 3); // matches backend
     return now.isAfter(currentPeriodEnd!) &&
         now.isBefore(currentPeriodEnd!.add(gracePeriod));
   }

@@ -361,8 +361,7 @@ void main() {
 
     test('isValid validates NanoID correctly', () {
       expect(NanoidGenerator.isValid('V1StGXR8_Z5jdHi6B-myT'), true);
-      expect(
-          NanoidGenerator.isValid('123456', alphabet: '0123456789'), true);
+      expect(NanoidGenerator.isValid('123456', alphabet: '0123456789'), true);
       expect(NanoidGenerator.isValid('invalid!@#'), false);
       expect(NanoidGenerator.isValid(''), false);
     });

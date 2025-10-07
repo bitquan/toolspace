@@ -121,6 +121,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
 
     try {
       final String filename;
+      // ignore: unused_local_variable
       final dynamic content;
 
       switch (format) {

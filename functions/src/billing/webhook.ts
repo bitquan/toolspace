@@ -18,7 +18,6 @@ import {
   BillingEvent,
   StripeWebhookEventType,
 } from "../types/billing";
-import { loadPricingConfig } from "./entitlements";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET || functions.config().stripe?.secret || "",
@@ -169,7 +168,6 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
   }
 
   // Validate plan
-  const config = loadPricingConfig();
   const validPlan = planId && ["pro", "pro_plus"].includes(planId);
 
   if (!validPlan) {

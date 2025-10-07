@@ -193,38 +193,38 @@ void main() {
         appBar: AppBar(
           title: const Text('Markdown to PDF'),
           backgroundColor: theme.colorScheme.inversePrimary,
-        actions: [
-          if (_isExporting)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
+          actions: [
+            if (_isExporting)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: FilledButton.icon(
+                  onPressed: _showExportDialog,
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text('Export to PDF'),
+                ),
               ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: FilledButton.icon(
-                onPressed: _showExportDialog,
-                icon: const Icon(Icons.picture_as_pdf),
-                label: const Text('Export to PDF'),
-              ),
-            ),
-        ],
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 800;
+          ],
+        ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 800;
 
-          if (isWide) {
-            return _buildSplitPane(theme);
-          } else {
-            return _buildSinglePane(theme);
-          }
-        },
-      ),
+            if (isWide) {
+              return _buildSplitPane(theme);
+            } else {
+              return _buildSinglePane(theme);
+            }
+          },
+        ),
       ), // Scaffold
     ); // PaywallGuard
   }

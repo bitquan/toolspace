@@ -16,14 +16,16 @@ void main() {
       expect(find.byIcon(Icons.upload_file), findsOneWidget);
     });
 
-    testWidgets('shows upload button in empty state', (WidgetTester tester) async {
+    testWidgets('shows upload button in empty state',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: CsvCleanerScreen(),
         ),
       );
 
-      expect(find.widgetWithText(FilledButton, 'Upload CSV File'), findsOneWidget);
+      expect(
+          find.widgetWithText(FilledButton, 'Upload CSV File'), findsOneWidget);
     });
 
     testWidgets('app bar displays correct title', (WidgetTester tester) async {

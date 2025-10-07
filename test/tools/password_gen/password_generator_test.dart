@@ -23,7 +23,8 @@ void main() {
       );
 
       expect(config.isValid(), false);
-      expect(config.getValidationError(), 'Password length must be at least 8 characters');
+      expect(config.getValidationError(),
+          'Password length must be at least 8 characters');
     });
 
     test('validates maximum length', () {
@@ -33,7 +34,8 @@ void main() {
       );
 
       expect(config.isValid(), false);
-      expect(config.getValidationError(), 'Password length must be at most 128 characters');
+      expect(config.getValidationError(),
+          'Password length must be at most 128 characters');
     });
 
     test('requires at least one character set', () {
@@ -46,7 +48,8 @@ void main() {
       );
 
       expect(config.isValid(), false);
-      expect(config.getValidationError(), 'At least one character set must be selected');
+      expect(config.getValidationError(),
+          'At least one character set must be selected');
     });
 
     test('builds correct character set', () {
@@ -253,7 +256,8 @@ void main() {
 
       // Should have some entropy but less than fully random
       expect(entropy, greaterThan(0));
-      expect(entropy, lessThan(password.length * 6.64)); // Max for 100 unique chars
+      expect(entropy,
+          lessThan(password.length * 6.64)); // Max for 100 unique chars
     });
 
     test('Shannon entropy is zero for empty password', () {
@@ -314,7 +318,8 @@ void main() {
         includeSymbols: true,
       );
 
-      final strongEntropy = PasswordGenerator.calculateCharsetEntropy(strongConfig);
+      final strongEntropy =
+          PasswordGenerator.calculateCharsetEntropy(strongConfig);
       final strongScore = PasswordGenerator.getStrengthScore(strongEntropy);
       expect(strongScore, greaterThan(80));
     });

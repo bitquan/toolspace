@@ -233,7 +233,6 @@ class _CodecLabScreenState extends State<CodecLabScreen>
     // platform-specific code or a package like universal_html for web
     try {
       final blob = bytes;
-      final fileName = 'decoded_${DateTime.now().millisecondsSinceEpoch}';
 
       // For Flutter web, we'd use dart:html
       // For now, just copy the Base64 representation to clipboard

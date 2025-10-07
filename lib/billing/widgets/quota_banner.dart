@@ -2,6 +2,7 @@
 ///
 /// Displays when user has operations remaining but approaching limit.
 /// Neo-Playground style with glassmorphism.
+library;
 
 import 'package:flutter/material.dart';
 import '../billing_types.dart';

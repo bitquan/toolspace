@@ -10,30 +10,39 @@ void main() {
       expect(UnitConverter.convert(1, 'meter', 'kilometer', 'Length'), 0.001);
       expect(UnitConverter.convert(1, 'kilometer', 'meter', 'Length'), 1000.0);
       expect(UnitConverter.convert(1, 'meter', 'centimeter', 'Length'), 100.0);
-      expect(UnitConverter.convert(1, 'mile', 'kilometer', 'Length'), closeTo(1.609344, 0.00001));
+      expect(UnitConverter.convert(1, 'mile', 'kilometer', 'Length'),
+          closeTo(1.609344, 0.00001));
     });
 
     test('converts mass units correctly', () {
       expect(UnitConverter.convert(1, 'kilogram', 'kilogram', 'Mass'), 1.0);
       expect(UnitConverter.convert(1, 'kilogram', 'gram', 'Mass'), 1000.0);
       expect(UnitConverter.convert(1, 'ton', 'kilogram', 'Mass'), 1000.0);
-      expect(UnitConverter.convert(1, 'pound', 'kilogram', 'Mass'), closeTo(0.453592, 0.00001));
+      expect(UnitConverter.convert(1, 'pound', 'kilogram', 'Mass'),
+          closeTo(0.453592, 0.00001));
     });
 
     test('converts temperature correctly', () {
       expect(UnitConverter.convertTemperature(0, 'celsius', 'celsius'), 0.0);
-      expect(UnitConverter.convertTemperature(0, 'celsius', 'fahrenheit'), 32.0);
+      expect(
+          UnitConverter.convertTemperature(0, 'celsius', 'fahrenheit'), 32.0);
       expect(UnitConverter.convertTemperature(0, 'celsius', 'kelvin'), 273.15);
-      expect(UnitConverter.convertTemperature(32, 'fahrenheit', 'celsius'), 0.0);
-      expect(UnitConverter.convertTemperature(100, 'celsius', 'fahrenheit'), 212.0);
-      expect(UnitConverter.convertTemperature(273.15, 'kelvin', 'celsius'), 0.0);
+      expect(
+          UnitConverter.convertTemperature(32, 'fahrenheit', 'celsius'), 0.0);
+      expect(UnitConverter.convertTemperature(100, 'celsius', 'fahrenheit'),
+          212.0);
+      expect(
+          UnitConverter.convertTemperature(273.15, 'kelvin', 'celsius'), 0.0);
     });
 
     test('converts data storage units correctly', () {
       expect(UnitConverter.convert(1, 'byte', 'byte', 'Data Storage'), 1.0);
-      expect(UnitConverter.convert(1, 'kilobyte', 'byte', 'Data Storage'), 1024.0);
-      expect(UnitConverter.convert(1, 'megabyte', 'kilobyte', 'Data Storage'), 1024.0);
-      expect(UnitConverter.convert(1, 'gigabyte', 'megabyte', 'Data Storage'), 1024.0);
+      expect(
+          UnitConverter.convert(1, 'kilobyte', 'byte', 'Data Storage'), 1024.0);
+      expect(UnitConverter.convert(1, 'megabyte', 'kilobyte', 'Data Storage'),
+          1024.0);
+      expect(UnitConverter.convert(1, 'gigabyte', 'megabyte', 'Data Storage'),
+          1024.0);
       expect(UnitConverter.convert(8, 'bit', 'byte', 'Data Storage'), 1.0);
     });
 
@@ -46,21 +55,29 @@ void main() {
     });
 
     test('converts area units correctly', () {
-      expect(UnitConverter.convert(1, 'square meter', 'square meter', 'Area'), 1.0);
-      expect(UnitConverter.convert(1, 'square kilometer', 'square meter', 'Area'), 1000000.0);
-      expect(UnitConverter.convert(1, 'hectare', 'square meter', 'Area'), 10000.0);
-      expect(UnitConverter.convert(1, 'acre', 'square meter', 'Area'), closeTo(4046.86, 0.01));
+      expect(UnitConverter.convert(1, 'square meter', 'square meter', 'Area'),
+          1.0);
+      expect(
+          UnitConverter.convert(1, 'square kilometer', 'square meter', 'Area'),
+          1000000.0);
+      expect(
+          UnitConverter.convert(1, 'hectare', 'square meter', 'Area'), 10000.0);
+      expect(UnitConverter.convert(1, 'acre', 'square meter', 'Area'),
+          closeTo(4046.86, 0.01));
     });
 
     test('converts volume units correctly', () {
       expect(UnitConverter.convert(1, 'liter', 'liter', 'Volume'), 1.0);
       expect(UnitConverter.convert(1, 'liter', 'milliliter', 'Volume'), 1000.0);
-      expect(UnitConverter.convert(1, 'cubic meter', 'liter', 'Volume'), 1000.0);
-      expect(UnitConverter.convert(1, 'gallon', 'liter', 'Volume'), closeTo(3.78541, 0.00001));
+      expect(
+          UnitConverter.convert(1, 'cubic meter', 'liter', 'Volume'), 1000.0);
+      expect(UnitConverter.convert(1, 'gallon', 'liter', 'Volume'),
+          closeTo(3.78541, 0.00001));
     });
 
     test('handles precision correctly', () {
-      final result = UnitConverter.convert(1.234567, 'meter', 'centimeter', 'Length');
+      final result =
+          UnitConverter.convert(1.234567, 'meter', 'centimeter', 'Length');
       expect(result, closeTo(123.4567, 0.0001));
     });
 
@@ -264,25 +281,31 @@ void main() {
   group('Edge Cases', () {
     test('handles zero values', () {
       expect(UnitConverter.convert(0, 'meter', 'kilometer', 'Length'), 0.0);
-      expect(UnitConverter.convertTemperature(0, 'celsius', 'fahrenheit'), 32.0);
+      expect(
+          UnitConverter.convertTemperature(0, 'celsius', 'fahrenheit'), 32.0);
     });
 
     test('handles negative values', () {
-      expect(UnitConverter.convert(-5, 'meter', 'centimeter', 'Length'), -500.0);
-      expect(UnitConverter.convertTemperature(-40, 'celsius', 'fahrenheit'), -40.0);
+      expect(
+          UnitConverter.convert(-5, 'meter', 'centimeter', 'Length'), -500.0);
+      expect(UnitConverter.convertTemperature(-40, 'celsius', 'fahrenheit'),
+          -40.0);
     });
 
     test('handles large values', () {
-      expect(UnitConverter.convert(1000000, 'meter', 'kilometer', 'Length'), 1000.0);
+      expect(UnitConverter.convert(1000000, 'meter', 'kilometer', 'Length'),
+          1000.0);
     });
 
     test('handles same unit conversion', () {
       expect(UnitConverter.convert(100, 'meter', 'meter', 'Length'), 100.0);
-      expect(UnitConverter.convertTemperature(100, 'celsius', 'celsius'), 100.0);
+      expect(
+          UnitConverter.convertTemperature(100, 'celsius', 'celsius'), 100.0);
     });
 
     test('handles decimal precision', () {
-      final result = UnitConverter.convert(3.14159, 'meter', 'centimeter', 'Length');
+      final result =
+          UnitConverter.convert(3.14159, 'meter', 'centimeter', 'Length');
       expect(result.toStringAsFixed(2), '314.16');
     });
   });

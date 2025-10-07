@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toolspace/tools/password_gen/password_gen_screen.dart';
 
 void main() {
-  testWidgets('Password generator screen loads correctly', (WidgetTester tester) async {
+  testWidgets('Password generator screen loads correctly',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -22,7 +23,8 @@ void main() {
     expect(find.text('Digits (0-9)'), findsOneWidget);
   });
 
-  testWidgets('Length slider changes password length', (WidgetTester tester) async {
+  testWidgets('Length slider changes password length',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -62,7 +64,8 @@ void main() {
     // The checkbox should have changed state (covered by internal state)
   });
 
-  testWidgets('Avoid ambiguous characters toggle works', (WidgetTester tester) async {
+  testWidgets('Avoid ambiguous characters toggle works',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -127,7 +130,8 @@ void main() {
     expect(find.textContaining('Entropy:'), findsOneWidget);
   });
 
-  testWidgets('Validation error is shown for invalid config', (WidgetTester tester) async {
+  testWidgets('Validation error is shown for invalid config',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -149,10 +153,12 @@ void main() {
 
     // Check that validation error is shown
     expect(find.byIcon(Icons.warning), findsOneWidget);
-    expect(find.text('At least one character set must be selected'), findsOneWidget);
+    expect(find.text('At least one character set must be selected'),
+        findsOneWidget);
   });
 
-  testWidgets('Copy button is available for generated password', (WidgetTester tester) async {
+  testWidgets('Copy button is available for generated password',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -167,7 +173,8 @@ void main() {
     expect(find.text('Copy Password'), findsOneWidget);
   });
 
-  testWidgets('Batch generation shows list of passwords', (WidgetTester tester) async {
+  testWidgets('Batch generation shows list of passwords',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),
@@ -185,7 +192,8 @@ void main() {
     expect(find.text('Copy All'), findsWidgets);
   });
 
-  testWidgets('Strength label updates with config changes', (WidgetTester tester) async {
+  testWidgets('Strength label updates with config changes',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: PasswordGenScreen(),

@@ -2,6 +2,7 @@
 ///
 /// Neo-Playground style with glassmorphism, gradients, and playful animations.
 /// Loads plans from pricing.json and creates Stripe checkout sessions.
+library;
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -189,7 +190,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
             else if (_error != null)
               Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(_error!, style: TextStyle(color: Colors.red)),
+                child: Text(_error!, style: const TextStyle(color: Colors.red)),
               )
             else if (_plans != null)
               Expanded(
@@ -382,7 +383,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: [Colors.blue, Colors.purple],
                   ),
                   borderRadius: BorderRadius.circular(12),

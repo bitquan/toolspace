@@ -166,8 +166,8 @@ void main() {
         data.timestamp.isAfter(before.subtract(const Duration(seconds: 1))),
         true,
       );
-      expect(data.timestamp.isBefore(after.add(const Duration(seconds: 1))),
-          true);
+      expect(
+          data.timestamp.isBefore(after.add(const Duration(seconds: 1))), true);
     });
 
     test('SharedData toString includes key information', () {

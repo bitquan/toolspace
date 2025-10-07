@@ -156,7 +156,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                               ),
                             ),
                             // Billing button
-                            _BillingButton(),
+                            const _BillingButton(),
                           ],
                         ),
 
@@ -179,7 +179,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                     ? Colors.white.withValues(alpha: 0.4)
                                     : Colors.black.withValues(alpha: 0.4),
                               ),
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.search_rounded,
                                 color: NeoPlaygroundTheme.primaryPurple,
                               ),

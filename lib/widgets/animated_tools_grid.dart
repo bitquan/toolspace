@@ -132,6 +132,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
   late AnimationController _hoverController;
   late Animation<double> _elevationAnimation;
   late Animation<double> _scaleAnimation;
+  // ignore: unused_field
   bool _isHovered = false;
 
   @override

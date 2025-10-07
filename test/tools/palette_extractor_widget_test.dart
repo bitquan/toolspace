@@ -6,7 +6,8 @@ import 'package:toolspace/tools/palette_extractor/widgets/color_swatch_card.dart
 
 void main() {
   group('PaletteExtractorScreen Widget Tests', () {
-    testWidgets('displays app bar with correct title', (WidgetTester tester) async {
+    testWidgets('displays app bar with correct title',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: PaletteExtractorScreen(),
@@ -27,14 +28,16 @@ void main() {
       expect(find.byType(ImageUploadZone), findsOneWidget);
     });
 
-    testWidgets('displays empty state message initially', (WidgetTester tester) async {
+    testWidgets('displays empty state message initially',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: PaletteExtractorScreen(),
         ),
       );
 
-      expect(find.text('Upload an image to extract its color palette'), findsOneWidget);
+      expect(find.text('Upload an image to extract its color palette'),
+          findsOneWidget);
       expect(find.byIcon(Icons.palette_outlined), findsOneWidget);
     });
 
@@ -49,7 +52,8 @@ void main() {
       expect(find.textContaining('Number of colors:'), findsOneWidget);
     });
 
-    testWidgets('does not show export button without palette', (WidgetTester tester) async {
+    testWidgets('does not show export button without palette',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: PaletteExtractorScreen(),
@@ -79,7 +83,8 @@ void main() {
   });
 
   group('ImageUploadZone Widget Tests', () {
-    testWidgets('displays upload prompt when no image', (WidgetTester tester) async {
+    testWidgets('displays upload prompt when no image',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -91,12 +96,14 @@ void main() {
         ),
       );
 
-      expect(find.text('Tap to select an image or drag & drop'), findsOneWidget);
+      expect(
+          find.text('Tap to select an image or drag & drop'), findsOneWidget);
       expect(find.text('PNG, JPG, WebP • Max 10MB'), findsOneWidget);
       expect(find.byIcon(Icons.image_outlined), findsOneWidget);
     });
 
-    testWidgets('displays different message when image loaded', (WidgetTester tester) async {
+    testWidgets('displays different message when image loaded',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -112,7 +119,8 @@ void main() {
       expect(find.byIcon(Icons.refresh), findsOneWidget);
     });
 
-    testWidgets('displays extracting message when disabled', (WidgetTester tester) async {
+    testWidgets('displays extracting message when disabled',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -127,7 +135,8 @@ void main() {
       expect(find.text('Extracting colors...'), findsOneWidget);
     });
 
-    testWidgets('calls onImageSelected when tapped', (WidgetTester tester) async {
+    testWidgets('calls onImageSelected when tapped',
+        (WidgetTester tester) async {
       var called = false;
 
       await tester.pumpWidget(

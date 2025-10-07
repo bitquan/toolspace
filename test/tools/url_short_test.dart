@@ -20,7 +20,7 @@ void main() {
     test('rejects invalid URLs', () {
       final invalidUrls = [
         'not-a-url',
-        'example.com',  // Missing protocol in strict validation
+        'example.com', // Missing protocol in strict validation
         'htp://example.com',
         'https:/example.com',
         'https://example',

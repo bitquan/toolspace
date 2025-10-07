@@ -8,6 +8,7 @@
 /// 3. md_to_pdf - requiresHeavyOp, check file size
 /// 4. qr_maker (batch mode) - requiresHeavyOp, batch size
 /// 5. json_flatten (CSV export) - requiresHeavyOp
+library;
 
 import 'package:flutter/material.dart';
 import '../../billing/billing_service.dart';

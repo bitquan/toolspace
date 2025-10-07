@@ -17,7 +17,8 @@ void main() {
       expect(find.text('File Mode'), findsOneWidget);
     });
 
-    testWidgets('switches between Text and File modes', (WidgetTester tester) async {
+    testWidgets('switches between Text and File modes',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: CodecLabScreen(),
@@ -60,7 +61,8 @@ void main() {
       expect(find.text('Decode'), findsOneWidget);
     });
 
-    testWidgets('has input and output fields in Text Mode', (WidgetTester tester) async {
+    testWidgets('has input and output fields in Text Mode',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: CodecLabScreen(),
@@ -80,12 +82,14 @@ void main() {
       );
 
       // Find input field and enter text
-      final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello World');
       await tester.pump();
 
       // Check that output is generated
-      final outputField = find.widgetWithText(TextField, 'Output will appear here...');
+      final outputField =
+          find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
       expect(outputWidget.controller?.text, 'SGVsbG8gV29ybGQ=');
     });
@@ -102,12 +106,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter Base64 text
-      final inputField = find.widgetWithText(TextField, 'Enter encoded text to decode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter encoded text to decode...');
       await tester.enterText(inputField, 'SGVsbG8gV29ybGQ=');
       await tester.pump();
 
       // Check output
-      final outputField = find.widgetWithText(TextField, 'Output will appear here...');
+      final outputField =
+          find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
       expect(outputWidget.controller?.text, 'Hello World');
     });
@@ -124,12 +130,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter text
-      final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
 
       // Check hex output
-      final outputField = find.widgetWithText(TextField, 'Output will appear here...');
+      final outputField =
+          find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
       expect(outputWidget.controller?.text, '48656c6c6f');
     });
@@ -142,7 +150,8 @@ void main() {
       );
 
       // Enter text
-      final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
 
@@ -167,7 +176,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter invalid Base64
-      final inputField = find.widgetWithText(TextField, 'Enter encoded text to decode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter encoded text to decode...');
       await tester.enterText(inputField, 'Invalid!!!');
       await tester.pump();
 
@@ -183,7 +193,8 @@ void main() {
       );
 
       // Enter text
-      final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
 
@@ -208,7 +219,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter Base64 text
-      final inputField = find.widgetWithText(TextField, 'Enter encoded text to decode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter encoded text to decode...');
       await tester.enterText(inputField, 'SGVsbG8gV29ybGQ=');
       await tester.pump();
 
@@ -217,12 +229,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Format should be detected and decoded
-      final outputField = find.widgetWithText(TextField, 'Output will appear here...');
+      final outputField =
+          find.widgetWithText(TextField, 'Output will appear here...');
       final outputWidget = tester.widget<TextField>(outputField);
       expect(outputWidget.controller?.text, 'Hello World');
     });
 
-    testWidgets('shows success message after encoding', (WidgetTester tester) async {
+    testWidgets('shows success message after encoding',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: CodecLabScreen(),
@@ -230,7 +244,8 @@ void main() {
       );
 
       // Enter text
-      final inputField = find.widgetWithText(TextField, 'Enter text to encode...');
+      final inputField =
+          find.widgetWithText(TextField, 'Enter text to encode...');
       await tester.enterText(inputField, 'Hello');
       await tester.pump();
 
@@ -238,7 +253,8 @@ void main() {
       expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
     });
 
-    testWidgets('File Mode shows file upload interface', (WidgetTester tester) async {
+    testWidgets('File Mode shows file upload interface',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: CodecLabScreen(),

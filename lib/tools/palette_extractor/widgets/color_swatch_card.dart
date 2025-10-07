@@ -71,7 +71,6 @@ class _ColorSwatchCardState extends State<ColorSwatchCard>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final hex = ColorUtils.toHex(widget.color);
     final rgb = ColorUtils.toRgb(widget.color);
     final textColor = ColorUtils.getContrastColor(widget.color);

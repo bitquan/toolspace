@@ -1,6 +1,7 @@
 /// Manage Billing Button - opens Stripe Customer Portal.
 ///
 /// For Pro/Pro+ users to manage subscription, payment methods, invoices.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
