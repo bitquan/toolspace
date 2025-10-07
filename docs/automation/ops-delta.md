@@ -399,6 +399,9 @@ A: Check priority labels (P0-blocker, P1, P2) and estimate format (`Estimate: X.
 **Q: Progress tracker not closing issues**
 A: Ensure PR body contains `Closes #123` format and PR is actually merged
 
+**Q: Progress tracker failing with 404 errors**
+A: Fixed in latest version - ensure workflow uses `pull_number` parameter (not `pull_request_number`) for GitHub API calls
+
 **Q: Reports missing velocity data**
 A: Verify closed issues have `done` labels - only labeled issues count in velocity
 
@@ -505,6 +508,15 @@ The system is designed to be self-maintaining through the watchdog workflow, but
 - Major GitHub API changes
 - Repository permission updates
 - New feature requirements
+
+### Maintenance Log
+
+#### 2025-10-06: Fixed Progress Tracker API Parameter
+- **Issue**: Progress tracker and auto-approve workflows failing with 404 errors
+- **Cause**: Incorrect parameter `pull_request_number` used instead of `pull_number` in GitHub REST API calls
+- **Resolution**: Updated both `delta-progress.yml` and `auto-approve-copilot.yml` to use correct parameter
+- **Files Changed**: `.github/workflows/delta-progress.yml`, `.github/workflows/auto-approve-copilot.yml`
+- **Impact**: Resolved consecutive workflow failures, restored automatic PR processing
 - Performance optimization
 
 **Remember: All workflows default to dry-run mode for safety. Always test changes thoroughly before enabling live mode.**

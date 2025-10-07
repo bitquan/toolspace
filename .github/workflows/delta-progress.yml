@@ -58,7 +58,7 @@ jobs:
                         const { data: prData } = await github.rest.pulls.get({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
-                          pull_request_number: prNumber
+                          pull_number: prNumber
                         });
                         pr = prData;
                       } catch (error) {
