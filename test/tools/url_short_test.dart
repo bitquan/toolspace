@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -164,12 +166,11 @@ String? getValidationError(String url) {
 
 String generateShortCode() {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  final random = Random();
   return String.fromCharCodes(
     Iterable.generate(
       6,
-      (_) => chars.codeUnitAt(
-        DateTime.now().microsecondsSinceEpoch % chars.length,
-      ),
+      (_) => chars.codeUnitAt(random.nextInt(chars.length)),
     ),
   );
 }

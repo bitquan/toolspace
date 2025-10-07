@@ -251,14 +251,16 @@ void main() {
       final dateTime = DateTime.now().add(const Duration(minutes: 15));
       final result = TimestampConverter.getRelativeTime(dateTime);
 
-      expect(result, '15 minutes from now');
+      // Accept slight variance due to test execution time
+      expect(result, anyOf('15 minutes from now', '14 minutes from now'));
     });
 
     test('returns "in X hours" for future hours', () {
       final dateTime = DateTime.now().add(const Duration(hours: 2));
       final result = TimestampConverter.getRelativeTime(dateTime);
 
-      expect(result, '2 hours from now');
+      // Accept slight variance due to test execution time
+      expect(result, anyOf('2 hours from now', '1 hour from now'));
     });
   });
 
