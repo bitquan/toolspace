@@ -37,7 +37,7 @@ class ShareDataButton extends StatelessWidget {
     // Show feedback
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Data shared! You can now use it in other tools.'),
+        content: const Text('Data shared! You can now use it in other tools.'),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(

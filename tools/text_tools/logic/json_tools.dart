@@ -22,7 +22,7 @@ class JsonTools {
   /// Validate JSON and return detailed error information
   static ValidationResult validateJson(String jsonString) {
     if (jsonString.trim().isEmpty) {
-      return ValidationResult(
+      return const ValidationResult(
         isValid: false,
         error: 'JSON string is empty',
         errorLine: 1,

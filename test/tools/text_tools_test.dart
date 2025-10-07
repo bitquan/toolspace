@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/text_tools/logic/case_convert.dart';
-import '../../lib/tools/text_tools/logic/clean_text.dart';
-import '../../lib/tools/text_tools/logic/json_tools.dart';
-import '../../lib/tools/text_tools/logic/slugify.dart';
-import '../../lib/tools/text_tools/logic/counters.dart';
-import '../../lib/tools/text_tools/logic/uuid_gen.dart';
-import '../../lib/tools/text_tools/logic/nanoid_gen.dart';
+import 'package:toolspace/tools/text_tools/logic/case_convert.dart';
+import 'package:toolspace/tools/text_tools/logic/clean_text.dart';
+import 'package:toolspace/tools/text_tools/logic/json_tools.dart';
+import 'package:toolspace/tools/text_tools/logic/slugify.dart';
+import 'package:toolspace/tools/text_tools/logic/counters.dart';
+import 'package:toolspace/tools/text_tools/logic/uuid_gen.dart';
+import 'package:toolspace/tools/text_tools/logic/nanoid_gen.dart';
 
 void main() {
   group('CaseConverter Tests', () {
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('validateJson provides correct line number for multi-line error', () {
-      final input = '{\n  "name": "value",\n  "bad": test\n}';
+      const input = '{\n  "name": "value",\n  "bad": test\n}';
       final result = JsonTools.validateJson(input);
       expect(result.isValid, false);
       expect(result.errorLine, 3); // Error on line 3
@@ -101,7 +101,7 @@ void main() {
     });
 
     test('validateJson handles error at end of multi-line JSON', () {
-      final input = '{\n  "name": "value",\n  "key": "unclosed';
+      const input = '{\n  "name": "value",\n  "key": "unclosed';
       final result = JsonTools.validateJson(input);
       expect(result.isValid, false);
       expect(result.errorLine, isNotNull);
@@ -125,20 +125,20 @@ void main() {
     });
 
     test('prettyPrint formats JSON correctly', () {
-      final input = '{"name":"test","value":123}';
+      const input = '{"name":"test","value":123}';
       final result = JsonTools.prettyPrint(input, indent: 2);
       expect(result, contains('  "name"'));
       expect(result, contains('  "value"'));
     });
 
     test('minify removes formatting', () {
-      final input = '{\n  "name": "test",\n  "value": 123\n}';
+      const input = '{\n  "name": "test",\n  "value": 123\n}';
       final result = JsonTools.minify(input);
       expect(result, '{"name":"test","value":123}');
     });
 
     test('sortKeys orders object keys', () {
-      final input = '{"z": 1, "a": 2, "m": 3}';
+      const input = '{"z": 1, "a": 2, "m": 3}';
       final result = JsonTools.sortKeys(input);
       expect(result.indexOf('"a"'), lessThan(result.indexOf('"m"')));
       expect(result.indexOf('"m"'), lessThan(result.indexOf('"z"')));

@@ -404,7 +404,7 @@ class _CsvCleanerScreenState extends State<CsvCleanerScreen>
                                 labelText: 'Duplicate Detection Column',
                                 border: OutlineInputBorder(),
                               ),
-                              value: _selectedDedupeColumn,
+                              initialValue: _selectedDedupeColumn,
                               items: _headers.map((header) {
                                 return DropdownMenuItem(
                                   value: header,

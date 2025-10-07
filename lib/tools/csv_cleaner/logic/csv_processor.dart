@@ -11,7 +11,7 @@ class CsvProcessor {
 
     for (final line in lines) {
       if (line.trim().isEmpty) continue;
-      
+
       // Simple CSV parsing (handles basic comma-separated values)
       // For production, consider using a proper CSV library
       final cells = _parseCsvLine(line);
@@ -26,10 +26,10 @@ class CsvProcessor {
     final List<String> cells = [];
     final buffer = StringBuffer();
     bool inQuotes = false;
-    
+
     for (int i = 0; i < line.length; i++) {
       final char = line[i];
-      
+
       if (char == '"') {
         // Handle escaped quotes
         if (inQuotes && i + 1 < line.length && line[i + 1] == '"') {
@@ -45,10 +45,10 @@ class CsvProcessor {
         buffer.write(char);
       }
     }
-    
+
     // Add the last cell
     cells.add(buffer.toString());
-    
+
     return cells;
   }
 
@@ -108,7 +108,7 @@ class CsvProcessor {
 
     for (final row in rows) {
       String key;
-      
+
       if (keyColumnIndex != null && keyColumnIndex < row.length) {
         // Use specific column as key
         key = row[keyColumnIndex];
@@ -163,7 +163,7 @@ class CsvProcessor {
   /// Validate CSV data
   static CsvValidationResult validate(List<List<String>> rows) {
     if (rows.isEmpty) {
-      return CsvValidationResult(
+      return const CsvValidationResult(
         isValid: false,
         error: 'CSV is empty',
       );
@@ -175,13 +175,14 @@ class CsvProcessor {
       if (rows[i].length != columnCount) {
         return CsvValidationResult(
           isValid: false,
-          error: 'Row ${i + 1} has ${rows[i].length} columns, expected $columnCount',
+          error:
+              'Row ${i + 1} has ${rows[i].length} columns, expected $columnCount',
           rowNumber: i + 1,
         );
       }
     }
 
-    return CsvValidationResult(isValid: true);
+    return const CsvValidationResult(isValid: true);
   }
 }
 

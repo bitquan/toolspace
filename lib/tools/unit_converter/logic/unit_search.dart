@@ -11,10 +11,10 @@ class UnitSearch {
 
     for (final category in UnitConverter.getCategories()) {
       final units = UnitConverter.getUnitsForCategory(category);
-      
+
       for (final unit in units) {
         final score = _calculateMatchScore(lowerQuery, unit.toLowerCase());
-        
+
         if (score > 0) {
           results.add(UnitSearchResult(
             unit: unit,
@@ -29,13 +29,15 @@ class UnitSearch {
       for (final entry in aliases.entries) {
         final unit = entry.key;
         if (!units.contains(unit)) continue;
-        
+
         for (final alias in entry.value) {
           final score = _calculateMatchScore(lowerQuery, alias.toLowerCase());
-          
+
           if (score > 0) {
             // Check if we already have this unit in results
-            final existing = results.where((r) => r.unit == unit && r.category == category).firstOrNull;
+            final existing = results
+                .where((r) => r.unit == unit && r.category == category)
+                .firstOrNull;
             if (existing != null) {
               // Update score if this is better
               if (score > existing.score) {
@@ -74,7 +76,7 @@ class UnitSearch {
     // Fuzzy match - check if all query characters appear in order
     int queryIndex = 0;
     int matches = 0;
-    
+
     for (int i = 0; i < target.length && queryIndex < query.length; i++) {
       if (target[i] == query[queryIndex]) {
         matches++;

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/json_doctor/logic/jsonpath_query.dart';
+import 'package:toolspace/tools/json_doctor/logic/jsonpath_query.dart';
 
 void main() {
   group('JsonPathQuery Tests', () {
@@ -509,7 +509,7 @@ void main() {
       });
 
       test('handles path on non-object data', () {
-        final data = 'simple string';
+        const data = 'simple string';
 
         final result = JsonPathQuery.query(data, r'$.property');
         expect(result.success, true);
@@ -517,7 +517,7 @@ void main() {
       });
 
       test('handles path on numeric data', () {
-        final data = 42;
+        const data = 42;
 
         final result = JsonPathQuery.query(data, r'$.property');
         expect(result.success, true);
@@ -527,7 +527,7 @@ void main() {
 
     group('JsonPathResult', () {
       test('result contains correct fields', () {
-        final result = JsonPathResult(
+        const result = JsonPathResult(
           success: true,
           value: 'test',
           matches: ['test'],
@@ -540,7 +540,7 @@ void main() {
       });
 
       test('result can contain error', () {
-        final result = JsonPathResult(
+        const result = JsonPathResult(
           success: false,
           error: 'Something went wrong',
         );

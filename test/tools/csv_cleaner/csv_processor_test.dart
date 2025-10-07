@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/csv_cleaner/logic/csv_processor.dart';
+import 'package:toolspace/tools/csv_cleaner/logic/csv_processor.dart';
 
 void main() {
   group('CsvProcessor Tests', () {

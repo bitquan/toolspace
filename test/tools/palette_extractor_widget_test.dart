@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/palette_extractor/palette_extractor_screen.dart';
-import '../../lib/tools/palette_extractor/widgets/image_upload_zone.dart';
-import '../../lib/tools/palette_extractor/widgets/color_swatch_card.dart';
+import 'package:toolspace/tools/palette_extractor/palette_extractor_screen.dart';
+import 'package:toolspace/tools/palette_extractor/widgets/image_upload_zone.dart';
+import 'package:toolspace/tools/palette_extractor/widgets/color_swatch_card.dart';
 
 void main() {
   group('PaletteExtractorScreen Widget Tests', () {

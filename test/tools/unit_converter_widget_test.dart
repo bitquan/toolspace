@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/unit_converter/unit_converter_screen.dart';
+import 'package:toolspace/tools/unit_converter/unit_converter_screen.dart';
 
 void main() {
   group('UnitConverterScreen Widget Tests', () {
@@ -123,7 +123,7 @@ void main() {
       // Should display either Recent or Popular conversions
       final recentText = find.text('Recent Conversions');
       final popularText = find.text('Popular Conversions');
-      
+
       expect(recentText.evaluate().isNotEmpty || popularText.evaluate().isNotEmpty, true);
     });
 
@@ -139,7 +139,7 @@ void main() {
       // Find the Mass chip specifically using FilterChip
       final massChip = find.widgetWithText(FilterChip, 'Mass');
       expect(massChip, findsOneWidget);
-      
+
       // Tap on Mass category
       await tester.tap(massChip);
       await tester.pumpAndSettle();
@@ -279,7 +279,7 @@ void main() {
 
       // Find a popular conversion item (using ListTile)
       final popularItems = find.byIcon(Icons.trending_up);
-      
+
       // Check if popular items exist
       if (popularItems.evaluate().isNotEmpty) {
         // Tap on first one

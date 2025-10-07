@@ -558,7 +558,8 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: theme.colorScheme.secondaryContainer,
+                                      color:
+                                          theme.colorScheme.secondaryContainer,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -566,8 +567,8 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            theme.colorScheme.onSecondaryContainer,
+                                        color: theme
+                                            .colorScheme.onSecondaryContainer,
                                       ),
                                     ),
                                   ),
@@ -756,9 +757,7 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
     } else if (_result!.hasError) {
       return 'Fix the pattern syntax';
     } else if (_result!.hasMatches) {
-      final groupCount = _result!.matches
-          .expand((m) => m.groups)
-          .length;
+      final groupCount = _result!.matches.expand((m) => m.groups).length;
       return '${_result!.matchCount} match(es) found${groupCount > 0 ? ' with $groupCount group(s)' : ''}';
     } else {
       return 'Pattern is valid but no matches in text';

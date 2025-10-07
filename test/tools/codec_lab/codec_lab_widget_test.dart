@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/codec_lab/codec_lab_screen.dart';
+import 'package:toolspace/tools/codec_lab/codec_lab_screen.dart';
 
 void main() {
   group('CodecLabScreen Widget Tests', () {

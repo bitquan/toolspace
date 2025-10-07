@@ -19,10 +19,11 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
   String _selectedCategory = 'Length';
   String _fromUnit = 'meter';
   String _toUnit = 'kilometer';
-  final TextEditingController _inputController = TextEditingController(text: '1');
+  final TextEditingController _inputController =
+      TextEditingController(text: '1');
   String _result = '';
   int _precision = 2;
-  
+
   final TextEditingController _searchController = TextEditingController();
   List<UnitSearchResult> _searchResults = [];
   bool _showSearchResults = false;
@@ -64,9 +65,11 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
 
     double convertedValue;
     if (_selectedCategory.toLowerCase() == 'temperature') {
-      convertedValue = UnitConverter.convertTemperature(input, _fromUnit, _toUnit);
+      convertedValue =
+          UnitConverter.convertTemperature(input, _fromUnit, _toUnit);
     } else {
-      convertedValue = UnitConverter.convert(input, _fromUnit, _toUnit, _selectedCategory);
+      convertedValue =
+          UnitConverter.convert(input, _fromUnit, _toUnit, _selectedCategory);
     }
 
     setState(() {
@@ -119,7 +122,8 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
         _searchResults = [];
       } else {
         _searchResults = UnitSearch.search(query)
-            .where((r) => r.category.toLowerCase() == _selectedCategory.toLowerCase())
+            .where((r) =>
+                r.category.toLowerCase() == _selectedCategory.toLowerCase())
             .take(10)
             .toList();
       }
@@ -200,7 +204,9 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                             const SizedBox(height: 8),
                             TextField(
                               controller: _inputController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               decoration: InputDecoration(
                                 hintText: 'Enter value',
                                 border: const OutlineInputBorder(),
@@ -223,17 +229,20 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: colorScheme.outline),
+                                  border:
+                                      Border.all(color: colorScheme.outline),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       _fromUnit,
                                       style: theme.textTheme.bodyLarge,
                                     ),
-                                    Icon(Icons.arrow_drop_down, color: colorScheme.onSurface),
+                                    Icon(Icons.arrow_drop_down,
+                                        color: colorScheme.onSurface),
                                   ],
                                 ),
                               ),
@@ -290,10 +299,13 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                                     IconButton(
                                       icon: const Icon(Icons.content_copy),
                                       onPressed: () {
-                                        Clipboard.setData(ClipboardData(text: _result));
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        Clipboard.setData(
+                                            ClipboardData(text: _result));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
-                                            content: Text('Copied to clipboard'),
+                                            content:
+                                                Text('Copied to clipboard'),
                                             duration: Duration(seconds: 1),
                                           ),
                                         );
@@ -311,17 +323,20 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: colorScheme.outline),
+                                  border:
+                                      Border.all(color: colorScheme.outline),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       _toUnit,
                                       style: theme.textTheme.bodyLarge,
                                     ),
-                                    Icon(Icons.arrow_drop_down, color: colorScheme.onSurface),
+                                    Icon(Icons.arrow_drop_down,
+                                        color: colorScheme.onSurface),
                                   ],
                                 ),
                               ),
@@ -382,7 +397,8 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                     const SizedBox(height: 8),
                     Card(
                       child: Column(
-                        children: ConversionHistory.getRecent(limit: 5).map((pair) {
+                        children:
+                            ConversionHistory.getRecent(limit: 5).map((pair) {
                           return ListTile(
                             dense: true,
                             leading: const Icon(Icons.history, size: 20),
@@ -417,7 +433,8 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
                     const SizedBox(height: 8),
                     Card(
                       child: Column(
-                        children: UnitSearch.getPopularConversions().map((pair) {
+                        children:
+                            UnitSearch.getPopularConversions().map((pair) {
                           return ListTile(
                             dense: true,
                             leading: const Icon(Icons.trending_up, size: 20),

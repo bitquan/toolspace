@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _batchTextController = TextEditingController();
+  final BillingService _billingService = BillingService();
 
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
@@ -26,7 +29,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   int _qrSize = 200;
   Color _foregroundColor = Colors.black;
   Color _backgroundColor = Colors.white;
-  bool _isGenerating = false;
+  final bool _isGenerating = false;
   List<String> _batchItems = [];
   int _generatedCount = 0;
 
@@ -100,7 +103,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
     });
   }
 
-  void _processBatchGeneration() {
+  Future<void> _processBatchGeneration() async {
     final input = _batchTextController.text.trim();
     if (input.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,12 +115,18 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       return;
     }
 
-    final items = input.split('\n').where((line) => line.trim().isNotEmpty).toList();
-    
+    final items =
+        input.split('\n').where((line) => line.trim().isNotEmpty).toList();
+
     setState(() {
       _batchItems = items;
       _generatedCount = items.length;
     });
+
+    // Track heavy operations (one per QR code generated)
+    for (var i = 0; i < items.length; i++) {
+      await _billingService.trackHeavyOp();
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -176,9 +185,15 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
+    return PaywallGuard(
+      billingService: _billingService,
+      permission: const ToolPermission(
+        toolId: 'qr_maker',
+        requiresHeavyOp: true,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
@@ -215,7 +230,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
               tooltip: 'Copy Data',
             ),
           IconButton(
-            onPressed: _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
+            onPressed:
+                _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
             icon: const Icon(Icons.download),
             tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
           ),
@@ -235,292 +251,289 @@ class _QrMakerScreenState extends State<QrMakerScreen>
           _buildBatchGenerationTab(theme),
         ],
       ),
-    );
+      ), // Scaffold
+    ); // PaywallGuard
   }
 
   Widget _buildSingleQrTab(ThemeData theme) {
     return Row(
-        children: [
-          // Input panel
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  right: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
-                  ),
-                ),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // QR Type selector
-                    Text(
-                      'QR Code Type',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: QrType.values.map((type) {
-                        final isSelected = _selectedType == type;
-                        return FilterChip(
-                          label: Text(_getTypeLabel(type)),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedType = type;
-                            });
-                            if (selected && _textController.text.isEmpty) {
-                              _useQuickTemplate(_getQuickTemplate(type));
-                            }
-                          },
-                          selectedColor:
-                              const Color(0xFFFF5722).withOpacity(0.2),
-                          checkmarkColor: const Color(0xFFFF5722),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Input field
-                    Text(
-                      'Content',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _textController,
-                      maxLines: 8,
-                      decoration: InputDecoration(
-                        hintText: _getHintText(_selectedType),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.all(16),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Import and quick template buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ImportDataButton(
-                            acceptedTypes: const [
-                              SharedDataType.text,
-                              SharedDataType.url,
-                            ],
-                            onImport: (data, type, source) {
-                              setState(() {
-                                _textController.text = data;
-                              });
-                            },
-                            label: 'Import Data',
-                          ),
-                        ),
-                        if (_textController.text.isEmpty) ...[
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => _useQuickTemplate(
-                                  _getQuickTemplate(_selectedType)),
-                              icon: const Icon(Icons.auto_fix_high),
-                              label: const Text('Template'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color(0xFFFF5722).withOpacity(0.1),
-                                foregroundColor: const Color(0xFFFF5722),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Customization
-                    Text(
-                      'Customization',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Size slider
-                    Text('Size: ${_qrSize}px'),
-                    Slider(
-                      value: _qrSize.toDouble(),
-                      min: 100,
-                      max: 500,
-                      divisions: 8,
-                      onChanged: (value) {
-                        setState(() {
-                          _qrSize = value.round();
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Color selection
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Foreground'),
-                              const SizedBox(height: 8),
-                              _ColorPicker(
-                                color: _foregroundColor,
-                                onColorChanged: (color) {
-                                  setState(() {
-                                    _foregroundColor = color;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Background'),
-                              const SizedBox(height: 8),
-                              _ColorPicker(
-                                color: _backgroundColor,
-                                onColorChanged: (color) {
-                                  setState(() {
-                                    _backgroundColor = color;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+      children: [
+        // Input panel
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
                 ),
               ),
             ),
-          ),
-
-          // QR Preview panel
-          Expanded(
-            flex: 1,
-            child: Container(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // QR Type selector
                   Text(
-                    'QR Code Preview',
+                    'QR Code Type',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: QrType.values.map((type) {
+                      final isSelected = _selectedType == type;
+                      return FilterChip(
+                        label: Text(_getTypeLabel(type)),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(() {
+                            _selectedType = type;
+                          });
+                          if (selected && _textController.text.isEmpty) {
+                            _useQuickTemplate(_getQuickTemplate(type));
+                          }
+                        },
+                        selectedColor: const Color(0xFFFF5722).withOpacity(0.2),
+                        checkmarkColor: const Color(0xFFFF5722),
+                      );
+                    }).toList(),
+                  ),
                   const SizedBox(height: 24),
 
-                  Expanded(
-                    child: Center(
-                      child: _isGenerating
-                          ? const CircularProgressIndicator()
-                          : _qrData.isEmpty
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.qr_code_2,
-                                      size: 64,
-                                      color: theme.colorScheme.outline,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Enter content to generate QR code',
-                                      style:
-                                          theme.textTheme.bodyMedium?.copyWith(
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                )
-                              : AnimatedBuilder(
-                                  animation: _bounceAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _bounceAnimation.value,
-                                      child: _QrCodePreview(
-                                        data: _qrData,
-                                        size: _qrSize.toDouble(),
-                                        foregroundColor: _foregroundColor,
-                                        backgroundColor: _backgroundColor,
-                                      ),
-                                    );
-                                  },
-                                ),
+                  // Input field
+                  Text(
+                    'Content',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _textController,
+                    maxLines: 8,
+                    decoration: InputDecoration(
+                      hintText: _getHintText(_selectedType),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Import and quick template buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ImportDataButton(
+                          acceptedTypes: const [
+                            SharedDataType.text,
+                            SharedDataType.url,
+                          ],
+                          onImport: (data, type, source) {
+                            setState(() {
+                              _textController.text = data;
+                            });
+                          },
+                          label: 'Import Data',
+                        ),
+                      ),
+                      if (_textController.text.isEmpty) ...[
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _useQuickTemplate(
+                                _getQuickTemplate(_selectedType)),
+                            icon: const Icon(Icons.auto_fix_high),
+                            label: const Text('Template'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color(0xFFFF5722).withOpacity(0.1),
+                              foregroundColor: const Color(0xFFFF5722),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
 
                   const SizedBox(height: 24),
 
-                  // Generation info
-                  if (_qrData.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Characters:'),
-                              Text('${_qrData.length}'),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Type:'),
-                              Text(_getTypeLabel(_selectedType)),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Size:'),
-                              Text('${_qrSize}x$_qrSize px'),
-                            ],
-                          ),
-                        ],
-                      ),
+                  // Customization
+                  Text(
+                    'Customization',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Size slider
+                  Text('Size: ${_qrSize}px'),
+                  Slider(
+                    value: _qrSize.toDouble(),
+                    min: 100,
+                    max: 500,
+                    divisions: 8,
+                    onChanged: (value) {
+                      setState(() {
+                        _qrSize = value.round();
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Color selection
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Foreground'),
+                            const SizedBox(height: 8),
+                            _ColorPicker(
+                              color: _foregroundColor,
+                              onColorChanged: (color) {
+                                setState(() {
+                                  _foregroundColor = color;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Background'),
+                            const SizedBox(height: 8),
+                            _ColorPicker(
+                              color: _backgroundColor,
+                              onColorChanged: (color) {
+                                setState(() {
+                                  _backgroundColor = color;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+
+        // QR Preview panel
+        Expanded(
+          flex: 1,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text(
+                  'QR Code Preview',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Expanded(
+                  child: Center(
+                    child: _isGenerating
+                        ? const CircularProgressIndicator()
+                        : _qrData.isEmpty
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.qr_code_2,
+                                    size: 64,
+                                    color: theme.colorScheme.outline,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Enter content to generate QR code',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              )
+                            : AnimatedBuilder(
+                                animation: _bounceAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _bounceAnimation.value,
+                                    child: _QrCodePreview(
+                                      data: _qrData,
+                                      size: _qrSize.toDouble(),
+                                      foregroundColor: _foregroundColor,
+                                      backgroundColor: _backgroundColor,
+                                    ),
+                                  );
+                                },
+                              ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Generation info
+                if (_qrData.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Characters:'),
+                            Text('${_qrData.length}'),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Type:'),
+                            Text(_getTypeLabel(_selectedType)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Size:'),
+                            Text('${_qrSize}x$_qrSize px'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -568,7 +581,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         fontSize: 14,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3\n...',
+                        hintText:
+                            'https://example.com/page1\nhttps://example.com/page2\nhttps://example.com/page3\n...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -606,7 +620,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const Icon(Icons.check_circle,
+                              color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             'Generated $_generatedCount QR codes',
@@ -655,7 +670,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                           Text(
                             'No QR codes generated yet',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.5),
                             ),
                           ),
                         ],
@@ -665,7 +681,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                 else
                   Expanded(
                     child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -691,7 +708,9 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  item.length > 30 ? '${item.substring(0, 30)}...' : item,
+                                  item.length > 30
+                                      ? '${item.substring(0, 30)}...'
+                                      : item,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     fontFamily: 'monospace',
                                   ),

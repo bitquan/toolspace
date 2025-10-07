@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/tools/unit_converter/logic/unit_converter.dart';
-import '../../lib/tools/unit_converter/logic/unit_search.dart';
-import '../../lib/tools/unit_converter/logic/conversion_history.dart';
+import 'package:toolspace/tools/unit_converter/logic/unit_converter.dart';
+import 'package:toolspace/tools/unit_converter/logic/unit_search.dart';
+import 'package:toolspace/tools/unit_converter/logic/conversion_history.dart';
 
 void main() {
   group('UnitConverter Tests', () {

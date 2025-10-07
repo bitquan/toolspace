@@ -29,7 +29,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
   JsonDoctorStatus _status = JsonDoctorStatus.empty;
   String _errorMessage = '';
-  int _indentLevel = 2;
+  final int _indentLevel = 2;
   List<SchemaValidationError> _schemaErrors = [];
   String _jsonPathResult = '';
 
@@ -539,7 +539,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                 ))
                                   Row(
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.check_circle,
                                         color: Colors.green,
                                         size: 20,
@@ -549,9 +549,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                         'Schema validation passed!',
                                         style: theme.textTheme.bodyMedium
                                             ?.copyWith(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   )
@@ -573,10 +573,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                             error.path,
                                             style: theme.textTheme.bodyMedium
                                                 ?.copyWith(
-                                                  fontWeight: FontWeight.w600,
-                                                  color:
-                                                      theme.colorScheme.error,
-                                                ),
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.colorScheme.error,
+                                            ),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
@@ -587,10 +586,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                             'Expected: ${error.expectedType}, Got: ${error.actualType}',
                                             style: theme.textTheme.bodySmall
                                                 ?.copyWith(
-                                                  color: theme
-                                                      .colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
+                                            ),
                                           ),
                                         ],
                                       ),

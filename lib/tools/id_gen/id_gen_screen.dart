@@ -68,10 +68,12 @@ class _IdGenScreenState extends State<IdGenScreen>
 
       switch (_selectedType) {
         case IdType.uuidV4:
-          newIds = List.generate(_batchCount, (_) => UuidGenerator.generateV4());
+          newIds =
+              List.generate(_batchCount, (_) => UuidGenerator.generateV4());
           break;
         case IdType.uuidV7:
-          newIds = List.generate(_batchCount, (_) => UuidGenerator.generateV7());
+          newIds =
+              List.generate(_batchCount, (_) => UuidGenerator.generateV7());
           break;
         case IdType.nanoid:
           newIds = NanoidGenerator.generateMultiple(
@@ -450,7 +452,8 @@ class _IdGenScreenState extends State<IdGenScreen>
                       child: ElevatedButton.icon(
                         onPressed: _generateIds,
                         icon: const Icon(Icons.auto_awesome),
-                        label: Text('Generate ${_batchCount > 1 ? '$_batchCount IDs' : 'ID'}'),
+                        label: Text(
+                            'Generate ${_batchCount > 1 ? '$_batchCount IDs' : 'ID'}'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: const Color(0xFF9C27B0),
@@ -543,9 +546,8 @@ class _IdGenScreenState extends State<IdGenScreen>
                                     margin: const EdgeInsets.only(bottom: 8),
                                     child: ListTile(
                                       leading: CircleAvatar(
-                                        backgroundColor:
-                                            const Color(0xFF9C27B0)
-                                                .withOpacity(0.2),
+                                        backgroundColor: const Color(0xFF9C27B0)
+                                            .withOpacity(0.2),
                                         child: Text(
                                           '${index + 1}',
                                           style: const TextStyle(

@@ -275,7 +275,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: _selectedTimezone,
+                      initialValue: _selectedTimezone,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -353,7 +353,6 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   if (_parsedDateTime == null && _errorMessage == null)
                     Expanded(
                       child: Center(
@@ -405,11 +404,11 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                                     ),
                                     child: SelectableText(
                                       _result,
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontFamily: 'monospace',
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        fontFamily: 'monospace',
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 );
@@ -430,20 +429,19 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                             ...TimeFormat.values
                                 .where((f) => f != _selectedFormat)
                                 .map((format) {
-                                  final formatted =
-                                      TimestampConverter.formatCustom(
-                                        _parsedDateTime!,
-                                        format,
-                                      );
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: _buildFormatItem(
-                                      _getFormatLabel(format),
-                                      formatted,
-                                      theme,
-                                    ),
-                                  );
-                                }),
+                              final formatted = TimestampConverter.formatCustom(
+                                _parsedDateTime!,
+                                format,
+                              );
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildFormatItem(
+                                  _getFormatLabel(format),
+                                  formatted,
+                                  theme,
+                                ),
+                              );
+                            }),
 
                             const SizedBox(height: 12),
 

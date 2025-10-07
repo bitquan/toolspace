@@ -159,9 +159,7 @@ class RegexPresets {
 
   /// Get all presets as a flat list
   static List<RegexPreset> getAllPresets() {
-    return getAllCategories()
-        .expand((category) => category.presets)
-        .toList();
+    return getAllCategories().expand((category) => category.presets).toList();
   }
 
   /// Search presets by name or description

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/time_convert/logic/timestamp_converter.dart';
+import 'package:toolspace/tools/time_convert/logic/timestamp_converter.dart';
 
 void main() {
   group('TimestampConverter - Natural Language Parsing', () {
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('parses ISO 8601 date string', () {
-      final input = '2024-01-15T10:30:00.000Z';
+      const input = '2024-01-15T10:30:00.000Z';
       final result = TimestampConverter.parseNaturalLanguage(input);
 
       expect(result, isNotNull);
@@ -76,7 +76,7 @@ void main() {
     });
 
     test('parses Unix timestamp in seconds', () {
-      final timestamp = 1234567890; // 2009-02-13
+      const timestamp = 1234567890; // 2009-02-13
       final result = TimestampConverter.parseNaturalLanguage(
         timestamp.toString(),
       );
@@ -88,7 +88,7 @@ void main() {
     });
 
     test('parses Unix timestamp in milliseconds', () {
-      final timestamp = 1234567890000; // 2009-02-13
+      const timestamp = 1234567890000; // 2009-02-13
       final result = TimestampConverter.parseNaturalLanguage(
         timestamp.toString(),
       );
@@ -131,7 +131,7 @@ void main() {
     });
 
     test('converts Unix seconds to DateTime', () {
-      final timestamp = 1704067200; // 2024-01-01 00:00:00 UTC
+      const timestamp = 1704067200; // 2024-01-01 00:00:00 UTC
       final result = TimestampConverter.fromUnixSeconds(timestamp);
 
       expect(result.year, 2024);
@@ -140,7 +140,7 @@ void main() {
     });
 
     test('converts Unix milliseconds to DateTime', () {
-      final timestamp = 1704067200000; // 2024-01-01 00:00:00 UTC
+      const timestamp = 1704067200000; // 2024-01-01 00:00:00 UTC
       final result = TimestampConverter.fromUnixMilliseconds(timestamp);
 
       expect(result.year, 2024);

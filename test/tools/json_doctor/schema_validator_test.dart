@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../../lib/tools/json_doctor/logic/schema_validator.dart';
+import 'package:toolspace/tools/json_doctor/logic/schema_validator.dart';
 
 void main() {
   group('SchemaValidator Tests', () {
@@ -545,7 +545,7 @@ void main() {
 
     group('SchemaValidationError', () {
       test('toString returns formatted error message', () {
-        final error = SchemaValidationError(
+        const error = SchemaValidationError(
           path: 'user.age',
           message: 'Type mismatch',
           expectedType: 'integer',
