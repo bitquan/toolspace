@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import 'app_shell.dart';
-import 'firebase_options.dart';
 import 'core/services/debug_logger.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +32,13 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Sign in anonymously for testing
+    final auth = FirebaseAuth.instance;
+    if (auth.currentUser == null) {
+      await auth.signInAnonymously();
+      DebugLogger.info('Signed in anonymously for testing');
+    }
   } catch (e) {
     // Firebase initialization failed - continue with app but Firebase features won't work
     DebugLogger.warning('Firebase initialization failed: $e');
