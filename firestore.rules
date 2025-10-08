@@ -1,40 +1,18 @@
-rules_version = '2';
+rules_version='2'
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Auth helper function
-    function authed() {
-      return request.auth != null;
-    }
-    
-    // Tenant isolation - users can only access their own data
-    function isOwner(userId) {
-      return authed() && request.auth.uid == userId;
-    }
-    
-    // User documents
-    match /users/{userId} {
-      allow read, write: if isOwner(userId);
-    }
-    
-    // Tool configurations per user
-    match /users/{userId}/tools/{toolId} {
-      allow read, write: if isOwner(userId);
-    }
-    
-    // Billing information per user
-    match /users/{userId}/billing/{document} {
-      allow read, write: if isOwner(userId);
-    }
-    
-    // Public tool metadata (read-only)
-    match /tool_metadata/{toolId} {
-      allow read: if true;
-      allow write: if false; // Only backend can write
-    }
-    
-    // Default: deny all other access
     match /{document=**} {
-      allow read, write: if false;
+      // This rule allows anyone with your database reference to view, edit,
+      // and delete all data in your database. It is useful for getting
+      // started, but it is configured to expire after 30 days because it
+      // leaves your app open to attackers. At that time, all client
+      // requests to your database will be denied.
+      //
+      // Make sure to write security rules for your app before that time, or
+      // else all client requests to your database will be denied until you
+      // update your rules.
+      allow read, write: if request.time < timestamp.date(2025, 11, 7);
     }
   }
 }

@@ -10,20 +10,24 @@
  * - invoice.paid/payment_failed
  */
 
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
 import {
-  BillingProfile,
   BillingEvent,
+  BillingProfile,
   StripeWebhookEventType,
 } from "../types/billing";
 import { loadPricingConfig } from "./entitlements";
 
 const stripe = new Stripe(
-  process.env.STRIPE_SECRET || functions.config().stripe?.secret || "",
+  process.env.STRIPE_SECRET_KEY ||
+    process.env.STRIPE_SECRET ||
+    functions.config().stripe?.secret_key ||
+    functions.config().stripe?.secret ||
+    "",
   {
-    apiVersion: "2024-11-20.acacia",
+    apiVersion: "2025-09-30.clover",
   }
 );
 
@@ -187,10 +191,12 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
     stripeCustomerId: customerId,
     planId: validPlan ? (planId as "pro" | "pro_plus") : "free",
     status: mapStripeStatus(subscription.status),
-    currentPeriodStart: subscription.current_period_start * 1000,
-    currentPeriodEnd: subscription.current_period_end * 1000,
-    trialEnd: subscription.trial_end ? subscription.trial_end * 1000 : null,
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    currentPeriodStart: (subscription as any).current_period_start * 1000,
+    currentPeriodEnd: (subscription as any).current_period_end * 1000,
+    trialEnd: (subscription as any).trial_end
+      ? (subscription as any).trial_end * 1000
+      : null,
+    cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
     updatedAt: Date.now(),
   };
 
@@ -268,7 +274,7 @@ async function handleSubscriptionDeleted(event: Stripe.Event) {
  * Handle successful invoice payment
  */
 async function handleInvoicePaid(event: Stripe.Event) {
-  const invoice = event.data.object as Stripe.Invoice;
+  const invoice = event.data.object as any;
   const customerId = invoice.customer as string;
   const subscriptionId = invoice.subscription as string;
 
@@ -303,7 +309,7 @@ async function handleInvoicePaid(event: Stripe.Event) {
  * Handle failed invoice payment
  */
 async function handleInvoicePaymentFailed(event: Stripe.Event) {
-  const invoice = event.data.object as Stripe.Invoice;
+  const invoice = event.data.object as any;
   const customerId = invoice.customer as string;
   const subscriptionId = invoice.subscription as string;
 
