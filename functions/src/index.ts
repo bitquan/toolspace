@@ -33,6 +33,9 @@ export { createCheckoutSession } from "./billing/createCheckoutSession";
 export { createPortalLink } from "./billing/createPortalLink";
 export { webhook as stripeWebhook } from "./billing/webhook";
 
+// Export legacy quota function (deprecated - for backward compatibility)
+export { getQuotaStatus } from "./tools/quota/getQuotaStatus";
+
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
