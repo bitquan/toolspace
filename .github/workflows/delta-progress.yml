@@ -27,10 +27,10 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Process merged PR and update progress
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const dry = (core.getInput('dry_run') || '${{ github.event.inputs.dry_run }}' || 'false').toLowerCase() === 'true';

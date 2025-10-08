@@ -25,7 +25,7 @@ jobs:
 
         steps:
             - name: 📥 Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: 🎯 Setup Flutter
               uses: subosito/flutter-action@v2
@@ -73,7 +73,7 @@ jobs:
                   channelId: pr-${{ github.event.pull_request.number }}
 
             - name: 💬 Comment PR with preview URL
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const previewUrl = '${{ steps.deploy.outputs.details_url }}';

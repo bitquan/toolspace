@@ -43,7 +43,7 @@ jobs:
 
             - name: 📋 Extract Issue Information
               id: issue_info
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       let issueNumber, issue;
@@ -97,14 +97,14 @@ jobs:
                   echo "✅ Issue is eligible for auto-development"
 
             - name: 🔧 Checkout Repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 0
                   token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: 🔍 Resolve Feature Branch
               id: branch_info
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const issueNumber = '${{ steps.issue_info.outputs.issue_number }}';
@@ -175,7 +175,7 @@ jobs:
                   channel: "stable"
 
             - name: 🟢 Setup Node.js Environment
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v5
               with:
                   node-version: "20.x"
                   cache: "npm"
@@ -296,7 +296,7 @@ jobs:
             - name: 🔀 Create Pull Request
               id: create_pr
               if: steps.commit_changes.outputs.has_changes == 'true' || github.event.inputs.dry_run == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
@@ -379,7 +379,7 @@ jobs:
 
             - name: 💬 Update Issue with Progress
               if: steps.create_pr.outputs.pr_number || github.event.inputs.dry_run == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
@@ -451,7 +451,7 @@ jobs:
 
             - name: 🎯 Auto-Merge Setup
               if: steps.create_pr.outputs.pr_number && github.event.inputs.dry_run != 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@v8
               with:
                   script: |
                       const prNumber = ${{ steps.create_pr.outputs.pr_number }};

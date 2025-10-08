@@ -45,7 +45,7 @@ jobs:
 
         steps:
             - name: "Checkout Repository"
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: "Analyze Workflow Runs"
               id: analysis
@@ -109,7 +109,7 @@ jobs:
 
         steps:
             - name: "Checkout Repository"
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: "Execute Failed Runs Cleanup"
               if: github.event.inputs.cleanup_scope == 'failed_runs' || github.event.inputs.cleanup_scope == 'full_cleanup'
