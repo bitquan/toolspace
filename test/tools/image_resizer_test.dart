@@ -37,8 +37,7 @@ void main() {
             ImageUpload.inferContentType('image.webp'), equals('image/webp'));
 
         // Test GIF
-        expect(
-            ImageUpload.inferContentType('animation.gif'), equals('image/gif'));
+        expect(ImageUpload.inferContentType('animation.gif'), equals('image/gif'));
 
         // Test BMP
         expect(ImageUpload.inferContentType('bitmap.bmp'), equals('image/bmp'));

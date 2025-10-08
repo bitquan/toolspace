@@ -22,13 +22,16 @@ export const createShortUrl = functions.https.onCall(async (data, context) => {
   // Validate input
   const { url } = data;
   if (!url || typeof url !== "string") {
-    throw new functions.https.HttpsError("invalid-argument", "URL is required");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "URL is required"
+    );
   }
 
   // Validate URL format
   try {
     new URL(url);
-  } catch {
+  } catch (e) {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Invalid URL format"
@@ -192,41 +195,43 @@ export const deleteShortUrl = functions.https.onCall(async (data, context) => {
  * HTTP redirect endpoint for short URLs
  * GET /u/:code
  */
-export const redirectShortUrl = functions.https.onRequest(async (req, res) => {
-  // Extract short code from path
-  const pathParts = req.path.split("/").filter((p) => p);
-  const shortCode = pathParts[pathParts.length - 1];
+export const redirectShortUrl = functions.https.onRequest(
+  async (req, res) => {
+    // Extract short code from path
+    const pathParts = req.path.split("/").filter((p) => p);
+    const shortCode = pathParts[pathParts.length - 1];
 
-  if (!shortCode) {
-    res.status(400).send("Short code is required");
-    return;
-  }
-
-  try {
-    const db = admin.firestore();
-    const doc = await db.collection("shortUrls").doc(shortCode).get();
-
-    if (!doc.exists) {
-      res.status(404).send("Short URL not found");
+    if (!shortCode) {
+      res.status(400).send("Short code is required");
       return;
     }
 
-    const data = doc.data();
-    if (!data) {
-      res.status(404).send("Short URL not found");
-      return;
+    try {
+      const db = admin.firestore();
+      const doc = await db.collection("shortUrls").doc(shortCode).get();
+
+      if (!doc.exists) {
+        res.status(404).send("Short URL not found");
+        return;
+      }
+
+      const data = doc.data();
+      if (!data) {
+        res.status(404).send("Short URL not found");
+        return;
+      }
+
+      // Increment click counter
+      await doc.ref.update({
+        clicks: admin.firestore.FieldValue.increment(1),
+        lastAccessedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Redirect to original URL
+      res.redirect(302, data.originalUrl);
+    } catch (error: any) {
+      console.error("Error redirecting short URL:", error);
+      res.status(500).send("Internal server error");
     }
-
-    // Increment click counter
-    await doc.ref.update({
-      clicks: admin.firestore.FieldValue.increment(1),
-      lastAccessedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    // Redirect to original URL
-    res.redirect(302, data.originalUrl);
-  } catch (error: any) {
-    console.error("Error redirecting short URL:", error);
-    res.status(500).send("Internal server error");
   }
-});
+);

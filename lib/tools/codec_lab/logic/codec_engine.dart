@@ -37,19 +37,25 @@ class CodecEngine {
 
   /// Decode Hexadecimal to text
   static String decodeHex(String hex) {
+    // Remove whitespace and common separators
+    final cleaned = hex.replaceAll(RegExp(r'[\s:,-]'), '').toLowerCase();
+
+    // Handle empty string - return empty
+    if (cleaned.isEmpty) {
+      return '';
+    }
+
+    // Validate hex string - must contain only hex characters
+    if (!RegExp(r'^[0-9a-f]+$').hasMatch(cleaned)) {
+      throw const CodecException('Invalid hexadecimal characters');
+    }
+
+    // Validate even length
+    if (cleaned.length % 2 != 0) {
+      throw const CodecException('Hex string must have even length');
+    }
+
     try {
-      // Remove whitespace and common separators
-      final cleaned = hex.replaceAll(RegExp(r'[\s:,-]'), '').toLowerCase();
-
-      // Validate hex string
-      if (!RegExp(r'^[0-9a-f]*$').hasMatch(cleaned)) {
-        throw const FormatException('Invalid hexadecimal characters');
-      }
-
-      if (cleaned.length % 2 != 0) {
-        throw const FormatException('Hex string must have even length');
-      }
-
       final bytes = <int>[];
       for (int i = 0; i < cleaned.length; i += 2) {
         final hex = cleaned.substring(i, i + 2);
@@ -110,17 +116,24 @@ class CodecEngine {
 
   /// Decode Hexadecimal to bytes (for file processing)
   static Uint8List decodeHexToBytes(String hex) {
+    final cleaned = hex.replaceAll(RegExp(r'[\s:,-]'), '').toLowerCase();
+
+    // Check for empty string
+    if (cleaned.isEmpty) {
+      throw const CodecException('Hex string cannot be empty');
+    }
+
+    // Validate hex string - must contain only hex characters
+    if (!RegExp(r'^[0-9a-f]+$').hasMatch(cleaned)) {
+      throw const CodecException('Invalid hexadecimal characters');
+    }
+
+    // Validate even length
+    if (cleaned.length % 2 != 0) {
+      throw const CodecException('Hex string must have even length');
+    }
+
     try {
-      final cleaned = hex.replaceAll(RegExp(r'[\s:,-]'), '').toLowerCase();
-
-      if (!RegExp(r'^[0-9a-f]*$').hasMatch(cleaned)) {
-        throw const FormatException('Invalid hexadecimal characters');
-      }
-
-      if (cleaned.length % 2 != 0) {
-        throw const FormatException('Hex string must have even length');
-      }
-
       final bytes = <int>[];
       for (int i = 0; i < cleaned.length; i += 2) {
         final hex = cleaned.substring(i, i + 2);
@@ -146,9 +159,21 @@ class CodecEngine {
       return CodecFormat.url;
     }
 
+    // Check for Hex BEFORE Base64 (only hex characters, possibly with separators)
+    // This must come first since hex can also look like base64
+    final hexCleaned = trimmed.replaceAll(RegExp(r'[\s:,-]'), '');
+    if (RegExp(r'^[0-9A-Fa-f]+$').hasMatch(hexCleaned) &&
+        hexCleaned.length % 2 == 0 &&
+        hexCleaned.length >= 4) {
+      // Additional check: if it contains non-base64 hex chars (8-9, a-f, A-F only)
+      // and is even length, it's more likely hex than base64
+      if (RegExp(r'[8-9a-fA-F]').hasMatch(hexCleaned)) {
+        return CodecFormat.hex;
+      }
+    }
+
     // Check for Base64 (alphanumeric + / + = padding)
-    if (RegExp(r'^[A-Za-z0-9+/]*={0,2}$')
-        .hasMatch(trimmed.replaceAll(RegExp(r'\s'), ''))) {
+    if (RegExp(r'^[A-Za-z0-9+/]*={0,2}$').hasMatch(trimmed.replaceAll(RegExp(r'\s'), ''))) {
       // Additional validation: Base64 length should be multiple of 4 (with padding)
       final cleaned = trimmed.replaceAll(RegExp(r'\s'), '');
       if (cleaned.length % 4 == 0) {
@@ -156,16 +181,12 @@ class CodecEngine {
           base64.decode(cleaned);
           return CodecFormat.base64;
         } catch (_) {
-          // Not valid Base64
+          // Not valid Base64, might still be hex
+          if (RegExp(r'^[0-9A-Fa-f]+$').hasMatch(cleaned) && cleaned.length % 2 == 0) {
+            return CodecFormat.hex;
+          }
         }
       }
-    }
-
-    // Check for Hex (only hex characters, possibly with separators)
-    final hexCleaned = trimmed.replaceAll(RegExp(r'[\s:,-]'), '');
-    if (RegExp(r'^[0-9A-Fa-f]+$').hasMatch(hexCleaned) &&
-        hexCleaned.length % 2 == 0) {
-      return CodecFormat.hex;
     }
 
     return CodecFormat.unknown;

@@ -58,7 +58,11 @@ void main() {
     });
 
     test('validates string length constraints', () {
-      final schema = {'type': 'string', 'minLength': 3, 'maxLength': 10};
+      final schema = {
+        'type': 'string',
+        'minLength': 3,
+        'maxLength': 10
+      };
 
       final result1 = SchemaValidator.validate('test', schema);
       expect(result1.isValid, true);
@@ -73,7 +77,11 @@ void main() {
     });
 
     test('validates number constraints', () {
-      final schema = {'type': 'integer', 'minimum': 0, 'maximum': 100};
+      final schema = {
+        'type': 'integer',
+        'minimum': 0,
+        'maximum': 100
+      };
 
       final result1 = SchemaValidator.validate(50, schema);
       expect(result1.isValid, true);

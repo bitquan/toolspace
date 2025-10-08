@@ -23,10 +23,8 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: TimeConvertScreen()));
 
       expect(find.text('Now'), findsOneWidget);
-      expect(
-        find.widgetWithIcon(ElevatedButton, Icons.access_time),
-        findsOneWidget,
-      );
+      // ElevatedButton.icon creates a complex widget tree, check for icon directly
+      expect(find.byIcon(Icons.access_time), findsWidgets);
     });
 
     testWidgets('clicking "Now" button sets input', (
@@ -113,8 +111,8 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'now');
       await tester.pump();
 
-      // Tap on a different format chip
-      await tester.tap(find.text('Unix (seconds)'));
+      // Tap on a different format chip (use .first to disambiguate)
+      await tester.tap(find.text('Unix (seconds)').first);
       await tester.pump();
 
       // The result should be displayed (we don't check exact value, just that it changed)

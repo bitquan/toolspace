@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'logic/upload_manager.dart';
-import 'widgets/file_upload_zone.dart';
-import 'widgets/file_list.dart';
-import 'widgets/quota_banner.dart';
-import 'widgets/merge_progress.dart';
 import '../../billing/billing_service.dart';
 import '../../billing/widgets/paywall_guard.dart';
+import 'logic/upload_manager.dart';
+import 'widgets/file_list.dart';
+import 'widgets/file_upload_zone.dart';
+import 'widgets/merge_progress.dart';
+import 'widgets/quota_banner.dart';
 
 /// Main screen for the File Merger tool
 class FileMergerScreen extends StatefulWidget {
@@ -113,9 +113,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
     }
 
     // Check quota
-    if (_quotaStatus != null &&
-        !_quotaStatus!.isPro &&
-        _quotaStatus!.mergesRemaining <= 0) {
+    if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0) {
       _showErrorSnackBar('Free quota exceeded. Please upgrade to Pro.');
       return;
     }
@@ -187,11 +185,18 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate max file size and batch size for paywall guard
+    final maxFileBytes =
+        _files.isEmpty ? null : _files.map((f) => f.bytes.length).reduce((a, b) => a > b ? a : b);
+    final batchSize = _files.length;
+
     return PaywallGuard(
       billingService: _billingService,
-      permission: const ToolPermission(
+      permission: ToolPermission(
         toolId: 'file_merger',
         requiresHeavyOp: true,
+        fileSize: maxFileBytes,
+        batchSize: batchSize > 0 ? batchSize : null,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -201,9 +206,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
         body: Column(
           children: [
             // Quota banner
-            if (_quotaStatus != null &&
-                !_quotaStatus!.isPro &&
-                _quotaStatus!.mergesRemaining <= 0)
+            if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0)
               QuotaBanner(quotaStatus: _quotaStatus!),
 
             Expanded(
@@ -331,9 +334,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
                     // Merge button
                     ElevatedButton(
                       onPressed:
-                          _files.isNotEmpty && !_isUploading && !_isMerging
-                              ? _mergeFiles
-                              : null,
+                          _files.isNotEmpty && !_isUploading && !_isMerging ? _mergeFiles : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Theme.of(context).primaryColor,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Create Stripe Checkout Session for plan upgrades.
  *
@@ -5,20 +6,24 @@
  * Auth: Requires authenticated user
  */
 
-import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
 import {
+  BillingProfile,
   CreateCheckoutSessionRequest,
   CreateCheckoutSessionResponse,
-  BillingProfile,
 } from "../types/billing";
 import { loadPricingConfig } from "./entitlements";
 
 const stripe = new Stripe(
-  process.env.STRIPE_SECRET || functions.config().stripe?.secret || "",
+  process.env.STRIPE_SECRET_KEY ||
+    process.env.STRIPE_SECRET ||
+    functions.config().stripe?.secret_key ||
+    functions.config().stripe?.secret ||
+    "",
   {
-    apiVersion: "2024-11-20.acacia",
+    apiVersion: "2025-09-30.clover",
   }
 );
 

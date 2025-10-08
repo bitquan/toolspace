@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'debug_logger.dart';
 
 /// Performance monitoring utility for tracking route load times
 /// Only active in debug mode
@@ -6,11 +7,18 @@ class PerfMonitor {
   static final Map<String, DateTime> _routeStartTimes = {};
   static final Map<String, Duration> _routeLoadTimes = {};
 
+  /// Safe debug print that won't trigger VM service errors
+  static void _safePrint(String message) {
+    if (kDebugMode) {
+      DebugLogger.debug(message);
+    }
+  }
+
   /// Start timing a route load
   static void startRouteTimer(String routeName) {
     if (kDebugMode) {
       _routeStartTimes[routeName] = DateTime.now();
-      debugPrint('🏁 [PerfMonitor] Starting route: $routeName');
+      _safePrint('🏁 [PerfMonitor] Starting route: $routeName');
     }
   }
 
@@ -21,7 +29,7 @@ class PerfMonitor {
       if (startTime != null) {
         final duration = DateTime.now().difference(startTime);
         _routeLoadTimes[routeName] = duration;
-        debugPrint(
+        _safePrint(
           '✅ [PerfMonitor] Route loaded: $routeName in ${duration.inMilliseconds}ms',
         );
         _routeStartTimes.remove(routeName);
@@ -33,7 +41,7 @@ class PerfMonitor {
   static void logMetric(String name, dynamic value, [String? unit]) {
     if (kDebugMode) {
       final unitStr = unit != null ? ' $unit' : '';
-      debugPrint('📊 [PerfMonitor] $name: $value$unitStr');
+      _safePrint('📊 [PerfMonitor] $name: $value$unitStr');
     }
   }
 
@@ -45,12 +53,12 @@ class PerfMonitor {
   /// Print performance summary
   static void printSummary() {
     if (kDebugMode && _routeLoadTimes.isNotEmpty) {
-      debugPrint('📈 [PerfMonitor] Performance Summary:');
+      _safePrint('📈 [PerfMonitor] Performance Summary:');
       final sorted = _routeLoadTimes.entries.toList()
         ..sort((a, b) => b.value.compareTo(a.value));
 
       for (final entry in sorted) {
-        debugPrint('  ${entry.key}: ${entry.value.inMilliseconds}ms');
+        _safePrint('  ${entry.key}: ${entry.value.inMilliseconds}ms');
       }
 
       final total = _routeLoadTimes.values.fold<int>(
@@ -58,8 +66,8 @@ class PerfMonitor {
         (sum, duration) => sum + duration.inMilliseconds,
       );
       final average = total / _routeLoadTimes.length;
-      debugPrint('  Average: ${average.toStringAsFixed(2)}ms');
-      debugPrint('  Total: ${total}ms');
+      _safePrint('  Average: ${average.toStringAsFixed(2)}ms');
+      _safePrint('  Total: ${total}ms');
     }
   }
 

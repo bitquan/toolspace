@@ -65,14 +65,7 @@ class TimestampConverter {
       return isAgo ? now.subtract(duration) : now.add(duration);
     }
 
-    // Try parsing as ISO 8601 or other standard formats
-    try {
-      return DateTime.parse(input);
-    } catch (_) {
-      // Not a valid date format
-    }
-
-    // Try parsing as Unix timestamp (milliseconds or seconds)
+    // Try parsing as Unix timestamp first (numbers only)
     final timestamp = int.tryParse(input);
     if (timestamp != null) {
       // If timestamp is too large, assume milliseconds; otherwise seconds
@@ -81,6 +74,13 @@ class TimestampConverter {
       } else {
         return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
       }
+    }
+
+    // Try parsing as ISO 8601 or other standard formats
+    try {
+      return DateTime.parse(input);
+    } catch (_) {
+      // Not a valid date format
     }
 
     return null;
@@ -98,12 +98,12 @@ class TimestampConverter {
 
   /// Convert Unix epoch seconds to DateTime
   static DateTime fromUnixSeconds(int seconds) {
-    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+    return DateTime.fromMillisecondsSinceEpoch(seconds * 1000, isUtc: true);
   }
 
   /// Convert Unix epoch milliseconds to DateTime
   static DateTime fromUnixMilliseconds(int milliseconds) {
-    return DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    return DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
   }
 
   /// Format DateTime to ISO 8601 string

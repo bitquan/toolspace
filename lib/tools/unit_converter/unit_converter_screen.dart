@@ -477,7 +477,6 @@ class _UnitConverterScreenState extends State<UnitConverterScreen>
   }
 
   // Search dialog widget moved to separate method for clarity
-  // ignore: unused_element
   Widget _buildSearchDialog() {
     return Dialog(
       child: Container(

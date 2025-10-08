@@ -125,9 +125,7 @@ void main() {
       final recentText = find.text('Recent Conversions');
       final popularText = find.text('Popular Conversions');
 
-      expect(
-          recentText.evaluate().isNotEmpty || popularText.evaluate().isNotEmpty,
-          true);
+      expect(recentText.evaluate().isNotEmpty || popularText.evaluate().isNotEmpty, true);
     });
 
     testWidgets('can switch categories', (WidgetTester tester) async {

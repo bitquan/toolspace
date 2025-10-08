@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
@@ -14,8 +17,7 @@ class QrMakerScreen extends StatefulWidget {
   State<QrMakerScreen> createState() => _QrMakerScreenState();
 }
 
-class _QrMakerScreenState extends State<QrMakerScreen>
-    with TickerProviderStateMixin {
+class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _batchTextController = TextEditingController();
   final BillingService _billingService = BillingService();
@@ -115,8 +117,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       return;
     }
 
-    final items =
-        input.split('\n').where((line) => line.trim().isNotEmpty).toList();
+    final items = input.split('\n').where((line) => line.trim().isNotEmpty).toList();
 
     setState(() {
       _batchItems = items;
@@ -128,7 +129,6 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       await _billingService.trackHeavyOp();
     }
 
-    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Generated ${items.length} QR codes!'),
@@ -186,11 +186,16 @@ class _QrMakerScreenState extends State<QrMakerScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Only gate batch mode (tab index 1)
+    final isBatchMode = _tabController.index == 1;
+    final batchSize = _batchItems.length;
+
     return PaywallGuard(
       billingService: _billingService,
-      permission: const ToolPermission(
-        toolId: 'qr_maker',
-        requiresHeavyOp: true,
+      permission: ToolPermission(
+        toolId: isBatchMode ? 'qr_maker_batch' : 'qr_maker',
+        requiresHeavyOp: isBatchMode,
+        batchSize: isBatchMode && batchSize > 0 ? batchSize : null,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -231,12 +236,9 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                 tooltip: 'Copy Data',
               ),
             IconButton(
-              onPressed: _tabController.index == 0
-                  ? _downloadQr
-                  : _downloadAllBatchQrs,
+              onPressed: _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
               icon: const Icon(Icons.download),
-              tooltip:
-                  _tabController.index == 0 ? 'Download QR' : 'Download All',
+              tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
             ),
           ],
           bottom: TabBar(
@@ -350,13 +352,11 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () => _useQuickTemplate(
-                                _getQuickTemplate(_selectedType)),
+                            onPressed: () => _useQuickTemplate(_getQuickTemplate(_selectedType)),
                             icon: const Icon(Icons.auto_fix_high),
                             label: const Text('Template'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFFFF5722).withOpacity(0.1),
+                              backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
                               foregroundColor: const Color(0xFFFF5722),
                             ),
                           ),
@@ -500,8 +500,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withOpacity(0.5),
+                      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

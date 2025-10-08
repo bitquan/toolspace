@@ -32,7 +32,7 @@ jobs:
                         await github.rest.pulls.createReview({
                           owner: owner,
                           repo: repo,
-                          pull_number: pr_number,
+                          pull_request_number: pr_number,
                           event: 'APPROVE',
                           body: '🤖 **AUTO-APPROVED**: This PR was automatically approved because it was created by GitHub Copilot.\n\n✅ Copilot PRs are pre-validated and safe for automatic approval.\n✅ This enables the AUTO-DEV pipeline to proceed without manual intervention.\n\n*Automated by Auto-Approve Copilot PRs workflow*'
                         });
@@ -43,7 +43,7 @@ jobs:
                         const { data: pr } = await github.rest.pulls.get({
                           owner: owner,
                           repo: repo,
-                          pull_number: pr_number
+                          pull_request_number: pr_number
                         });
 
                         const labels = pr.labels.map(label => label.name);

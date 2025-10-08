@@ -5,8 +5,10 @@
 library;
 
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../billing_service.dart';
 import '../billing_types.dart';
 
@@ -194,12 +196,11 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
               )
             else if (_plans != null)
               Expanded(
-                child: SingleChildScrollView(
+                child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children:
-                        _plans!.map((plan) => _buildPlanCard(plan)).toList(),
-                  ),
+                  shrinkWrap: false,
+                  itemCount: _plans!.length,
+                  itemBuilder: (context, index) => _buildPlanCard(_plans![index]),
                 ),
               ),
 
@@ -225,8 +226,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
 
     final priceData = plan['price'] as Map<String, dynamic>;
     final amount = priceData['amount'] as int;
-    final displayPrice =
-        amount == 0 ? 'Free' : '\$${(amount / 100).toStringAsFixed(0)}';
+    final displayPrice = amount == 0 ? 'Free' : '\$${(amount / 100).toStringAsFixed(0)}';
     final interval = priceData['interval'] as String?;
 
     final features = (plan['features'] as List<dynamic>).cast<String>();
@@ -249,9 +249,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                     ],
                   )
                 : null,
-        color: isCurrent || isPopular
-            ? null
-            : theme.colorScheme.surface.withOpacity(0.5),
+        color: isCurrent || isPopular ? null : theme.colorScheme.surface.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCurrent
@@ -280,8 +278,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                     if (isCurrent) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
@@ -333,17 +330,20 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                   (feature) => Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          Icons.check_circle_outline,
+                          Icons.check_circle,
                           size: 20,
                           color: theme.colorScheme.primary,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             feature,
-                            style: theme.textTheme.bodyMedium,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ],
@@ -358,15 +358,16 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                       onPressed: () => _upgradeToPlan(planId),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: isPopular
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.secondary,
+                        backgroundColor:
+                            isPopular ? theme.colorScheme.primary : theme.colorScheme.secondary,
+                        foregroundColor: Colors.white,
                       ),
                       child: Text(
                         'Upgrade to ${plan['displayName']}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -380,8 +381,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
               top: 12,
               right: 12,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Colors.blue, Colors.purple],

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'logic/json_flattener.dart';
+
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
-import '../../billing/billing_service.dart';
-import '../../billing/widgets/paywall_guard.dart';
+import 'logic/json_flattener.dart';
 
 /// JSON CSV Flattener - Flatten nested JSON to CSV with field selection
 class JsonFlattenScreen extends StatefulWidget {
@@ -15,8 +16,7 @@ class JsonFlattenScreen extends StatefulWidget {
   State<JsonFlattenScreen> createState() => _JsonFlattenScreenState();
 }
 
-class _JsonFlattenScreenState extends State<JsonFlattenScreen>
-    with TickerProviderStateMixin {
+class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _csvController = TextEditingController();
   final BillingService _billingService = BillingService();
@@ -182,15 +182,19 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final stats = _flattenResult != null
-        ? JsonFlattener.getStatistics(_flattenResult!)
-        : null;
+    final stats = _flattenResult != null ? JsonFlattener.getStatistics(_flattenResult!) : null;
+
+    // Calculate input size for paywall (large JSON exports are heavy ops)
+    final inputBytes = _inputController.text.length;
+    final outputRows = _flattenResult?.rows.length ?? 0;
 
     return PaywallGuard(
       billingService: _billingService,
-      permission: const ToolPermission(
+      permission: ToolPermission(
         toolId: 'json_flatten',
-        requiresHeavyOp: true,
+        requiresHeavyOp: outputRows > 100, // Heavy if exporting >100 rows
+        fileSize: inputBytes > 0 ? inputBytes : null,
+        batchSize: outputRows > 0 ? outputRows : null,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -372,8 +376,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                                     ),
                                   ],
                                   selected: {_notationStyle},
-                                  onSelectionChanged:
-                                      (Set<NotationStyle> value) {
+                                  onSelectionChanged: (Set<NotationStyle> value) {
                                     setState(() {
                                       _notationStyle = value.first;
                                     });
@@ -384,8 +387,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                           ),
                           Expanded(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: TextField(
                                 controller: _inputController,
                                 maxLines: null,
@@ -422,9 +424,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                                       )
                                     : const Icon(Icons.transform),
                                 label: Text(
-                                  _isFlattening
-                                      ? 'Flattening...'
-                                      : 'Flatten to CSV',
+                                  _isFlattening ? 'Flattening...' : 'Flatten to CSV',
                                 ),
                               ),
                             ),
@@ -455,8 +455,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                                 children: [
                                   Text(
                                     'Fields',
-                                    style:
-                                        theme.textTheme.titleMedium?.copyWith(
+                                    style: theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -471,8 +470,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 children: [
                                   Expanded(
@@ -494,13 +492,11 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                             const SizedBox(height: 8),
                             Expanded(
                               child: ListView.builder(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 itemCount: _flattenResult!.allKeys.length,
                                 itemBuilder: (context, index) {
                                   final key = _flattenResult!.allKeys[index];
-                                  final isSelected =
-                                      _selectedKeys.contains(key);
+                                  final isSelected = _selectedKeys.contains(key);
                                   return CheckboxListTile(
                                     value: isSelected,
                                     onChanged: (bool? value) {
@@ -514,8 +510,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                                       ),
                                     ),
                                     dense: true,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
+                                    controlAffinity: ListTileControlAffinity.leading,
                                   );
                                 },
                               ),
@@ -554,8 +549,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen>
                                 fontSize: 14,
                               ),
                               decoration: InputDecoration(
-                                hintText:
-                                    'CSV output will appear here after flattening...',
+                                hintText: 'CSV output will appear here after flattening...',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),

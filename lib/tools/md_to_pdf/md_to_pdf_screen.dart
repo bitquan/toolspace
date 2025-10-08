@@ -1,11 +1,12 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'widgets/export_options_dialog.dart';
-import 'logic/pdf_exporter.dart';
+
 import '../../billing/billing_service.dart';
 import '../../billing/widgets/paywall_guard.dart';
+import 'logic/pdf_exporter.dart';
+import 'widgets/export_options_dialog.dart';
 
 class MdToPdfScreen extends StatefulWidget {
   const MdToPdfScreen({super.key});
@@ -183,11 +184,15 @@ void main() {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Calculate file size (markdown content size in bytes)
+    final markdownBytes = _markdownController.text.length;
+
     return PaywallGuard(
       billingService: _billingService,
-      permission: const ToolPermission(
+      permission: ToolPermission(
         toolId: 'md_to_pdf',
         requiresHeavyOp: true,
+        fileSize: markdownBytes > 0 ? markdownBytes : null,
       ),
       child: Scaffold(
         appBar: AppBar(

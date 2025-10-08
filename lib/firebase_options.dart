@@ -41,12 +41,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'demo-api-key',
-    appId: '1:demo-project:web:demo',
-    messagingSenderId: 'demo-sender-id',
-    projectId: 'demo-project',
-    authDomain: 'demo-project.firebaseapp.com',
-    storageBucket: 'demo-project.appspot.com',
+    apiKey: 'AIzaSyBqQDl_le67C-0FPLT0-m9k5le3HspLdSc',
+    appId: '1:574675500095:web:17049f049886c96c76cc8a',
+    messagingSenderId: '574675500095',
+    projectId: 'toolspace-beta',
+    authDomain: 'toolspace-beta.firebaseapp.com',
+    storageBucket: 'toolspace-beta.firebasestorage.app',
+    measurementId: 'G-CMH1VEHL34',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

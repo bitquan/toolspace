@@ -155,11 +155,22 @@ firebase deploy --only functions
 #### For Local Development:
 
 ```bash
-# Forward webhooks to local functions emulator
-stripe listen --forward-to http://localhost:5001/YOUR_PROJECT/us-central1/webhook
+# Get your Firebase project ID from firebase.json
+PROJECT_ID="your-project-id"
 
-# Copy the webhook signing secret shown and use in local .env
+# Forward webhooks to local functions emulator
+stripe listen --forward-to http://localhost:5001/$PROJECT_ID/us-central1/webhook
+
+# Copy the webhook signing secret shown (starts with whsec_...)
+# Update in functions/.env or use firebase functions:config:set
 ```
+
+**Troubleshooting Webhook Issues:**
+
+- **Webhook not firing**: Check stripe listen output for errors
+- **401 Unauthorized**: Verify webhook secret matches between Stripe and Firebase config
+- **Function timeout**: Check Firebase Functions logs for errors
+- **Profile not updating**: Verify Firestore security rules allow writes to `users/{uid}/billing/profile`
 
 ---
 

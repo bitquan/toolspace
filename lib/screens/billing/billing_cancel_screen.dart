@@ -110,8 +110,7 @@ class BillingCancelScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushNamedAndRemoveUntil('/', (route) => false),
+                      onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -127,8 +126,7 @@ class BillingCancelScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context)
-                          .pushNamedAndRemoveUntil('/', (route) => false);
+                      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                       // TODO: Show upgrade sheet after navigation
                     },
                     child: const Text('View Plans Again'),

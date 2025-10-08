@@ -75,7 +75,8 @@ class JsonPathQuery {
       segments.add(current);
     }
 
-    return segments.where((s) => s.isNotEmpty).toList();
+    // Trim whitespace from segments and filter empty ones
+    return segments.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
   }
 
   /// Evaluate path segments against data
@@ -102,6 +103,13 @@ class JsonPathQuery {
       return results;
     }
 
+    // Handle object property (check maps before array indices)
+    // This allows numeric string keys like '1', '2' to work in maps
+    if (data is Map<String, dynamic>) {
+      if (!data.containsKey(segment)) return [];
+      return _evaluatePath(data[segment], remainingSegments);
+    }
+
     // Handle array index or slice
     if (_isArrayIndex(segment)) {
       if (data is! List) return [];
@@ -112,12 +120,6 @@ class JsonPathQuery {
       if (index < 0 || index >= data.length) return [];
 
       return _evaluatePath(data[index], remainingSegments);
-    }
-
-    // Handle object property
-    if (data is Map<String, dynamic>) {
-      if (!data.containsKey(segment)) return [];
-      return _evaluatePath(data[segment], remainingSegments);
     }
 
     // Handle quoted strings in maps
@@ -171,10 +173,18 @@ class JsonPathQuery {
 
       // Basic validation - check for balanced brackets
       int bracketCount = 0;
+      String? prevChar;
       for (final char in path.split('')) {
-        if (char == '[') bracketCount++;
-        if (char == ']') bracketCount--;
-        if (bracketCount < 0) return false;
+        if (char == '[') {
+          bracketCount++;
+          // Check for nested opening brackets (invalid)
+          if (prevChar == '[') return false;
+        }
+        if (char == ']') {
+          bracketCount--;
+          if (bracketCount < 0) return false;
+        }
+        prevChar = char;
       }
 
       return bracketCount == 0;

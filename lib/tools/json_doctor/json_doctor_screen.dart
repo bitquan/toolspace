@@ -29,7 +29,6 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
   JsonDoctorStatus _status = JsonDoctorStatus.empty;
   String _errorMessage = '';
-  // ignore: unused_field
   final int _indentLevel = 2;
   List<SchemaValidationError> _schemaErrors = [];
   // ignore: unused_field

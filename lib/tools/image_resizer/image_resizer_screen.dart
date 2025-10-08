@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../billing/billing_service.dart';
+import '../../billing/widgets/paywall_guard.dart';
 import 'logic/upload_manager.dart';
-import 'widgets/image_upload_zone.dart';
 import 'widgets/image_list.dart';
+import 'widgets/image_upload_zone.dart';
 import 'widgets/resize_progress.dart';
 import '../../billing/billing_service.dart';
 import '../../billing/widgets/paywall_guard.dart';
@@ -39,11 +41,19 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Calculate max file size and batch size for paywall guard
+    final maxFileBytes = _images.isEmpty
+        ? null
+        : _images.map((img) => img.bytes.length).reduce((a, b) => a > b ? a : b);
+    final batchSize = _images.length;
+
     return PaywallGuard(
       billingService: _billingService,
-      permission: const ToolPermission(
+      permission: ToolPermission(
         toolId: 'image_resizer',
         requiresHeavyOp: true,
+        fileSize: maxFileBytes,
+        batchSize: batchSize > 0 ? batchSize : null,
       ),
       child: Scaffold(
         backgroundColor: theme.colorScheme.surface,
@@ -423,9 +433,8 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
             requestData,
           );
 
-      final results = (result.data['results'] as List)
-          .map((r) => ResizedImage.fromJson(r))
-          .toList();
+      final results =
+          (result.data['results'] as List).map((r) => ResizedImage.fromJson(r)).toList();
 
       setState(() {
         _isResizing = false;
@@ -462,10 +471,8 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
   }
 
   void _showCustomDimensionsDialog() {
-    final widthController =
-        TextEditingController(text: _customWidth?.toString() ?? '');
-    final heightController =
-        TextEditingController(text: _customHeight?.toString() ?? '');
+    final widthController = TextEditingController(text: _customWidth?.toString() ?? '');
+    final heightController = TextEditingController(text: _customHeight?.toString() ?? '');
 
     showDialog(
       context: context,
