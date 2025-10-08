@@ -6,7 +6,6 @@
  * Auth: Requires authenticated user
  */
 
-import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
 import {
@@ -15,6 +14,7 @@ import {
   CreateCheckoutSessionResponse,
 } from "../types/billing";
 import { loadPricingConfig } from "./entitlements";
+import { db } from "../admin";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY ||
@@ -37,6 +37,14 @@ export const createCheckoutSession = functions.https.onCall(
       throw new functions.https.HttpsError(
         "unauthenticated",
         "Must be logged in"
+      );
+    }
+
+    // Require email verification before checkout
+    if (!context.auth.token.email_verified) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Email verification required. Please verify your email address before purchasing a subscription."
       );
     }
 
@@ -71,7 +79,6 @@ export const createCheckoutSession = functions.https.onCall(
       }
 
       // Get or create Stripe customer
-      const db = admin.firestore();
       const billingRef = db.doc(`users/${userId}/billing/profile`);
       const billingDoc = await billingRef.get();
 
@@ -119,9 +126,11 @@ export const createCheckoutSession = functions.https.onCall(
         await billingRef.set(newProfile);
       }
 
-      // Create checkout session
+      // Create checkout session with proper Firebase UID linking
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
+        client_reference_id: userId, // Link to Firebase UID for cross-device access
+        customer_email: context.auth?.token.email, // Ensure email consistency
         payment_method_types: ["card"],
         line_items: [
           {
@@ -135,11 +144,13 @@ export const createCheckoutSession = functions.https.onCall(
         metadata: {
           userId,
           planId,
+          firebaseUid: userId, // Additional UID tracking
         },
         subscription_data: {
           metadata: {
             userId,
             planId,
+            firebaseUid: userId, // Ensure subscription has Firebase UID
           },
         },
       });
@@ -176,16 +187,27 @@ export const createCheckoutSession = functions.https.onCall(
 );
 
 /**
- * Create Stripe customer with metadata
+ * Create Stripe customer with comprehensive Firebase UID metadata
  */
 async function createStripeCustomer(
   userId: string,
   email?: string
 ): Promise<Stripe.Customer> {
-  return await stripe.customers.create({
+  const customer = await stripe.customers.create({
     email: email || undefined,
     metadata: {
       firebaseUserId: userId,
+      uid: userId, // Alternative field for UID lookup
+      created_by: "toolspace_firebase_auth",
     },
+    description: `Toolspace user: ${userId}`,
   });
+
+  functions.logger.info("Stripe customer created", {
+    customerId: customer.id,
+    firebaseUserId: userId,
+    email: email || "none",
+  });
+
+  return customer;
 }

@@ -1,9 +1,13 @@
 import { requireAuth } from "../util/guards.js";
 import { AuthError } from "../util/errors.js";
 
-export function authMiddleware(req: any, res: any, next: any): void {
+export async function authMiddleware(
+  req: any,
+  res: any,
+  next: any
+): Promise<void> {
   try {
-    const userId = requireAuth(req);
+    const userId = await requireAuth(req);
     // Attach user ID to request for downstream handlers
     (req as any).userId = userId;
     next();

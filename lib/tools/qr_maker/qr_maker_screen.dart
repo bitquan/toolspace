@@ -6,8 +6,6 @@ import '../../billing/widgets/paywall_guard.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
-import '../../billing/billing_service.dart';
-import '../../billing/widgets/paywall_guard.dart';
 
 /// QR Maker - Generate QR codes instantly with customization
 class QrMakerScreen extends StatefulWidget {

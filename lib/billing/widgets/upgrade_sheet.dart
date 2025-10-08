@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../billing_service.dart';
 import '../billing_types.dart';
+import '../../auth/services/auth_service.dart';
+import '../../auth/widgets/email_verification_dialog.dart';
 
 class UpgradeSheet extends StatefulWidget {
   final BillingService billingService;
@@ -79,6 +81,29 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
   Future<void> _upgradeToPlan(PlanId planId) async {
     if (planId == PlanId.free) return;
 
+    // Check if user is authenticated and email is verified
+    final authService = AuthService();
+    final currentUser = authService.currentUser;
+    
+    if (currentUser == null) {
+      _showError('Please sign in to upgrade your plan');
+      return;
+    }
+    
+    if (!currentUser.emailVerified) {
+      // Show email verification dialog
+      await EmailVerificationDialog.show(
+        context,
+        onVerified: () => _proceedToCheckout(planId),
+        authService: authService,
+      );
+      return;
+    }
+    
+    await _proceedToCheckout(planId);
+  }
+
+  Future<void> _proceedToCheckout(PlanId planId) async {
     try {
       final baseUrl = Uri.base.toString();
       final successUrl = widget.successUrl ?? '$baseUrl#/billing/success';
@@ -100,7 +125,14 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
         if (mounted) _showError('Could not open checkout page');
       }
     } catch (e) {
-      if (mounted) _showError('Failed to create checkout session: $e');
+      if (mounted) {
+        // Handle email verification error specifically
+        if (e.toString().contains('Email verification required')) {
+          _showError('Please verify your email address before upgrading');
+        } else {
+          _showError('Failed to create checkout session: $e');
+        }
+      }
     }
   }
 

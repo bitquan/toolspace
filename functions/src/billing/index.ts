@@ -1,26 +1,50 @@
 import * as functions from "firebase-functions";
+import { withAuth, withEmailVerification } from "../middleware/withAuth.js";
+import { AuthenticatedRequest } from "../types/auth.js";
 
-// Billing stub - implement Stripe/payment processing here
-export const createSubscription = functions.https.onRequest((_req, res) => {
-  // TODO: Implement subscription creation
-  res.json({
-    message: "Billing endpoint - implement subscription logic",
-    timestamp: Date.now(),
-  });
-});
+// Billing endpoints with proper authentication
+export const createSubscription = functions.https.onRequest(
+  async (req, res) => {
+    await withAuth(req, res, async () => {
+      await withEmailVerification(req, res, () => {
+        const authReq = req as AuthenticatedRequest;
+        // Authenticated and email verified user can create subscription
+        res.json({
+          message: "Subscription creation endpoint",
+          userId: authReq.uid,
+          userEmail: authReq.user?.email,
+          timestamp: Date.now(),
+        });
+      });
+    });
+  }
+);
 
-export const cancelSubscription = functions.https.onRequest((_req, res) => {
-  // TODO: Implement subscription cancellation
-  res.json({
-    message: "Billing endpoint - implement cancellation logic",
-    timestamp: Date.now(),
-  });
-});
+export const cancelSubscription = functions.https.onRequest(
+  async (req, res) => {
+    await withAuth(req, res, () => {
+      const authReq = req as AuthenticatedRequest;
+      // Authenticated user can cancel subscription
+      res.json({
+        message: "Subscription cancellation endpoint",
+        userId: authReq.uid,
+        userEmail: authReq.user?.email,
+        timestamp: Date.now(),
+      });
+    });
+  }
+);
 
-export const getBillingStatus = functions.https.onRequest((_req, res) => {
-  // TODO: Implement billing status check
-  res.json({
-    message: "Billing endpoint - implement status check",
-    timestamp: Date.now(),
+export const getBillingStatus = functions.https.onRequest(async (req, res) => {
+  await withAuth(req, res, () => {
+    const authReq = req as AuthenticatedRequest;
+    // Authenticated user can check billing status
+    res.json({
+      message: "Billing status endpoint",
+      userId: authReq.uid,
+      userEmail: authReq.user?.email,
+      emailVerified: authReq.user?.email_verified,
+      timestamp: Date.now(),
+    });
   });
 });

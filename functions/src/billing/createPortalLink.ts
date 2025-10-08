@@ -6,10 +6,10 @@
  * Auth: Requires authenticated user with existing subscription
  */
 
-import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
 import { BillingProfile, CreatePortalLinkResponse } from "../types/billing";
+import { db } from "../admin";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY ||
@@ -46,7 +46,6 @@ export const createPortalLink = functions.https.onCall(
     }
 
     try {
-      const db = admin.firestore();
       const billingRef = db.doc(`users/${userId}/billing/profile`);
       const billingDoc = await billingRef.get();
 

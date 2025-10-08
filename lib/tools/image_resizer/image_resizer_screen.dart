@@ -10,8 +10,6 @@ import 'logic/upload_manager.dart';
 import 'widgets/image_list.dart';
 import 'widgets/image_upload_zone.dart';
 import 'widgets/resize_progress.dart';
-import '../../billing/billing_service.dart';
-import '../../billing/widgets/paywall_guard.dart';
 
 /// Main screen for the Image Resizer tool
 class ImageResizerScreen extends StatefulWidget {

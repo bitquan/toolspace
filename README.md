@@ -4,6 +4,23 @@
 
 Toolspace is a collection of focused, web-based micro-tools designed to help small businesses, freelancers, and individuals accomplish common tasks quickly and efficiently.
 
+## 🚨 PRODUCTION STATUS
+
+❌ **NOT READY FOR PRODUCTION**
+
+**Current Blocker:** AUTH-01 Epic - Production Auth, Security Rules, and Billing Link
+
+**Required before launch:**
+
+- Real user authentication (currently anonymous only)
+- Secure database rules (currently wide open)
+- Billing linked to persistent user accounts
+- Security audit completion
+
+✅ **Ready to launch when AUTH-01 is complete.**
+
+**Epic Progress:** [View AUTH-01 Issues](https://github.com/bitquan/toolspace/issues?q=is%3Aissue+is%3Aopen+A1+A2+S1+S2+B1+B2+U1+D1)
+
 ## 🚀 Quick Start
 
 ### Run Locally
@@ -42,6 +59,7 @@ npm run build                # Build TypeScript
 ### Cross-Tool Data Sharing
 
 Share data seamlessly between tools without manual copy-paste:
+
 - 🔄 Share text, JSON, URLs, and more between tools
 - 📋 One-click import from other tools
 - 📜 History tracking for recent shares

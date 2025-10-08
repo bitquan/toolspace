@@ -17,6 +17,11 @@ import '../tools/image_resizer/image_resizer_screen.dart';
 import '../tools/password_gen/password_gen_screen.dart';
 import '../tools/json_flatten/json_flatten_screen.dart';
 import '../tools/unit_converter/unit_converter_screen.dart';
+import '../auth/screens/signin_screen.dart';
+import '../auth/screens/signup_screen.dart';
+import '../auth/screens/password_reset_screen.dart';
+import '../auth/screens/email_verification_screen.dart';
+import '../auth/screens/account_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
@@ -39,6 +44,11 @@ class ToolspaceRouter {
   static const String jsonFlatten = '/tools/json-flatten';
   static const String unitConverter = '/tools/unit-converter';
   static const String auth = '/auth';
+  static const String authSignIn = '/auth/signin';
+  static const String authSignUp = '/auth/signup';
+  static const String authReset = '/auth/reset';
+  static const String authVerify = '/auth/verify';
+  static const String account = '/account';
   static const String billing = '/billing';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -118,6 +128,26 @@ class ToolspaceRouter {
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
+        );
+      case authSignIn:
+        return MaterialPageRoute(
+          builder: (_) => const SignInScreen(),
+        );
+      case authSignUp:
+        return MaterialPageRoute(
+          builder: (_) => const SignUpScreen(),
+        );
+      case authReset:
+        return MaterialPageRoute(
+          builder: (_) => const PasswordResetScreen(),
+        );
+      case authVerify:
+        return MaterialPageRoute(
+          builder: (_) => const EmailVerificationScreen(),
+        );
+      case account:
+        return MaterialPageRoute(
+          builder: (_) => const AccountScreen(),
         );
       case billing:
         return MaterialPageRoute(
