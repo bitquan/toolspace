@@ -1,662 +1,667 @@
 name: OPS-Zeta Code Quality Scan
 
 on:
-  schedule:
-    - cron: "0 6 * * *" # Daily at 6 AM UTC
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Dry run (true/false)"
-        required: true
-        default: "true"
-        type: string
-      scan_type:
-        description: "Scan type (full/quick)"
-        required: false
-        default: "full"
-        type: choice
-        options:
-          - full
-          - quick
+    schedule:
+        - cron: "0 6 * * *" # Daily at 6 AM UTC
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: "Dry run (true/false)"
+                required: true
+                default: "true"
+                type: string
+            scan_type:
+                description: "Scan type (full/quick)"
+                required: false
+                default: "full"
+                type: choice
+                options:
+                    - full
+                    - quick
 
 permissions:
-  contents: read
-  actions: read
-  issues: write
-  pull-requests: write
-  security-events: write
+    contents: read
+    issues: write
+    pull-requests: write
+    security-events: write
 
 jobs:
-  static-analysis:
-    runs-on: ubuntu-latest
-    outputs:
-      eslint-issues: ${{ steps.eslint.outputs.issues }}
-      dart-issues: ${{ steps.dart-analyze.outputs.issues }}
-      metrics-issues: ${{ steps.code-metrics.outputs.issues }}
-      smells-detected: ${{ steps.code-smells.outputs.detected }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: functions/package-lock.json
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          flutter-version: "3.24.3"
-          cache: true
-
-      - name: Install dependencies
-        run: |
-          cd functions && npm ci
-          flutter pub get
-
-      - name: ESLint Analysis (Functions)
-        id: eslint
-        run: |
-          cd functions
-          echo "Running ESLint analysis..."
-
-          # Run ESLint with JSON output
-          npx eslint src/ --format json --output-file ../eslint-results.json || true
-
-          # Count issues
-          ISSUES=$(node -e "
-            const results = require('./eslint-results.json');
-            const total = results.reduce((sum, file) => sum + file.errorCount + file.warningCount, 0);
-            console.log(total);
-          ")
-
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
-          echo "Found $ISSUES ESLint issues"
-
-      - name: Dart Analyzer
-        id: dart-analyze
-        run: |
-          echo "Running Dart analyzer..."
-
-          # Run analyzer with machine format
-          flutter analyze --format machine > dart-analyze-results.txt 2>&1 || true
-
-          # Count issues (lines that don't start with "Analyzing")
-          ISSUES=$(grep -v "^Analyzing" dart-analyze-results.txt | grep -v "^No issues found" | wc -l || echo "0")
-
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
-          echo "Found $ISSUES Dart analyzer issues"
-
-      - name: Code Metrics Analysis
-        id: code-metrics
-        run: |
-          echo "Running dart_code_metrics..."
-
-          # Install dart_code_metrics
-          dart pub global activate dart_code_metrics
-
-          # Run metrics analysis
-          dart pub global run dart_code_metrics:metrics analyze lib --reporter=json --output-file=metrics-results.json || true
-
-          # Count violations
-          ISSUES=0
-          if [ -f "metrics-results.json" ]; then
-            ISSUES=$(node -e "
-              try {
-                const data = require('./metrics-results.json');
-                const violations = data.records ? data.records.reduce((sum, record) =>
-                  sum + (record.issues ? record.issues.length : 0), 0) : 0;
-                console.log(violations);
-              } catch(e) {
-                console.log('0');
-              }
-            ")
-          fi
-
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
-          echo "Found $ISSUES code metrics violations"
-
-      - name: Code Smells Detection
-        id: code-smells
-        run: |
-          echo "Detecting code smells..."
-
-          SMELLS=0
-
-          # Long files (>1000 lines)
-          LONG_FILES=$(find lib -name "*.dart" -exec wc -l {} + | awk '$1 > 1000 {print $2}' | wc -l)
-          echo "Long files (>1000 LOC): $LONG_FILES"
-
-          # Large functions files (>500 lines)
-          LARGE_JS_FILES=$(find functions/src -name "*.ts" -exec wc -l {} + | awk '$1 > 500 {print $2}' | wc -l)
-          echo "Large TypeScript files (>500 LOC): $LARGE_JS_FILES"
-
-          # TODO comments older than 30 days
-          OLD_TODOS=0
-          if command -v git &> /dev/null; then
-            # Find TODO comments in recent commits (approximation)
-            OLD_TODOS=$(git log --since="30 days ago" --grep="TODO" --oneline | wc -l)
-          fi
-          echo "Old TODO comments: $OLD_TODOS"
-
-          # Unused exports (simplified check)
-          UNUSED_EXPORTS=0
-          if [ -d "functions/src" ]; then
-            # Check for exports that might be unused (basic heuristic)
-            UNUSED_EXPORTS=$(grep -r "export.*function\|export.*const\|export.*class" functions/src --include="*.ts" | wc -l)
-            # This is a rough estimate - real detection would need more sophisticated analysis
-            UNUSED_EXPORTS=$((UNUSED_EXPORTS / 10)) # Rough approximation
-          fi
-          echo "Potentially unused exports: $UNUSED_EXPORTS"
-
-          SMELLS=$((LONG_FILES + LARGE_JS_FILES + OLD_TODOS + UNUSED_EXPORTS))
-
-          echo "detected=$SMELLS" >> $GITHUB_OUTPUT
-          echo "Total code smells detected: $SMELLS"
-
-      - name: Upload analysis artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-analysis-results
-          path: |
-            eslint-results.json
-            dart-analyze-results.txt
-            metrics-results.json
-
-  security-scan:
-    runs-on: ubuntu-latest
-    outputs:
-      npm-vulnerabilities: ${{ steps.npm-audit.outputs.vulnerabilities }}
-      secrets-detected: ${{ steps.secret-scan.outputs.detected }}
-      dependency-issues: ${{ steps.dep-health.outputs.issues }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history for secret scanning
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: functions/package-lock.json
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          flutter-version: "3.24.3"
-          cache: true
-
-      - name: Install dependencies
-        run: |
-          cd functions && npm ci
-          flutter pub get
-
-      - name: NPM Security Audit
-        id: npm-audit
-        run: |
-          cd functions
-          echo "Running npm audit..."
-
-          # Run audit and capture output
-          npm audit --json > ../npm-audit-results.json 2>&1 || true
-
-          # Count vulnerabilities
-          VULNS=$(node -e "
-            try {
-              const audit = require('./npm-audit-results.json');
-              const critical = audit.metadata?.vulnerabilities?.critical || 0;
-              const high = audit.metadata?.vulnerabilities?.high || 0;
-              console.log(critical + high);
-            } catch(e) {
-              console.log('0');
-            }
-          ")
-
-          echo "vulnerabilities=$VULNS" >> $GITHUB_OUTPUT
-          echo "Found $VULNS critical/high npm vulnerabilities"
-
-      - name: Flutter Dependency Check
-        run: |
-          echo "Checking Flutter dependencies..."
-          flutter pub outdated > flutter-outdated.txt 2>&1 || true
-
-          # Check for security advisories (if available)
-          echo "Flutter dependency status logged"
-
-      - name: Secret Scanning with gitleaks
-        id: secret-scan
-        run: |
-          echo "Running secret detection..."
-
-          # Install gitleaks
-          wget -O gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
-          tar -xzf gitleaks.tar.gz
-          chmod +x gitleaks
-
-          # Run gitleaks
-          ./gitleaks detect --report-format json --report-path gitleaks-results.json --verbose || true
-
-          # Count secrets found
-          SECRETS=0
-          if [ -f "gitleaks-results.json" ]; then
-            SECRETS=$(jq length gitleaks-results.json 2>/dev/null || echo "0")
-          fi
-
-          echo "detected=$SECRETS" >> $GITHUB_OUTPUT
-          echo "Found $SECRETS potential secrets"
-
-      - name: Dependency Health Check
-        id: dep-health
-        run: |
-          echo "Checking dependency health..."
-
-          ISSUES=0
-
-          # Check for critical npm vulnerabilities
-          if [ -f "npm-audit-results.json" ]; then
-            CRITICAL_NPM=$(node -e "
-              try {
-                const audit = require('./npm-audit-results.json');
-                console.log(audit.metadata?.vulnerabilities?.critical || 0);
-              } catch(e) {
-                console.log('0');
-              }
-            ")
-            ISSUES=$((ISSUES + CRITICAL_NPM))
-          fi
-
-          # Check Flutter dependency freshness (simplified)
-          OUTDATED_FLUTTER=0
-          if [ -f "flutter-outdated.txt" ]; then
-            # Count lines mentioning outdated packages
-            OUTDATED_FLUTTER=$(grep -c "latest:" flutter-outdated.txt || echo "0")
-          fi
-
-          # Only count major version gaps as issues
-          ISSUES=$((ISSUES + OUTDATED_FLUTTER / 5))
-
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
-          echo "Found $ISSUES critical dependency issues"
-
-      - name: Upload security artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-scan-results
-          path: |
-            npm-audit-results.json
-            flutter-outdated.txt
-            gitleaks-results.json
-
-  test-reliability:
-    runs-on: ubuntu-latest
-    outputs:
-      flaky-tests: ${{ steps.flaky-detection.outputs.detected }}
-      test-failures: ${{ steps.test-runs.outputs.failures }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          flutter-version: "3.24.3"
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Test Run #1
-        id: test-run-1
-        run: |
-          echo "Running test suite - attempt 1"
-          flutter test --reporter json > test-results-1.json 2>&1 || echo "Tests may have failed"
-
-      - name: Test Run #2
-        id: test-run-2
-        run: |
-          echo "Running test suite - attempt 2"
-          flutter test --reporter json > test-results-2.json 2>&1 || echo "Tests may have failed"
-
-      - name: Test Run #3
-        id: test-run-3
-        run: |
-          echo "Running test suite - attempt 3"
-          flutter test --reporter json > test-results-3.json 2>&1 || echo "Tests may have failed"
-
-      - name: Flaky Test Detection
-        id: flaky-detection
-        run: |
-          echo "Analyzing test consistency..."
-
-          FLAKY=0
-
-          # Compare test results (simplified detection)
-          # In a real implementation, this would parse JSON and compare specific test outcomes
-
-          if [ -f "test-results-1.json" ] && [ -f "test-results-2.json" ] && [ -f "test-results-3.json" ]; then
-            # Check if file sizes differ significantly (indication of different outcomes)
-            SIZE1=$(wc -c < test-results-1.json)
-            SIZE2=$(wc -c < test-results-2.json)
-            SIZE3=$(wc -c < test-results-3.json)
-
-            # If sizes differ by more than 10%, might indicate flaky tests
-            DIFF12=$((SIZE1 - SIZE2))
-            DIFF13=$((SIZE1 - SIZE3))
-
-            if [ ${DIFF12#-} -gt $((SIZE1 / 10)) ] || [ ${DIFF13#-} -gt $((SIZE1 / 10)) ]; then
-              FLAKY=1
-              echo "Potential flaky tests detected based on result variance"
-            fi
-          fi
-
-          echo "detected=$FLAKY" >> $GITHUB_OUTPUT
-          echo "Flaky tests detected: $FLAKY"
-
-      - name: Test Summary
-        id: test-runs
-        run: |
-          echo "Summarizing test runs..."
-
-          FAILURES=0
-
-          # Count failures across runs (simplified)
-          for i in 1 2 3; do
-            if [ -f "test-results-$i.json" ]; then
-              # Look for failure indicators in test output
-              FAIL_COUNT=$(grep -c "FAIL\|ERROR\|failed" "test-results-$i.json" || echo "0")
-              FAILURES=$((FAILURES + FAIL_COUNT))
-            fi
-          done
-
-          echo "failures=$FAILURES" >> $GITHUB_OUTPUT
-          echo "Total test failures across runs: $FAILURES"
-
-      - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reliability-results
-          path: |
-            test-results-*.json
-
-  coverage-analysis:
-    runs-on: ubuntu-latest
-    outputs:
-      coverage-percentage: ${{ steps.coverage.outputs.percentage }}
-      coverage-delta: ${{ steps.coverage-delta.outputs.delta }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          flutter-version: "3.24.3"
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run tests with coverage
-        id: coverage
-        run: |
-          echo "Running tests with coverage analysis..."
-
-          flutter test --coverage
-
-          # Calculate coverage percentage
-          COVERAGE=0
-          if [ -f "coverage/lcov.info" ]; then
-            # Install lcov for processing
-            sudo apt-get update && sudo apt-get install -y lcov
-
-            # Generate coverage report
-            lcov --summary coverage/lcov.info > coverage-summary.txt 2>&1 || true
-
-            # Extract coverage percentage
-            COVERAGE=$(grep -o "lines\.*[0-9.]*%" coverage-summary.txt | grep -o "[0-9.]*" | head -1 || echo "0")
-          fi
-
-          echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
-          echo "Current coverage: $COVERAGE%"
-
-      - name: Coverage Delta Analysis
-        id: coverage-delta
-        run: |
-          echo "Analyzing coverage delta..."
-
-          # For now, we'll just report current coverage
-          # In a full implementation, this would compare against main branch
-
-          CURRENT_COVERAGE="${{ steps.coverage.outputs.percentage }}"
-          BASELINE_COVERAGE="75" # Placeholder baseline
-
-          DELTA=$(echo "$CURRENT_COVERAGE - $BASELINE_COVERAGE" | bc -l 2>/dev/null || echo "0")
-
-          echo "delta=$DELTA" >> $GITHUB_OUTPUT
-          echo "Coverage delta from baseline: $DELTA%"
-
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-results
-          path: |
-            coverage/lcov.info
-            coverage-summary.txt
-
-  issue-creation:
-    needs: [ static-analysis, security-scan, test-reliability, coverage-analysis ]
-    runs-on: ubuntu-latest
-    if: always() && github.event.inputs.dry_run != 'true'
-    outputs:
-      critical_issues: ${{ steps.analyze-results.outputs.critical_issues }}
-      warning_issues: ${{ steps.analyze-results.outputs.warning_issues }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Analyze Results and Create Issues
-        id: analyze-results
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const dry = '${{ github.event.inputs.dry_run }}' === 'true';
-
-            console.log('🔍 OPS-Zeta Analysis Results');
-            console.log(`Dry Run: ${dry}`);
-
-            // Collect all scan results
-            const results = {
-              eslint: '${{ needs.static-analysis.outputs.eslint-issues }}' || '0',
-              dartAnalyzer: '${{ needs.static-analysis.outputs.dart-issues }}' || '0',
-              codeMetrics: '${{ needs.static-analysis.outputs.metrics-issues }}' || '0',
-              codeSmells: '${{ needs.static-analysis.outputs.smells-detected }}' || '0',
-              npmVulns: '${{ needs.security-scan.outputs.npm-vulnerabilities }}' || '0',
-              secrets: '${{ needs.security-scan.outputs.secrets-detected }}' || '0',
-              depIssues: '${{ needs.security-scan.outputs.dependency-issues }}' || '0',
-              flakyTests: '${{ needs.test-reliability.outputs.flaky-tests }}' || '0',
-              testFailures: '${{ needs.test-reliability.outputs.test-failures }}' || '0',
-              coverage: '${{ needs.coverage-analysis.outputs.coverage-percentage }}' || '0',
-              coverageDelta: '${{ needs.coverage-analysis.outputs.coverage-delta }}' || '0'
-            };
-
-            console.log('Results:', results);
-
-            // Calculate severity
-            const criticalIssues = parseInt(results.secrets) + parseInt(results.npmVulns);
-            const warningIssues = parseInt(results.eslint) + parseInt(results.dartAnalyzer) +
-                                 parseInt(results.codeMetrics) + parseInt(results.codeSmells);
-
-            // Get current sprint milestone for issue assignment
-            let currentMilestone = null;
-            try {
-              const milestones = await github.rest.issues.listMilestones({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open',
-                sort: 'due_on',
-                direction: 'asc'
-              });
-
-              // Find current sprint (assumes Sprint-YYMM-WNN naming)
-              const now = new Date();
-              const currentSprintPattern = /Sprint-\d{4}-W\d{2}/;
-              currentMilestone = milestones.data.find(m =>
-                currentSprintPattern.test(m.title) &&
-                new Date(m.due_on) > now
-              );
-            } catch (error) {
-              console.log('Could not find current sprint milestone:', error.message);
-            }
-
-            // Create issues for critical problems
-            if (criticalIssues > 0 && !dry) {
-              const issueTitle = `🚨 OPS-Zeta: Critical Security Issues Detected`;
-              const issueBody = `# Critical Security Issues
-
-            OPS-Zeta has detected ${criticalIssues} critical security issues that require immediate attention:
-
-            ## Issues Found
-            - **Secrets Detected**: ${results.secrets}
-            - **Critical/High NPM Vulnerabilities**: ${results.npmVulns}
-
-            ## Actions Required
-            1. Review and remove any exposed secrets
-            2. Update vulnerable dependencies
-            3. Run security scan again to verify fixes
-
-            **Priority**: P0 - Critical
-            **Assigned by**: OPS-Zeta Autonomous QA
-            **Scan Date**: ${new Date().toISOString()}
-            `;
-
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: issueTitle,
-                body: issueBody,
-                labels: ['security', 'P0', 'ops-zeta', 'qa:blocking'],
-                milestone: currentMilestone?.number
-              });
-
-              console.log('✅ Created critical security issue');
-            }
-
-            // Create tech debt issues for warnings
-            if (warningIssues > 10 && !dry) {
-              const issueTitle = `⚠️ OPS-Zeta: Code Quality Issues Detected`;
-              const issueBody = `# Code Quality Issues
-
-            OPS-Zeta has detected ${warningIssues} code quality issues that should be addressed:
-
-            ## Issues Found
-            - **ESLint Issues**: ${results.eslint}
-            - **Dart Analyzer Issues**: ${results.dartAnalyzer}
-            - **Code Metrics Violations**: ${results.codeMetrics}
-            - **Code Smells**: ${results.codeSmells}
-
-            ## Recommendations
-            1. Fix linting and analyzer issues
-            2. Refactor large files and functions
-            3. Address code metrics violations
-            4. Clean up old TODOs and unused code
-
-            **Priority**: P2 - Tech Debt
-            **Assigned by**: OPS-Zeta Autonomous QA
-            **Scan Date**: ${new Date().toISOString()}
-            `;
-
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: issueTitle,
-                body: issueBody,
-                labels: ['tech-debt', 'P2', 'ops-zeta'],
-                milestone: currentMilestone?.number
-              });
-
-              console.log('✅ Created code quality issue');
-            }
-
-            // Create issue for flaky tests
-            if (parseInt(results.flakyTests) > 0 && !dry) {
-              const issueTitle = `🔄 OPS-Zeta: Flaky Tests Detected`;
-              const issueBody = `# Flaky Test Detection
-
-            OPS-Zeta has detected potentially flaky tests that produce inconsistent results:
-
-            ## Issues Found
-            - **Flaky Tests Detected**: ${results.flakyTests}
-            - **Test Failures**: ${results.testFailures}
-
-            ## Actions Required
-            1. Review test output artifacts for inconsistencies
-            2. Identify and fix non-deterministic tests
-            3. Add test:flaky label to problematic tests
-            4. Consider quarantine for unreliable tests
-
-            **Priority**: P1 - Quality
-            **Assigned by**: OPS-Zeta Autonomous QA
-            **Scan Date**: ${new Date().toISOString()}
-            `;
-
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: issueTitle,
-                body: issueBody,
-                labels: ['testing', 'test:flaky', 'P1', 'ops-zeta'],
-                milestone: currentMilestone?.number
-              });
-
-              console.log('✅ Created flaky test issue');
-            }
-
-            // Generate summary
-            core.summary.addHeading('OPS-Zeta Quality Scan Results', 2);
-            core.summary.addTable([
-              ['Category', 'Issues Found', 'Status'],
-              ['ESLint', results.eslint, results.eslint === '0' ? '✅' : '⚠️'],
-              ['Dart Analyzer', results.dartAnalyzer, results.dartAnalyzer === '0' ? '✅' : '⚠️'],
-              ['Code Metrics', results.codeMetrics, results.codeMetrics === '0' ? '✅' : '⚠️'],
-              ['Code Smells', results.codeSmells, results.codeSmells === '0' ? '✅' : '⚠️'],
-              ['NPM Vulnerabilities', results.npmVulns, results.npmVulns === '0' ? '✅' : '🚨'],
-              ['Secret Detection', results.secrets, results.secrets === '0' ? '✅' : '🚨'],
-              ['Dependency Issues', results.depIssues, results.depIssues === '0' ? '✅' : '⚠️'],
-              ['Flaky Tests', results.flakyTests, results.flakyTests === '0' ? '✅' : '🔄'],
-              ['Test Coverage', `${results.coverage}%`, parseFloat(results.coverage) >= 80 ? '✅' : '⚠️']
-            ]);
-
-            await core.summary.write();
-
-            // Set outputs for potential notification
-            core.setOutput('critical_issues', criticalIssues);
-            core.setOutput('warning_issues', warningIssues);
-            core.setOutput('total_issues', criticalIssues + warningIssues);
-
-      - name: Send OPS-Zeta notification
-        if: github.event_name == 'schedule' && github.event.inputs.dry_run != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Sending OPS-Zeta scan completion notification..."
-          gh workflow run delta-notify.yml \
-            -f event_type="quality_scan" \
-            -f title="🔍 OPS-Zeta Quality Scan Complete" \
-            -f message="Daily quality scan completed. Critical issues: ${{ steps.analyze-results.outputs.critical_issues || 0 }}, Warnings: ${{ steps.analyze-results.outputs.warning_issues || 0 }}" \
-            -f severity="${{ steps.analyze-results.outputs.critical_issues > 0 && 'critical' || 'info' }}" \
-            -f dry_run="false"
+    static-analysis:
+        runs-on: ubuntu-latest
+        outputs:
+            eslint-issues: ${{ steps.eslint.outputs.issues }}
+            dart-issues: ${{ steps.dart-analyze.outputs.issues }}
+            metrics-issues: ${{ steps.code-metrics.outputs.issues }}
+            smells-detected: ${{ steps.code-smells.outputs.detected }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "20"
+                  cache: "npm"
+                  cache-dependency-path: functions/package-lock.json
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+        
+                  cache: true
+
+            - name: Install dependencies
+              run: |
+                  cd functions && npm ci
+                  flutter pub get
+
+            - name: ESLint Analysis (Functions)
+              id: eslint
+              run: |
+                  cd functions
+                  echo "Running ESLint analysis..."
+
+                  # Run ESLint with JSON output
+                  npx eslint src/ --format json --output-file ../eslint-results.json || true
+
+                  # Count issues
+                  ISSUES=$(node -e "
+                    const results = require('./eslint-results.json');
+                    const total = results.reduce((sum, file) => sum + file.errorCount + file.warningCount, 0);
+                    console.log(total);
+                  ")
+
+                  echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+                  echo "Found $ISSUES ESLint issues"
+
+            - name: Dart Analyzer
+              id: dart-analyze
+              run: |
+                  echo "Running Dart analyzer..."
+
+                  # Run analyzer with machine format
+                  flutter analyze --format machine > dart-analyze-results.txt 2>&1 || true
+
+                  # Count issues (lines that don't start with "Analyzing")
+                  ISSUES=$(grep -v "^Analyzing" dart-analyze-results.txt | grep -v "^No issues found" | wc -l || echo "0")
+
+                  echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+                  echo "Found $ISSUES Dart analyzer issues"
+
+            - name: Code Metrics Analysis
+              id: code-metrics
+              run: |
+                  echo "Running dart_code_metrics..."
+
+                  # Install dart_code_metrics
+                  dart pub global activate dart_code_metrics
+
+                  # Run metrics analysis
+                  dart pub global run dart_code_metrics:metrics analyze lib --reporter=json --output-file=metrics-results.json || true
+
+                  # Count violations
+                  ISSUES=0
+                  if [ -f "metrics-results.json" ]; then
+                    ISSUES=$(node -e "
+                      try {
+                        const data = require('./metrics-results.json');
+                        const violations = data.records ? data.records.reduce((sum, record) =>
+                          sum + (record.issues ? record.issues.length : 0), 0) : 0;
+                        console.log(violations);
+                      } catch(e) {
+                        console.log('0');
+                      }
+                    ")
+                  fi
+
+                  echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+                  echo "Found $ISSUES code metrics violations"
+
+            - name: Code Smells Detection
+              id: code-smells
+              run: |
+                  echo "Detecting code smells..."
+
+                  SMELLS=0
+
+                  # Long files (>1000 lines)
+                  LONG_FILES=$(find lib -name "*.dart" -exec wc -l {} + | awk '$1 > 1000 {print $2}' | wc -l)
+                  echo "Long files (>1000 LOC): $LONG_FILES"
+
+                  # Large functions files (>500 lines)
+                  LARGE_JS_FILES=$(find functions/src -name "*.ts" -exec wc -l {} + | awk '$1 > 500 {print $2}' | wc -l)
+                  echo "Large TypeScript files (>500 LOC): $LARGE_JS_FILES"
+
+                  # TODO comments older than 30 days
+                  OLD_TODOS=0
+                  if command -v git &> /dev/null; then
+                    # Find TODO comments in recent commits (approximation)
+                    OLD_TODOS=$(git log --since="30 days ago" --grep="TODO" --oneline | wc -l)
+                  fi
+                  echo "Old TODO comments: $OLD_TODOS"
+
+                  # Unused exports (simplified check)
+                  UNUSED_EXPORTS=0
+                  if [ -d "functions/src" ]; then
+                    # Check for exports that might be unused (basic heuristic)
+                    UNUSED_EXPORTS=$(grep -r "export.*function\|export.*const\|export.*class" functions/src --include="*.ts" | wc -l)
+                    # This is a rough estimate - real detection would need more sophisticated analysis
+                    UNUSED_EXPORTS=$((UNUSED_EXPORTS / 10)) # Rough approximation
+                  fi
+                  echo "Potentially unused exports: $UNUSED_EXPORTS"
+
+                  SMELLS=$((LONG_FILES + LARGE_JS_FILES + OLD_TODOS + UNUSED_EXPORTS))
+
+                  echo "detected=$SMELLS" >> $GITHUB_OUTPUT
+                  echo "Total code smells detected: $SMELLS"
+
+            - name: Upload analysis artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: code-analysis-results
+                  path: |
+                      eslint-results.json
+                      dart-analyze-results.txt
+                      metrics-results.json
+
+    security-scan:
+        runs-on: ubuntu-latest
+        outputs:
+            npm-vulnerabilities: ${{ steps.npm-audit.outputs.vulnerabilities }}
+            secrets-detected: ${{ steps.secret-scan.outputs.detected }}
+            dependency-issues: ${{ steps.dep-health.outputs.issues }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # Full history for secret scanning
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: "20"
+                  cache: "npm"
+                  cache-dependency-path: functions/package-lock.json
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+        
+                  cache: true
+
+            - name: Install dependencies
+              run: |
+                  cd functions && npm ci
+                  flutter pub get
+
+            - name: NPM Security Audit
+              id: npm-audit
+              run: |
+                  cd functions
+                  echo "Running npm audit..."
+
+                  # Run audit and capture output
+                  npm audit --json > ../npm-audit-results.json 2>&1 || true
+
+                  # Count vulnerabilities
+                  VULNS=$(node -e "
+                    try {
+                      const audit = require('./npm-audit-results.json');
+                      const critical = audit.metadata?.vulnerabilities?.critical || 0;
+                      const high = audit.metadata?.vulnerabilities?.high || 0;
+                      console.log(critical + high);
+                    } catch(e) {
+                      console.log('0');
+                    }
+                  ")
+
+                  echo "vulnerabilities=$VULNS" >> $GITHUB_OUTPUT
+                  echo "Found $VULNS critical/high npm vulnerabilities"
+
+            - name: Flutter Dependency Check
+              run: |
+                  echo "Checking Flutter dependencies..."
+                  flutter pub outdated > flutter-outdated.txt 2>&1 || true
+
+                  # Check for security advisories (if available)
+                  echo "Flutter dependency status logged"
+
+            - name: Secret Scanning with gitleaks
+              id: secret-scan
+              run: |
+                  echo "Running secret detection..."
+
+                  # Install gitleaks
+                  wget -O gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+                  tar -xzf gitleaks.tar.gz
+                  chmod +x gitleaks
+
+                  # Run gitleaks
+                  ./gitleaks detect --report-format json --report-path gitleaks-results.json --verbose || true
+
+                  # Count secrets found
+                  SECRETS=0
+                  if [ -f "gitleaks-results.json" ]; then
+                    SECRETS=$(jq length gitleaks-results.json 2>/dev/null || echo "0")
+                  fi
+
+                  echo "detected=$SECRETS" >> $GITHUB_OUTPUT
+                  echo "Found $SECRETS potential secrets"
+
+            - name: Dependency Health Check
+              id: dep-health
+              run: |
+                  echo "Checking dependency health..."
+
+                  ISSUES=0
+
+                  # Check for critical npm vulnerabilities
+                  if [ -f "npm-audit-results.json" ]; then
+                    CRITICAL_NPM=$(node -e "
+                      try {
+                        const audit = require('./npm-audit-results.json');
+                        console.log(audit.metadata?.vulnerabilities?.critical || 0);
+                      } catch(e) {
+                        console.log('0');
+                      }
+                    ")
+                    ISSUES=$((ISSUES + CRITICAL_NPM))
+                  fi
+
+                  # Check Flutter dependency freshness (simplified)
+                  OUTDATED_FLUTTER=0
+                  if [ -f "flutter-outdated.txt" ]; then
+                    # Count lines mentioning outdated packages
+                    OUTDATED_FLUTTER=$(grep -c "latest:" flutter-outdated.txt || echo "0")
+                  fi
+
+                  # Only count major version gaps as issues
+                  ISSUES=$((ISSUES + OUTDATED_FLUTTER / 5))
+
+                  echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+                  echo "Found $ISSUES critical dependency issues"
+
+            - name: Upload security artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: security-scan-results
+                  path: |
+                      npm-audit-results.json
+                      flutter-outdated.txt
+                      gitleaks-results.json
+
+    test-reliability:
+        runs-on: ubuntu-latest
+        outputs:
+            flaky-tests: ${{ steps.flaky-detection.outputs.detected }}
+            test-failures: ${{ steps.test-runs.outputs.failures }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+        
+                  cache: true
+
+            - name: Install dependencies
+              run: flutter pub get
+
+            - name: Test Run #1
+              id: test-run-1
+              run: |
+                  echo "Running test suite - attempt 1"
+                  flutter test --reporter json > test-results-1.json 2>&1 || echo "Tests may have failed"
+
+            - name: Test Run #2
+              id: test-run-2
+              run: |
+                  echo "Running test suite - attempt 2"
+                  flutter test --reporter json > test-results-2.json 2>&1 || echo "Tests may have failed"
+
+            - name: Test Run #3
+              id: test-run-3
+              run: |
+                  echo "Running test suite - attempt 3"
+                  flutter test --reporter json > test-results-3.json 2>&1 || echo "Tests may have failed"
+
+            - name: Flaky Test Detection
+              id: flaky-detection
+              run: |
+                  echo "Analyzing test consistency..."
+
+                  FLAKY=0
+
+                  # Compare test results (simplified detection)
+                  # In a real implementation, this would parse JSON and compare specific test outcomes
+
+                  if [ -f "test-results-1.json" ] && [ -f "test-results-2.json" ] && [ -f "test-results-3.json" ]; then
+                    # Check if file sizes differ significantly (indication of different outcomes)
+                    SIZE1=$(wc -c < test-results-1.json)
+                    SIZE2=$(wc -c < test-results-2.json)
+                    SIZE3=$(wc -c < test-results-3.json)
+
+                    # If sizes differ by more than 10%, might indicate flaky tests
+                    DIFF12=$((SIZE1 - SIZE2))
+                    DIFF13=$((SIZE1 - SIZE3))
+
+                    if [ ${DIFF12#-} -gt $((SIZE1 / 10)) ] || [ ${DIFF13#-} -gt $((SIZE1 / 10)) ]; then
+                      FLAKY=1
+                      echo "Potential flaky tests detected based on result variance"
+                    fi
+                  fi
+
+                  echo "detected=$FLAKY" >> $GITHUB_OUTPUT
+                  echo "Flaky tests detected: $FLAKY"
+
+            - name: Test Summary
+              id: test-runs
+              run: |
+                  echo "Summarizing test runs..."
+
+                  FAILURES=0
+
+                  # Count failures across runs (simplified)
+                  for i in 1 2 3; do
+                    if [ -f "test-results-$i.json" ]; then
+                      # Look for failure indicators in test output
+                      FAIL_COUNT=$(grep -c "FAIL\|ERROR\|failed" "test-results-$i.json" || echo "0")
+                      FAILURES=$((FAILURES + FAIL_COUNT))
+                    fi
+                  done
+
+                  echo "failures=$FAILURES" >> $GITHUB_OUTPUT
+                  echo "Total test failures across runs: $FAILURES"
+
+            - name: Upload test artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-reliability-results
+                  path: |
+                      test-results-*.json
+
+    coverage-analysis:
+        runs-on: ubuntu-latest
+        outputs:
+            coverage-percentage: ${{ steps.coverage.outputs.percentage }}
+            coverage-delta: ${{ steps.coverage-delta.outputs.delta }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  channel: "stable"
+        
+                  cache: true
+
+            - name: Install dependencies
+              run: flutter pub get
+
+            - name: Run tests with coverage
+              id: coverage
+              run: |
+                  echo "Running tests with coverage analysis..."
+
+                  flutter test --coverage
+
+                  # Calculate coverage percentage
+                  COVERAGE=0
+                  if [ -f "coverage/lcov.info" ]; then
+                    # Install lcov for processing
+                    sudo apt-get update && sudo apt-get install -y lcov
+
+                    # Generate coverage report
+                    lcov --summary coverage/lcov.info > coverage-summary.txt 2>&1 || true
+
+                    # Extract coverage percentage
+                    COVERAGE=$(grep -o "lines\.*[0-9.]*%" coverage-summary.txt | grep -o "[0-9.]*" | head -1 || echo "0")
+                  fi
+
+                  echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+                  echo "Current coverage: $COVERAGE%"
+
+            - name: Coverage Delta Analysis
+              id: coverage-delta
+              run: |
+                  echo "Analyzing coverage delta..."
+
+                  # For now, we'll just report current coverage
+                  # In a full implementation, this would compare against main branch
+
+                  CURRENT_COVERAGE="${{ steps.coverage.outputs.percentage }}"
+                  BASELINE_COVERAGE="75" # Placeholder baseline
+
+                  DELTA=$(echo "$CURRENT_COVERAGE - $BASELINE_COVERAGE" | bc -l 2>/dev/null || echo "0")
+
+                  echo "delta=$DELTA" >> $GITHUB_OUTPUT
+                  echo "Coverage delta from baseline: $DELTA%"
+
+            - name: Upload coverage artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-results
+                  path: |
+                      coverage/lcov.info
+                      coverage-summary.txt
+
+    issue-creation:
+        needs:
+            [
+                static-analysis,
+                security-scan,
+                test-reliability,
+                coverage-analysis,
+            ]
+        runs-on: ubuntu-latest
+        if: always() && github.event.inputs.dry_run != 'true'
+        outputs:
+            critical_issues: ${{ steps.analyze-results.outputs.critical_issues }}
+            warning_issues: ${{ steps.analyze-results.outputs.warning_issues }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Analyze Results and Create Issues
+              id: analyze-results
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const dry = '${{ github.event.inputs.dry_run }}' === 'true';
+
+                      console.log('🔍 OPS-Zeta Analysis Results');
+                      console.log(`Dry Run: ${dry}`);
+
+                      // Collect all scan results
+                      const results = {
+                        eslint: '${{ needs.static-analysis.outputs.eslint-issues }}' || '0',
+                        dartAnalyzer: '${{ needs.static-analysis.outputs.dart-issues }}' || '0',
+                        codeMetrics: '${{ needs.static-analysis.outputs.metrics-issues }}' || '0',
+                        codeSmells: '${{ needs.static-analysis.outputs.smells-detected }}' || '0',
+                        npmVulns: '${{ needs.security-scan.outputs.npm-vulnerabilities }}' || '0',
+                        secrets: '${{ needs.security-scan.outputs.secrets-detected }}' || '0',
+                        depIssues: '${{ needs.security-scan.outputs.dependency-issues }}' || '0',
+                        flakyTests: '${{ needs.test-reliability.outputs.flaky-tests }}' || '0',
+                        testFailures: '${{ needs.test-reliability.outputs.test-failures }}' || '0',
+                        coverage: '${{ needs.coverage-analysis.outputs.coverage-percentage }}' || '0',
+                        coverageDelta: '${{ needs.coverage-analysis.outputs.coverage-delta }}' || '0'
+                      };
+
+                      console.log('Results:', results);
+
+                      // Calculate severity
+                      const criticalIssues = parseInt(results.secrets) + parseInt(results.npmVulns);
+                      const warningIssues = parseInt(results.eslint) + parseInt(results.dartAnalyzer) +
+                                           parseInt(results.codeMetrics) + parseInt(results.codeSmells);
+
+                      // Get current sprint milestone for issue assignment
+                      let currentMilestone = null;
+                      try {
+                        const milestones = await github.rest.issues.listMilestones({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          state: 'open',
+                          sort: 'due_on',
+                          direction: 'asc'
+                        });
+
+                        // Find current sprint (assumes Sprint-YYMM-WNN naming)
+                        const now = new Date();
+                        const currentSprintPattern = /Sprint-\d{4}-W\d{2}/;
+                        currentMilestone = milestones.data.find(m =>
+                          currentSprintPattern.test(m.title) &&
+                          new Date(m.due_on) > now
+                        );
+                      } catch (error) {
+                        console.log('Could not find current sprint milestone:', error.message);
+                      }
+
+                      // Create issues for critical problems
+                      if (criticalIssues > 0 && !dry) {
+                        const issueTitle = `🚨 OPS-Zeta: Critical Security Issues Detected`;
+                        const issueBody = `# Critical Security Issues
+
+                      OPS-Zeta has detected ${criticalIssues} critical security issues that require immediate attention:
+
+                      ## Issues Found
+                      - **Secrets Detected**: ${results.secrets}
+                      - **Critical/High NPM Vulnerabilities**: ${results.npmVulns}
+
+                      ## Actions Required
+                      1. Review and remove any exposed secrets
+                      2. Update vulnerable dependencies
+                      3. Run security scan again to verify fixes
+
+                      **Priority**: P0 - Critical
+                      **Assigned by**: OPS-Zeta Autonomous QA
+                      **Scan Date**: ${new Date().toISOString()}
+                      `;
+
+                        await github.rest.issues.create({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          title: issueTitle,
+                          body: issueBody,
+                          labels: ['security', 'P0', 'ops-zeta', 'qa:blocking'],
+                          milestone: currentMilestone?.number
+                        });
+
+                        console.log('✅ Created critical security issue');
+                      }
+
+                      // Create tech debt issues for warnings
+                      if (warningIssues > 10 && !dry) {
+                        const issueTitle = `⚠️ OPS-Zeta: Code Quality Issues Detected`;
+                        const issueBody = `# Code Quality Issues
+
+                      OPS-Zeta has detected ${warningIssues} code quality issues that should be addressed:
+
+                      ## Issues Found
+                      - **ESLint Issues**: ${results.eslint}
+                      - **Dart Analyzer Issues**: ${results.dartAnalyzer}
+                      - **Code Metrics Violations**: ${results.codeMetrics}
+                      - **Code Smells**: ${results.codeSmells}
+
+                      ## Recommendations
+                      1. Fix linting and analyzer issues
+                      2. Refactor large files and functions
+                      3. Address code metrics violations
+                      4. Clean up old TODOs and unused code
+
+                      **Priority**: P2 - Tech Debt
+                      **Assigned by**: OPS-Zeta Autonomous QA
+                      **Scan Date**: ${new Date().toISOString()}
+                      `;
+
+                        await github.rest.issues.create({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          title: issueTitle,
+                          body: issueBody,
+                          labels: ['tech-debt', 'P2', 'ops-zeta'],
+                          milestone: currentMilestone?.number
+                        });
+
+                        console.log('✅ Created code quality issue');
+                      }
+
+                      // Create issue for flaky tests
+                      if (parseInt(results.flakyTests) > 0 && !dry) {
+                        const issueTitle = `🔄 OPS-Zeta: Flaky Tests Detected`;
+                        const issueBody = `# Flaky Test Detection
+
+                      OPS-Zeta has detected potentially flaky tests that produce inconsistent results:
+
+                      ## Issues Found
+                      - **Flaky Tests Detected**: ${results.flakyTests}
+                      - **Test Failures**: ${results.testFailures}
+
+                      ## Actions Required
+                      1. Review test output artifacts for inconsistencies
+                      2. Identify and fix non-deterministic tests
+                      3. Add test:flaky label to problematic tests
+                      4. Consider quarantine for unreliable tests
+
+                      **Priority**: P1 - Quality
+                      **Assigned by**: OPS-Zeta Autonomous QA
+                      **Scan Date**: ${new Date().toISOString()}
+                      `;
+
+                        await github.rest.issues.create({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          title: issueTitle,
+                          body: issueBody,
+                          labels: ['testing', 'test:flaky', 'P1', 'ops-zeta'],
+                          milestone: currentMilestone?.number
+                        });
+
+                        console.log('✅ Created flaky test issue');
+                      }
+
+                      // Generate summary
+                      core.summary.addHeading('OPS-Zeta Quality Scan Results', 2);
+                      core.summary.addTable([
+                        ['Category', 'Issues Found', 'Status'],
+                        ['ESLint', results.eslint, results.eslint === '0' ? '✅' : '⚠️'],
+                        ['Dart Analyzer', results.dartAnalyzer, results.dartAnalyzer === '0' ? '✅' : '⚠️'],
+                        ['Code Metrics', results.codeMetrics, results.codeMetrics === '0' ? '✅' : '⚠️'],
+                        ['Code Smells', results.codeSmells, results.codeSmells === '0' ? '✅' : '⚠️'],
+                        ['NPM Vulnerabilities', results.npmVulns, results.npmVulns === '0' ? '✅' : '🚨'],
+                        ['Secret Detection', results.secrets, results.secrets === '0' ? '✅' : '🚨'],
+                        ['Dependency Issues', results.depIssues, results.depIssues === '0' ? '✅' : '⚠️'],
+                        ['Flaky Tests', results.flakyTests, results.flakyTests === '0' ? '✅' : '🔄'],
+                        ['Test Coverage', `${results.coverage}%`, parseFloat(results.coverage) >= 80 ? '✅' : '⚠️']
+                      ]);
+
+                      await core.summary.write();
+
+                      // Set outputs for potential notification
+                      core.setOutput('critical_issues', criticalIssues);
+                      core.setOutput('warning_issues', warningIssues);
+                      core.setOutput('total_issues', criticalIssues + warningIssues);
+
+            - name: Send OPS-Zeta notification
+              if: github.event_name == 'schedule' && github.event.inputs.dry_run != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Sending OPS-Zeta scan completion notification..."
+                  gh workflow run delta-notify.yml \
+                    -f event_type="quality_scan" \
+                    -f title="🔍 OPS-Zeta Quality Scan Complete" \
+                    -f message="Daily quality scan completed. Critical issues: ${{ steps.analyze-results.outputs.critical_issues || 0 }}, Warnings: ${{ steps.analyze-results.outputs.warning_issues || 0 }}" \
+                    -f severity="${{ steps.analyze-results.outputs.critical_issues > 0 && 'critical' || 'info' }}" \
+                    -f dry_run="false"
