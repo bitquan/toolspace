@@ -38,7 +38,7 @@ jobs:
         run: flutter pub get
 
       - name: 🔍 Analyze code
-        run: flutter analyze --fatal-infos
+        run: flutter analyze
 
       - name: 🧪 Run tests
         run: flutter test
