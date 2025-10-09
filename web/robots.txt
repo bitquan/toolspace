@@ -1,0 +1,16 @@
+# Toolspace Robots Configuration
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow private/admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_firebase/
+
+# Sitemap location
+Sitemap: https://toolspace.dev/sitemap.xml
+
+# Crawl delay (optional, 1 second)
+Crawl-delay: 1

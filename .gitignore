@@ -340,7 +340,7 @@ dist
 
 # Generated files
 /functions/lib/
-/web/
+build/web/
 
 # OS generated files
 Thumbs.db
