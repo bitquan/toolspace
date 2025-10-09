@@ -23,9 +23,9 @@ class PaletteExporter {
         .map((color) => {
               'hex': ColorUtils.toHex(color),
               'rgb': ColorUtils.toRgb(color),
-              'r': color.red,
-              'g': color.green,
-              'b': color.blue,
+              'r': (color.r * 255.0).round() & 0xff,
+              'g': (color.g * 255.0).round() & 0xff,
+              'b': (color.b * 255.0).round() & 0xff,
             })
         .toList();
 
@@ -65,11 +65,14 @@ class PaletteExporter {
       offset += 2;
 
       // RGB values (6 bytes total, 2 bytes each, 0-65535 range)
-      bytes.setUint16(offset, (color.red * 257), Endian.big); // 257 = 65535/255
+      final r = (color.r * 255.0).round() & 0xff;
+      final g = (color.g * 255.0).round() & 0xff;
+      final b = (color.b * 255.0).round() & 0xff;
+      bytes.setUint16(offset, (r * 257), Endian.big); // 257 = 65535/255
       offset += 2;
-      bytes.setUint16(offset, (color.green * 257), Endian.big);
+      bytes.setUint16(offset, (g * 257), Endian.big);
       offset += 2;
-      bytes.setUint16(offset, (color.blue * 257), Endian.big);
+      bytes.setUint16(offset, (b * 257), Endian.big);
       offset += 2;
     }
 

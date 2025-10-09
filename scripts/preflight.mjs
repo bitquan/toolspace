@@ -1,242 +1,376 @@
 #!/usr/bin/env node
 
 /**
- * Preflight Check Script for Toolspace
+ * OPS-LocalGate: Preflight check system
+ * Ensures local tests are green before allowing push
  *
- * Runs comprehensive checks before push/commit:
- * - Flutter analyze
- * - Flutter tests (unit, golden, navigation)
- * - Flutter build web
- * - Playwright E2E smoke tests
- *
- * Emits pr-ci-summary.json with results for CI integration
+ * Usage:
+ *   npm run preflight              # Full suite
+ *   npm run preflight:quick        # Skip Playwright + web build
+ *   node scripts/preflight.mjs --quick --fix --no-emulators
  */
 
-import { spawn } from "child_process";
-import { writeFileSync } from "fs";
+import { $ } from "zx";
+import { execa } from "execa";
+import { cyan, green, red, yellow, bold, dim } from "colorette";
+import { mkdir, writeFile } from "fs/promises";
+import { existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import kill from "tree-kill";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const projectRoot = join(__dirname, "..");
+const ROOT = join(__dirname, "..");
 
-// ANSI color codes
-const colors = {
-  reset: "\x1b[0m",
-  green: "\x1b[32m",
-  red: "\x1b[31m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  bold: "\x1b[1m",
+// Parse flags
+const args = process.argv.slice(2);
+const FLAGS = {
+  quick: args.includes("--quick"),
+  noEmulators: args.includes("--no-emulators"),
+  fix: args.includes("--fix"),
 };
 
-const log = {
-  info: (msg) => console.log(`${colors.blue}ℹ${colors.reset} ${msg}`),
-  success: (msg) => console.log(`${colors.green}✓${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}✗${colors.reset} ${msg}`),
-  warn: (msg) => console.log(`${colors.yellow}⚠${colors.reset} ${msg}`),
-  step: (msg) => console.log(`\n${colors.bold}${msg}${colors.reset}`),
-};
+// Setup logging
+const LOG_DIR = join(ROOT, "local-ci", "logs");
+const SUMMARY_PATH = join(ROOT, "local-ci", "summary.md");
+const JSON_SUMMARY_PATH = join(ROOT, "local-ci", "pr-ci-summary.json");
+const SIM_LOG_PATH = join(ROOT, "local-ci", "pr-ci-sim.log");
 
-/**
- * Execute a command and return its result
- */
-function runCommand(command, args, options = {}) {
-  return new Promise((resolve, reject) => {
-    log.info(`Running: ${command} ${args.join(" ")}`);
+await mkdir(LOG_DIR, { recursive: true });
 
-    const proc = spawn(command, args, {
-      cwd: options.cwd || projectRoot,
-      stdio: "inherit",
-      shell: true,
-      ...options,
-    });
+let globalLogs = "";
+let results = [];
+let startTime = Date.now();
 
-    proc.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`Command failed with exit code ${code}`));
-      }
-    });
-
-    proc.on("error", (err) => {
-      reject(err);
-    });
-  });
+function log(message) {
+  console.log(message);
+  globalLogs += message + "\n";
 }
 
-/**
- * Main preflight check sequence
- */
-async function runPreflight() {
-  const results = {
-    success: true,
+function banner(text) {
+  const line = "=".repeat(60);
+  log("");
+  log(cyan(line));
+  log(cyan(bold(`  ${text}`)));
+  log(cyan(line));
+  log("");
+}
+
+async function writeLog(filename, content) {
+  await writeFile(join(LOG_DIR, filename), content, "utf-8");
+}
+
+async function checkTool(name, command, versionFlag = "--version") {
+  try {
+    const { stdout } = await execa(command, [versionFlag], { reject: false });
+    const version = stdout.split("\n")[0].trim();
+    log(green(`✓ ${name}: ${dim(version)}`));
+    return true;
+  } catch (err) {
+    log(red(`✗ ${name}: NOT FOUND`));
+    return false;
+  }
+}
+
+async function runStep(name, command, options = {}) {
+  const startTime = Date.now();
+  log(bold(`\n▶ ${name}...`));
+
+  const logFile = name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".log";
+  let output = "";
+  let success = false;
+  let error = null;
+
+  try {
+    const result = await execa(command, options.args || [], {
+      cwd: options.cwd || ROOT,
+      shell: true,
+      all: true,
+      reject: false,
+      ...options.execaOpts,
+    });
+
+    output = result.all || result.stdout || "";
+    success = result.exitCode === 0;
+    error = success ? null : result.stderr || `Exit code: ${result.exitCode}`;
+
+    if (success) {
+      log(green(`✓ ${name} PASSED`) + dim(` (${Date.now() - startTime}ms)`));
+    } else {
+      log(red(`✗ ${name} FAILED`) + dim(` (${Date.now() - startTime}ms)`));
+      if (error) log(red(`  ${error.split("\n")[0]}`));
+    }
+  } catch (err) {
+    output = err.message;
+    error = err.message;
+    log(red(`✗ ${name} ERROR: ${err.message}`));
+  }
+
+  await writeLog(logFile, output);
+
+  results.push({
+    name,
+    success,
+    duration: Date.now() - startTime,
+    error,
+    logFile,
+  });
+
+  return success;
+}
+
+async function writeSummary() {
+  const passed = results.filter((r) => r.success).length;
+  const failed = results.filter((r) => !r.success).length;
+  const total = results.length;
+  const success = failed === 0;
+  const totalDuration = Date.now() - startTime;
+
+  // Markdown summary
+  let md = `# Local CI - Preflight Summary\n\n`;
+  md += `**Generated:** ${new Date().toISOString()}\n\n`;
+  md += `**Flags:** ${JSON.stringify(FLAGS)}\n\n`;
+  md += `## Results: ${passed}/${total} passed\n\n`;
+
+  md += `| Step | Status | Duration | Log |\n`;
+  md += `|------|--------|----------|-----|\n`;
+
+  for (const r of results) {
+    const status = r.success ? "✅ PASS" : "❌ FAIL";
+    const duration = `${r.duration}ms`;
+    md += `| ${r.name} | ${status} | ${duration} | [${r.logFile}](logs/${r.logFile}) |\n`;
+  }
+
+  if (failed > 0) {
+    md += `\n## Failures\n\n`;
+    for (const r of results.filter((r) => !r.success)) {
+      md += `### ${r.name}\n`;
+      md += `\`\`\`\n${r.error || "See log file"}\n\`\`\`\n\n`;
+    }
+  }
+
+  await writeFile(SUMMARY_PATH, md, "utf-8");
+
+  // JSON summary (matches CI format)
+  const jsonSummary = {
     timestamp: new Date().toISOString(),
-    checks: {},
+    summary: {
+      success,
+      passed,
+      failed,
+      total,
+      duration: totalDuration,
+    },
+    flags: FLAGS,
+    results: results.map((r) => ({
+      name: r.name,
+      success: r.success,
+      duration: r.duration,
+      exitCode: r.success ? 0 : 1,
+      error: r.error || null,
+      logFile: r.logFile,
+    })),
   };
 
-  try {
-    log.step("🔍 Step 1: Flutter Analyze");
-    await runCommand("flutter", ["analyze"]);
-    log.success("Flutter analyze passed");
-    results.checks.analyze = { success: true };
-  } catch (error) {
-    log.error("Flutter analyze failed");
-    results.checks.analyze = { success: false, error: error.message };
-    results.success = false;
-  }
+  await writeFile(
+    JSON_SUMMARY_PATH,
+    JSON.stringify(jsonSummary, null, 2),
+    "utf-8"
+  );
 
-  try {
-    log.step("🧪 Step 2: Flutter Tests (Unit + Golden + Navigation)");
-    await runCommand("flutter", ["test", "--reporter", "expanded"]);
-    log.success("All Flutter tests passed");
-    results.checks.flutterTests = { success: true };
-  } catch (error) {
-    log.error("Flutter tests failed");
-    results.checks.flutterTests = { success: false, error: error.message };
-    results.success = false;
-  }
-
-  try {
-    log.step("🏗️  Step 3: Flutter Build Web");
-    await runCommand("flutter", ["build", "web", "--release"]);
-    log.success("Web build completed");
-    results.checks.buildWeb = { success: true };
-  } catch (error) {
-    log.error("Web build failed");
-    results.checks.buildWeb = { success: false, error: error.message };
-    results.success = false;
-  }
-
-  try {
-    log.step("📦 Step 4: Install E2E Dependencies");
-    await runCommand("npm", ["ci"], { cwd: join(projectRoot, "test", "e2e") });
-    log.success("E2E dependencies installed");
-    results.checks.e2eDeps = { success: true };
-  } catch (error) {
-    log.warn("E2E dependencies installation failed (skipping E2E tests)");
-    results.checks.e2eDeps = {
-      success: false,
-      error: error.message,
-      skipped: true,
-    };
-  }
-
-  if (results.checks.e2eDeps?.success) {
-    try {
-      log.step("🎭 Step 5: Install Playwright Browsers");
-      await runCommand(
-        "npx",
-        ["playwright", "install", "--with-deps", "chromium"],
-        {
-          cwd: join(projectRoot, "test", "e2e"),
-        }
-      );
-      log.success("Playwright browsers installed");
-      results.checks.playwrightInstall = { success: true };
-    } catch (error) {
-      log.warn("Playwright installation failed (skipping E2E tests)");
-      results.checks.playwrightInstall = {
-        success: false,
-        error: error.message,
-        skipped: true,
-      };
-    }
-
-    if (results.checks.playwrightInstall?.success) {
-      let serverProcess;
-      try {
-        log.step("🌐 Step 6: Start Web Server");
-
-        // Start server in background
-        serverProcess = spawn("npm", ["run", "serve"], {
-          cwd: join(projectRoot, "test", "e2e"),
-          shell: true,
-          stdio: "pipe",
-        });
-
-        // Wait for server to be ready
-        log.info("Waiting for server at http://localhost:4173...");
-        await new Promise((resolve, reject) => {
-          const maxAttempts = 30;
-          let attempts = 0;
-
-          const checkServer = async () => {
-            try {
-              const response = await fetch("http://localhost:4173");
-              if (response.ok) {
-                log.success("Server is ready");
-                resolve();
-              } else {
-                throw new Error("Server not ready");
-              }
-            } catch {
-              attempts++;
-              if (attempts >= maxAttempts) {
-                reject(new Error("Server failed to start"));
-              } else {
-                setTimeout(checkServer, 1000);
-              }
-            }
-          };
-
-          checkServer();
-        });
-
-        log.step("🎯 Step 7: Run Playwright E2E Tests");
-        await runCommand("npm", ["test"], {
-          cwd: join(projectRoot, "test", "e2e"),
-        });
-        log.success("E2E tests passed");
-        results.checks.e2eTests = { success: true };
-      } catch (error) {
-        log.error("E2E tests failed");
-        results.checks.e2eTests = { success: false, error: error.message };
-        results.success = false;
-      } finally {
-        if (serverProcess) {
-          log.info("Stopping web server...");
-          serverProcess.kill();
-        }
-      }
-    }
-  }
-
-  // Write results to file
-  const summaryPath = join(projectRoot, "pr-ci-summary.json");
-  writeFileSync(summaryPath, JSON.stringify(results, null, 2));
-  log.info(`Results written to ${summaryPath}`);
-
-  // Final summary
-  console.log("\n" + "=".repeat(60));
-  if (results.success) {
-    log.success(`${colors.bold}All preflight checks passed! ✨${colors.reset}`);
-    console.log("=".repeat(60) + "\n");
-    process.exit(0);
-  } else {
-    log.error(`${colors.bold}Preflight checks failed${colors.reset}`);
-    console.log("=".repeat(60) + "\n");
-    console.log("Failed checks:");
-    Object.entries(results.checks).forEach(([name, result]) => {
-      if (!result.success && !result.skipped) {
-        console.log(`  - ${name}: ${result.error}`);
-      }
-    });
-    console.log("");
-    process.exit(1);
-  }
+  // Write simulation log (all output)
+  await writeFile(SIM_LOG_PATH, globalLogs, "utf-8");
 }
 
-// Handle errors
-process.on("unhandledRejection", (error) => {
-  log.error(`Unhandled error: ${error.message}`);
-  process.exit(1);
-});
+// Main execution
+(async () => {
+  banner("LOCAL CI – PREFLIGHT");
 
-// Run preflight
-runPreflight().catch((error) => {
-  log.error(`Preflight failed: ${error.message}`);
+  log(dim("Flags:"));
+  log(dim(`  --quick: ${FLAGS.quick}`));
+  log(dim(`  --no-emulators: ${FLAGS.noEmulators}`));
+  log(dim(`  --fix: ${FLAGS.fix}`));
+  log("");
+
+  // Step 1: Tooling checks
+  log(bold("🔧 Checking required tools..."));
+  const tools = [
+    await checkTool("Flutter", "flutter", "--version"),
+    await checkTool("Dart", "dart", "--version"),
+    await checkTool("Node.js", "node", "--version"),
+    await checkTool("npm", "npm", "--version"),
+    await checkTool("Firebase CLI", "firebase", "--version"),
+  ];
+
+  if (!tools.every(Boolean)) {
+    log(red("\n✗ Missing required tools. Install and retry."));
+    process.exit(1);
+  }
+
+  // Step 2: Flutter app checks
+  banner("Flutter App Checks");
+
+  if (
+    !(await runStep("Flutter pub get", "flutter", { args: ["pub", "get"] }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Flutter pub get"));
+    await writeSummary();
+    process.exit(1);
+  }
+
+  // ZERO TOLERANCE: Fail on ANY error or warning
+  const analyzeArgs = ["analyze", "--fatal-warnings", "--fatal-infos"];
+  if (
+    !(await runStep("Flutter analyze (ZERO tolerance)", "flutter", {
+      args: analyzeArgs,
+    }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Flutter analyze"));
+    log(red("   ⚠️  ZERO TOLERANCE: NO errors or warnings allowed!"));
+    log(
+      yellow(
+        "   Hint: Run `flutter analyze --fatal-warnings` locally to see all issues"
+      )
+    );
+    await writeSummary();
+    process.exit(1);
+  }
+
+  if (
+    !(await runStep("Flutter test", "flutter", {
+      args: ["test", "--coverage"],
+    }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Flutter test"));
+    log(yellow("   Hint: Run `flutter test` locally to debug"));
+    await writeSummary();
+    process.exit(1);
+  }
+
+  if (!FLAGS.quick) {
+    if (
+      !(await runStep("Flutter build web", "flutter", {
+        args: ["build", "web", "--release"],
+      }))
+    ) {
+      log(red("\n❌ Preflight FAILED at: Flutter build web"));
+      await writeSummary();
+      process.exit(1);
+    }
+  } else {
+    log(dim("⏩ Skipping Flutter build web (--quick mode)"));
+  }
+
+  // Step 3: Functions checks
+  banner("Functions Checks");
+
+  const functionsDir = join(ROOT, "functions");
+
+  if (
+    !(await runStep("Functions npm ci", "npm", {
+      args: ["ci"],
+      cwd: functionsDir,
+    }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Functions npm ci"));
+    await writeSummary();
+    process.exit(1);
+  }
+
+  // ZERO TOLERANCE: Fail on ANY ESLint warning
+  const lintArgs = FLAGS.fix
+    ? ["run", "lint", "--", "--fix", "--max-warnings=0"]
+    : ["run", "lint", "--", "--max-warnings=0"];
+  if (
+    !(await runStep("Functions lint (ZERO warnings)", "npm", {
+      args: lintArgs,
+      cwd: functionsDir,
+    }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Functions lint"));
+    log(red("   ⚠️  ZERO TOLERANCE: NO warnings allowed!"));
+    log(
+      yellow("   Hint: Try `npm run lint -- --max-warnings=0` in functions/")
+    );
+    log(yellow("   Or use `npm run lint -- --fix` to auto-fix"));
+    await writeSummary();
+    process.exit(1);
+  }
+
+  if (
+    !(await runStep("Functions test", "npm", {
+      args: ["test", "--silent"],
+      cwd: functionsDir,
+    }))
+  ) {
+    log(red("\n❌ Preflight FAILED at: Functions test"));
+    log(yellow("   Hint: Run `npm test` in functions/ to debug"));
+    await writeSummary();
+    process.exit(1);
+  }
+
+  // Step 4: Security rules & E2E
+  banner("Security Rules & E2E Tests");
+
+  const securityDir = join(ROOT, "test", "security");
+
+  if (!FLAGS.quick && !FLAGS.noEmulators) {
+    // Full E2E with emulators and Playwright
+    log(bold("Running full E2E suite with emulators..."));
+
+    const emulatorsCmd = `firebase emulators:exec --project demo-test --only firestore,auth,storage "cd test/security && npm ci && npm run test:rules && npx playwright install --with-deps && npx playwright test --config=playwright.smoke.config.ts"`;
+
+    if (
+      !(await runStep("E2E with emulators", "bash", {
+        args: ["-c", emulatorsCmd],
+      }))
+    ) {
+      log(red("\n❌ Preflight FAILED at: E2E with emulators"));
+      await writeSummary();
+      process.exit(1);
+    }
+  } else {
+    // Quick mode: just security rules
+    log(dim("⏩ Quick mode: running security rules tests only"));
+
+    const securityPkgJson = join(securityDir, "package.json");
+    if (existsSync(securityPkgJson)) {
+      if (
+        !(await runStep("Security rules test", "npm", {
+          args: ["run", "test:rules"],
+          cwd: securityDir,
+        }))
+      ) {
+        log(red("\n❌ Preflight FAILED at: Security rules test"));
+        await writeSummary();
+        process.exit(1);
+      }
+    } else {
+      log(yellow("⚠ test/security not configured, skipping"));
+    }
+  }
+
+  // Success!
+  await writeSummary();
+
+  banner("✅ PREFLIGHT PASSED");
+  log(green(bold("All checks passed! Safe to push.")));
+  log(dim(`\nLogs: ${LOG_DIR}`));
+  log(dim(`Summary: ${SUMMARY_PATH}`));
+  log("");
+
+  process.exit(0);
+})().catch(async (err) => {
+  log(red(`\n❌ FATAL ERROR: ${err.message}`));
+  log(red(err.stack));
+
+  await writeSummary();
+
+  banner("❌ PREFLIGHT FAILED");
+  log(red("Fix errors above and retry."));
+  log(dim(`\nLogs: ${LOG_DIR}`));
+  log(dim(`Summary: ${SUMMARY_PATH}`));
+
   process.exit(1);
 });

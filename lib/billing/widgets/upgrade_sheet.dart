@@ -167,8 +167,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              theme.colorScheme.surface.withOpacity(0.95),
-              theme.colorScheme.surface.withOpacity(0.98),
+              theme.colorScheme.surface.withValues(alpha: 0.95),
+              theme.colorScheme.surface.withValues(alpha: 0.98),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -184,7 +184,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -199,8 +199,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.blue.withOpacity(0.2),
-                          Colors.purple.withOpacity(0.2),
+                          Colors.blue.withValues(alpha: 0.2),
+                          Colors.purple.withValues(alpha: 0.2),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -218,7 +218,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                   Text(
                     'Choose a plan that fits your needs',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -281,28 +281,28 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
         gradient: isCurrent
             ? LinearGradient(
                 colors: [
-                  Colors.green.withOpacity(0.15),
-                  Colors.teal.withOpacity(0.15),
+                  Colors.green.withValues(alpha: 0.15),
+                  Colors.teal.withValues(alpha: 0.15),
                 ],
               )
             : isPopular
                 ? LinearGradient(
                     colors: [
-                      Colors.blue.withOpacity(0.1),
-                      Colors.purple.withOpacity(0.1),
+                      Colors.blue.withValues(alpha: 0.1),
+                      Colors.purple.withValues(alpha: 0.1),
                     ],
                   )
                 : null,
         color: isCurrent || isPopular
             ? null
-            : theme.colorScheme.surface.withOpacity(0.5),
+        : theme.colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCurrent
-              ? Colors.green.withOpacity(0.5)
+              ? Colors.green.withValues(alpha: 0.5)
               : isPopular
-                  ? Colors.blue.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.3),
+                  ? Colors.blue.withValues(alpha: 0.5)
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
           width: isCurrent || isPopular ? 2 : 1,
         ),
       ),
@@ -327,7 +327,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.2),
+                          color: Colors.green.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -358,7 +358,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                         child: Text(
                           '/$interval',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
                       ),
@@ -369,7 +370,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                 Text(
                   plan['description'] as String,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 16),

@@ -4,26 +4,13 @@
 
 Toolspace is a collection of focused, web-based micro-tools designed to help small businesses, freelancers, and individuals accomplish common tasks quickly and efficiently.
 
----
-
-## 🚫 NOT READY FOR LAUNCH
-
-> **⚠️ PRODUCTION DEPLOYMENT BLOCKED**
->
-> All pull requests must pass the **PR CI pipeline** before deployment. The pipeline validates builds, tests, security, and code quality in <10 minutes.
->
-> **Status:** [![PR CI](https://github.com/bitquan/toolspace/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/pr-ci.yml)
-
----
-
-## � PRODUCTION STATUS
+## 🏗️ PRODUCTION STATUS
 
 ✅ **PRODUCTION READY**
 
 **Current Status:** Complete production blueprint implemented with single-environment deployment strategy
 
 **Key Features:**
-
 - ✅ Real user authentication (Google, Apple, Email)
 - ✅ Secure database rules and functions
 - ✅ Stripe billing integration (Free/Pro $9/Pro+ $19)
@@ -32,10 +19,11 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 - ✅ Production monitoring and alerts
 
 **Production Deployment:**
-
 - 🌐 Live at: [toolspace.app](https://toolspace.app)
 - 📊 Status: [![Production Deployment](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml)
 - 🔧 Staging: [![Staging Deployment](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml)
+
+---
 
 ## 🚀 Quick Start
 
@@ -56,19 +44,6 @@ npm run qa
 # 4. Start Firebase emulators
 firebase emulators:start
 ```
-
-## 📚 Documentation
-
-Complete production deployment documentation:
-
-- 📖 [Deployment Guide](DEPLOYMENT.md) - Step-by-step production deployment
-- 🤝 [Contributing Guide](CONTRIBUTING.md) - Development workflow and standards
-- 🏗️ [Architecture Overview](docs/development/coding-standards.md) - System design and patterns
-- 🔧 [Environment Setup](docs/ENVIRONMENT.md) - Configuration and secrets management
-- 🔒 [Security Guide](docs/security/) - Authentication, authorization, and compliance
-- 📊 [API Documentation](docs/backend/API.md) - Backend services and endpoints
-- 🚀 [Operations Manual](docs/ops/) - Monitoring, backup, and incident response
-- ✅ [Production Checklist](PRODUCTION_CHECKLIST.md) - Pre-launch validation steps
 
 ### Development Workflow
 
@@ -166,43 +141,9 @@ Server-assisted file merging and processing for multiple file formats.
 ### Infrastructure
 
 - **Hosting**: Firebase Hosting
-- **CI/CD**: Two-tier GitHub Actions (Lean PR + Heavy Nightly)
+- **CI/CD**: GitHub Actions
 - **Monitoring**: Firebase console + custom logging
 - **Security**: Firestore security rules + input validation
-
-## 🔄 CI/CD Pipeline
-
-Toolspace uses a **two-tier CI strategy** for fast feedback and comprehensive validation:
-
-### PR CI (Lean & Fast) - Required for Merge
-
-Runs on every pull request in <10 minutes:
-
-- ✅ **Flutter Build** - Dependencies, static analysis, web build
-- ✅ **Functions Build** - Dependencies, linting, TypeScript type-check
-- ✅ **Flutter Tests** - Unit tests with coverage
-- ✅ **Functions Tests** - Unit tests (excluding E2E)
-- ✅ **Security Smoke** - Critical security rules (@smoke tagged)
-
-**Run locally before pushing:**
-
-```bash
-make pr-ci
-```
-
-### Nightly CI (Heavy & Comprehensive) - Informational
-
-Runs overnight at 00:30 UTC for deep validation:
-
-- 🔍 **Full E2E Suite** - Playwright tests with artifacts
-- 🛡️ **Deep Security Scans** - CodeQL, Trivy, npm audit
-- 📊 **Coverage Trends** - Track test coverage over time
-- 📦 **Dependency Health** - Outdated packages, security advisories
-- 📈 **Weekly Digest** - Velocity reports and insights
-
-Nightly failures create GitHub issues but **don't block PRs**.
-
-**Documentation:** See [docs/ops/ci.md](docs/ops/ci.md) for full details.
 
 ## 📚 Documentation
 
@@ -247,35 +188,30 @@ toolspace/
 
 ### Contributing
 
+**🚨 ZERO TOLERANCE POLICY: This project must have ZERO errors and ZERO warnings at all times!**
+
+**All pushes are blocked by the Local Gate. Run `npm run preflight` until green.**
+
 1. Fork the repository
 2. Create a feature branch
-3. Make changes with tests
-4. Ensure QA passes (`npm run qa` + `flutter analyze`)
-5. Submit pull request
+3. Run `npm run setup:hooks` (one-time setup)
+4. Make changes with tests
+5. Run `npm run preflight` - **must pass with ZERO errors/warnings before push**
+6. Submit pull request
+
+See [docs/ops/local-gate.md](docs/ops/local-gate.md) for details on the Local Gate system.
+
+**No exceptions. No warnings. No errors. Period.**
 
 ### Quality Standards
 
-All PRs must pass these 5 checks:
+- ✅ **Local Gate**: `npm run preflight` must pass (enforced pre-push)
+- ✅ Backend: All functions tests + lint
+- ✅ Frontend: Flutter analyze + tests + build
+- ✅ Security: Rules tests pass
+- ✅ Documentation must be updated
 
-- ✅ **flutter_build** - Code analysis and web build
-- ✅ **functions_build** - Linting and TypeScript compilation
-- ✅ **tests_flutter** - Unit tests with coverage
-- ✅ **tests_functions** - Backend unit tests
-- ✅ **security_smoke** - Critical security rules
-
-Additional validation runs nightly (informational only).
-
-## � Pricing
-
-### Current Plans
-
-- **Free**: $0 - Access to all tools with basic limits
-- **Pro**: $9/month - Enhanced limits, batch processing, priority support
-- **Pro+**: $19/month - Maximum limits, priority queue, advanced features
-
-All pricing is managed through `config/pricing.json` with Stripe integration for paid plans.
-
-## �🔒 Security
+## 🔒 Security
 
 - All user data is isolated by tenant (user)
 - Firestore security rules enforce access control

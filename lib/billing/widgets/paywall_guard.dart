@@ -250,8 +250,8 @@ class _PaywallGuardState extends State<PaywallGuard> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.orange.withOpacity(0.2),
-                    Colors.deepOrange.withOpacity(0.2),
+                    Colors.orange.withValues(alpha: 0.2),
+                    Colors.deepOrange.withValues(alpha: 0.2),
                   ],
                 ),
                 shape: BoxShape.circle,
@@ -273,7 +273,7 @@ class _PaywallGuardState extends State<PaywallGuard> {
             Text(
               _blockReason ?? 'This feature requires a higher plan',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),

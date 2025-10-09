@@ -135,7 +135,7 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
               decoration: BoxDecoration(
                 border: Border(
                   left: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -150,10 +150,10 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -333,7 +333,7 @@ class _RegexTesterScreenState extends State<RegexTesterScreen>
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
             ),

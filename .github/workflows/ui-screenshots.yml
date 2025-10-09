@@ -1,144 +1,158 @@
 name: 📸 UI Screenshots Automation
 
 on:
-    push:
-        branches:
-            - main
-        paths:
-            - "lib/**"
-            - "web/**"
-            - ".github/workflows/ui-screenshots.yml"
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "web/**"
+      - ".github/workflows/ui-screenshots.yml"
+  workflow_dispatch:
 
 concurrency:
-    group: screenshots-${{ github.ref }}
-    cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
-    capture_screenshots:
-        name: Capture Tool Screenshots
-        runs-on: ubuntu-latest
+  capture_screenshots:
+    name: Capture Tool Screenshots
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v4
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  channel: "stable"
-                  cache: true
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
-            - name: 📦 Get dependencies
-              run: flutter pub get
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-            - name: 🏗️ Build web app
-              run: flutter build web --release
+      - name: 📦 Get dependencies
+        run: flutter pub get
 
-            - name: 🌐 Setup Chrome
-              uses: browser-actions/setup-chrome@latest
+      - name: 🏗️ Build web app
+        run: flutter build web --release
 
-            - name: 🚀 Start local server
-              run: |
-                  cd build/web
-                  python3 -m http.server 8080 &
-                  echo $! > server.pid
-                  sleep 5
+      - name: 🌐 Setup Chrome
+        uses: browser-actions/setup-chrome@latest
 
-            - name: 📸 Capture screenshots
-              run: |
-                  mkdir -p docs/screenshots
+      - name: 🚀 Start local server
+        run: |
+          cd build/web
+          python3 -m http.server 8080 &
+          echo $! > server.pid
+          sleep 5
 
-                  # Tool routes to capture
-                  tools=(
-                    "home"
-                    "text-tools"
-                    "file-merger"
-                    "json-doctor"
-                    "text-diff"
-                    "qr-maker"
-                    "url-short"
-                    "codec-lab"
-                    "time-convert"
-                    "regex-tester"
-                    "id-gen"
-                    "palette-extractor"
-                    "md-to-pdf"
-                    "csv-cleaner"
-                    "image-resizer"
-                    "password-gen"
-                    "json-flatten"
-                    "unit-converter"
-                  )
+      - name: 📸 Capture screenshots
+        run: |
+          mkdir -p docs/screenshots
 
-                  # Install playwright
-                  npm install -g playwright
-                  npx playwright install chromium
+          # Tool routes to capture
+          tools=(
+            "home"
+            "text-tools"
+            "file-merger"
+            "json-doctor"
+            "text-diff"
+            "qr-maker"
+            "url-short"
+            "codec-lab"
+            "time-convert"
+            "regex-tester"
+            "id-gen"
+            "palette-extractor"
+            "md-to-pdf"
+            "csv-cleaner"
+            "image-resizer"
+            "password-gen"
+            "json-flatten"
+            "unit-converter"
+          )
 
-                  # Capture each tool
-                  for tool in "${tools[@]}"; do
-                    echo "📷 Capturing $tool..."
+          # Install playwright
+          npm install -g playwright
+          npx playwright install chromium
 
-                    if [ "$tool" = "home" ]; then
-                      url="http://localhost:8080"
-                      output="docs/screenshots/home.png"
-                    else
-                      url="http://localhost:8080/#/tools/$tool"
-                      output="docs/screenshots/$tool.png"
-                    fi
+          # Capture each tool
+          for tool in "${tools[@]}"; do
+            echo "📷 Capturing $tool..."
 
-                    npx playwright screenshot \
-                      --browser chromium \
-                      --viewport-size 1280,800 \
-                      --wait-for-timeout 3000 \
-                      "$url" \
-                      "$output"
+            if [ "$tool" = "home" ]; then
+              url="http://localhost:8080"
+              output="docs/screenshots/home.png"
+            else
+              url="http://localhost:8080/#/tools/$tool"
+              output="docs/screenshots/$tool.png"
+            fi
 
-                    echo "✅ Saved $output"
-                  done
+            npx playwright screenshot \
+              --browser chromium \
+              --viewport-size 1280,800 \
+              --wait-for-timeout 3000 \
+              "$url" \
+              "$output"
 
-            - name: 🔍 Optimize images
-              run: |
-                  # Install imagemagick
-                  sudo apt-get update
-                  sudo apt-get install -y imagemagick
+            echo "✅ Saved $output"
+          done
 
-                  # Optimize PNGs
-                  for img in docs/screenshots/*.png; do
-                    echo "Optimizing $img..."
-                    convert "$img" -quality 85 -strip "$img"
-                  done
+      - name: 🔍 Optimize images
+        run: |
+          # Install imagemagick
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
-            - name: 📊 Screenshot report
-              run: |
-                  echo "## 📸 Screenshots Generated" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          # Optimize PNGs
+          for img in docs/screenshots/*.png; do
+            echo "Optimizing $img..."
+            convert "$img" -quality 85 -strip "$img"
+          done
 
-                  for img in docs/screenshots/*.png; do
-                    name=$(basename "$img" .png)
-                    size=$(du -h "$img" | cut -f1)
-                    echo "- **$name**: $size" >> $GITHUB_STEP_SUMMARY
-                  done
+      - name: 📊 Screenshot report
+        run: |
+          echo "## 📸 Screenshots Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: 💾 Commit screenshots
-              run: |
-                  git config --global user.name "github-actions[bot]"
-                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          for img in docs/screenshots/*.png; do
+            name=$(basename "$img" .png)
+            size=$(du -h "$img" | cut -f1)
+            echo "- **$name**: $size" >> $GITHUB_STEP_SUMMARY
+          done
 
-                  git add docs/screenshots/*.png
+      - name: 💾 Commit screenshots
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-                  if git diff --staged --quiet; then
-                    echo "No changes to commit"
-                  else
-                    git commit -m "docs: update UI screenshots [skip ci]"
-                    git push
-                  fi
+          git add docs/screenshots/*.png
 
-            - name: 🧹 Cleanup
-              if: always()
-              run: |
-                  if [ -f build/web/server.pid ]; then
-                    kill $(cat build/web/server.pid) || true
-                  fi
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update UI screenshots [skip ci]"
+            git push
+          fi
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          if [ -f build/web/server.pid ]; then
+            kill $(cat build/web/server.pid) || true
+          fi

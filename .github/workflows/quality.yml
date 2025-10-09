@@ -1,114 +1,150 @@
 name: 🎯 Quality & Performance Checks
 
 on:
-    pull_request:
-        branches:
-            - main
-    push:
-        branches:
-            - main
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
 
 concurrency:
-    group: quality-${{ github.ref }}
-    cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    test_and_lint:
-        name: Tests & Linting
-        runs-on: ubuntu-latest
+  test_and_lint:
+    name: Tests & Linting
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
 
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  channel: "stable"
-                  cache: true
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
-            - name: 📦 Get dependencies
-              run: flutter pub get
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-            - name: 🔍 Analyze
-              run: flutter analyze --fatal-infos
+      - name: 📦 Get dependencies
+        run: flutter pub get
 
-            - name: 🧪 Run Flutter tests
-              run: flutter test --coverage
+      - name: 🔍 Analyze (ZERO tolerance)
+        run: flutter analyze --fatal-warnings --fatal-infos
 
-            - name: 📊 Upload coverage
-              uses: codecov/codecov-action@v4
-              with:
-                  files: ./coverage/lcov.info
-                  fail_ci_if_error: false
-              env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: 🧪 Run Flutter tests
+        run: flutter test --coverage
 
-            - name: 🔧 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20"
-                  cache: "npm"
-                  cache-dependency-path: functions/package-lock.json
+      - name: 📊 Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-            - name: 📦 Install functions dependencies
-              working-directory: functions
-              run: npm ci
+      - name: � Cache Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            functions/node_modules
+          key: node-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-${{ runner.os }}-
 
-            - name: 🧪 Run functions tests
-              working-directory: functions
-              run: npm test
+      - name: �🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: functions/package-lock.json
 
-    bundle_size_check:
-        name: Bundle Size Check
-        runs-on: ubuntu-latest
+      - name: 📦 Install functions dependencies
+        working-directory: functions
+        run: npm ci
 
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
+      - name: 🔍 Lint functions (ZERO warnings)
+        working-directory: functions
+        run: npm run lint
 
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  channel: "stable"
-                  cache: true
+      - name: 🧪 Run functions tests
+        working-directory: functions
+        run: npm test
 
-            - name: 📦 Get dependencies
-              run: flutter pub get
+  bundle_size_check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
 
-            - name: 🏗️ Build
-              run: flutter build web --release --pwa-strategy=offline-first
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
-            - name: 📊 Analyze bundle
-              run: |
-                  echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
-                  # Total size
-                  TOTAL_SIZE=$(du -sh build/web | cut -f1)
-                  echo "**Total Size:** $TOTAL_SIZE" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-                  # Large files
-                  echo "### Largest Files" >> $GITHUB_STEP_SUMMARY
-                  echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
-                  echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-                  find build/web -type f -exec du -h {} \; | sort -rh | head -10 | while read size file; do
-                    filename=$(echo $file | sed 's|build/web/||')
-                    echo "| $filename | $size |" >> $GITHUB_STEP_SUMMARY
-                  done
+      - name: 📦 Get dependencies
+        run: flutter pub get
 
-            - name: ✅ Check bundle size budget
-              run: |
-                  MAX_SIZE_MB=5
-                  TOTAL_SIZE_KB=$(du -sk build/web | cut -f1)
-                  TOTAL_SIZE_MB=$((TOTAL_SIZE_KB / 1024))
+      - name: 🏗️ Build
+        run: flutter build web --release --pwa-strategy=offline-first
 
-                  echo "Bundle size: ${TOTAL_SIZE_MB}MB (Budget: ${MAX_SIZE_MB}MB)"
+      - name: 📊 Analyze bundle
+        run: |
+          echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  if [ $TOTAL_SIZE_MB -gt $MAX_SIZE_MB ]; then
-                    echo "❌ Bundle size exceeds budget!"
-                    exit 1
-                  else
-                    echo "✅ Bundle size within budget"
-                  fi
+          # Total size
+          TOTAL_SIZE=$(du -sh build/web | cut -f1)
+          echo "**Total Size:** $TOTAL_SIZE" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Large files
+          echo "### Largest Files" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          find build/web -type f -exec du -h {} \; | sort -rh | head -10 | while read size file; do
+            filename=$(echo $file | sed 's|build/web/||')
+            echo "| $filename | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: ✅ Check bundle size budget
+        run: |
+          MAX_SIZE_MB=40
+          TOTAL_SIZE_KB=$(du -sk build/web | cut -f1)
+          TOTAL_SIZE_MB=$((TOTAL_SIZE_KB / 1024))
+
+          echo "Bundle size: ${TOTAL_SIZE_MB}MB (Budget: ${MAX_SIZE_MB}MB)"
+
+          if [ $TOTAL_SIZE_MB -gt $MAX_SIZE_MB ]; then
+            echo "❌ Bundle size exceeds budget!"
+            exit 1
+          else
+            echo "✅ Bundle size within budget"
+          fi

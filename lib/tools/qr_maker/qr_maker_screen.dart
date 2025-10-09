@@ -129,9 +129,13 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       await _billingService.trackHeavyOp();
     }
 
+    if (!context.mounted) return;
+
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Generated ${items.length} QR codes!'),
+        // ignore: use_build_context_synchronously
         backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -204,7 +208,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5722).withOpacity(0.2),
+                  color: const Color(0xFFFF5722).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -273,7 +277,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -306,7 +310,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                             _useQuickTemplate(_getQuickTemplate(type));
                           }
                         },
-                        selectedColor: const Color(0xFFFF5722).withOpacity(0.2),
+                        selectedColor:
+                            const Color(0xFFFF5722).withValues(alpha: 0.2),
                         checkmarkColor: const Color(0xFFFF5722),
                       );
                     }).toList(),
@@ -360,8 +365,8 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                             icon: const Icon(Icons.auto_fix_high),
                             label: const Text('Template'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFFFF5722).withOpacity(0.1),
+                              backgroundColor: const Color(0xFFFF5722)
+                                  .withValues(alpha: 0.1),
                               foregroundColor: const Color(0xFFFF5722),
                             ),
                           ),
@@ -506,7 +511,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest
-                          .withOpacity(0.5),
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -555,7 +560,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -574,7 +579,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                   Text(
                     'Enter multiple items (one per line) to generate QR codes in bulk.',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -620,10 +625,10 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.green.withOpacity(0.3),
+                          color: Colors.green.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -672,14 +677,15 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                           Icon(
                             Icons.qr_code_scanner,
                             size: 80,
-                            color: theme.colorScheme.onSurface.withOpacity(0.3),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.3),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No QR codes generated yet',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.5),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.5),
                             ),
                           ),
                         ],
@@ -810,7 +816,7 @@ class _QrCodePreview extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: backgroundColor,
-        border: Border.all(color: foregroundColor.withOpacity(0.3)),
+        border: Border.all(color: foregroundColor.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

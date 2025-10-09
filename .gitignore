@@ -340,7 +340,7 @@ dist
 
 # Generated files
 /functions/lib/
-/web/
+build/web/
 
 # OS generated files
 Thumbs.db
@@ -372,3 +372,6 @@ yarn-error.log*
 dev-log/quality/logs/*.json
 dev-log/quality/logs/*.html
 dev-log/quality/logs/*.csv
+
+# OPS-LocalGate logs and summaries
+local-ci/

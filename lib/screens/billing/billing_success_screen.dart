@@ -55,8 +55,8 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.green.withOpacity(0.1),
-              Colors.teal.withOpacity(0.1),
+              Colors.green.withValues(alpha: 0.1),
+              Colors.teal.withValues(alpha: 0.1),
               theme.colorScheme.surface,
             ],
             begin: Alignment.topLeft,
@@ -77,8 +77,8 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Colors.green.withOpacity(0.3),
-                            Colors.teal.withOpacity(0.3),
+                            Colors.green.withValues(alpha: 0.3),
+                            Colors.teal.withValues(alpha: 0.3),
                           ],
                         ),
                         shape: BoxShape.circle,
@@ -106,7 +106,8 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
                         Text(
                           'Your subscription is now active',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -175,10 +176,10 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withOpacity(0.5),
+        color: theme.colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -187,7 +188,7 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 32),
@@ -207,7 +208,7 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],

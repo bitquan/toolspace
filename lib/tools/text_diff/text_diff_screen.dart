@@ -221,7 +221,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1976D2).withOpacity(0.2),
+                color: const Color(0xFF1976D2).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -299,10 +299,11 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               border: Border(
                 bottom: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -343,7 +344,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -354,7 +355,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         child: Row(
                           children: [
@@ -413,7 +414,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                       ),
                       child: Row(
                         children: [
@@ -473,7 +474,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -484,8 +485,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color:
-                          theme.colorScheme.primaryContainer.withOpacity(0.5),
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.5),
                     ),
                     child: Text(
                       'Differences (Line by Line)',
@@ -524,12 +525,12 @@ class _TextDiffScreenState extends State<TextDiffScreen>
 
         switch (diff.type) {
           case DiffType.insert:
-            backgroundColor = Colors.green.withOpacity(0.2);
+            backgroundColor = Colors.green.withValues(alpha: 0.2);
             textColor = Colors.green.shade700;
             prefix = '+ ';
             break;
           case DiffType.delete:
-            backgroundColor = Colors.red.withOpacity(0.2);
+            backgroundColor = Colors.red.withValues(alpha: 0.2);
             textColor = Colors.red.shade700;
             prefix = '- ';
             break;
@@ -568,10 +569,11 @@ class _TextDiffScreenState extends State<TextDiffScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               border: Border(
                 bottom: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -612,7 +614,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -623,7 +625,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         child: Text(
                           'Original Text',
@@ -668,7 +670,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                       ),
                       child: Text(
                         'Modified Text',
@@ -714,7 +716,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -725,8 +727,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color:
-                          theme.colorScheme.primaryContainer.withOpacity(0.5),
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.5),
                     ),
                     child: Text(
                       'Differences (Word by Word)',
@@ -758,18 +760,18 @@ class _TextDiffScreenState extends State<TextDiffScreen>
 
           switch (diff.type) {
             case WordDiffType.insert:
-              backgroundColor = Colors.green.withOpacity(0.3);
+              backgroundColor = Colors.green.withValues(alpha: 0.3);
               textColor = Colors.green.shade900;
               break;
             case WordDiffType.delete:
-              backgroundColor = Colors.red.withOpacity(0.3);
+              backgroundColor = Colors.red.withValues(alpha: 0.3);
               textColor = Colors.red.shade900;
               break;
             case WordDiffType.equal:
               backgroundColor = Colors.transparent;
               break;
             case WordDiffType.changed:
-              backgroundColor = Colors.orange.withOpacity(0.3);
+              backgroundColor = Colors.orange.withValues(alpha: 0.3);
               textColor = Colors.orange.shade900;
               break;
           }
@@ -805,10 +807,10 @@ class _TextDiffScreenState extends State<TextDiffScreen>
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
             border: Border(
               bottom: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.3),
+                color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -839,7 +841,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -850,7 +852,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         child: Text(
                           'Base Version',
@@ -892,7 +894,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -902,7 +904,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                         ),
                         child: Text(
                           'Left Version',
@@ -947,7 +949,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                       ),
                       child: Text(
                         'Right Version',
@@ -994,7 +996,7 @@ class _TextDiffScreenState extends State<TextDiffScreen>
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -1006,8 +1008,8 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: _mergeResult!.hasConflicts
-                          ? Colors.orange.withOpacity(0.2)
-                          : Colors.green.withOpacity(0.2),
+                          ? Colors.orange.withValues(alpha: 0.2)
+                          : Colors.green.withValues(alpha: 0.2),
                     ),
                     child: Row(
                       children: [
@@ -1043,10 +1045,11 @@ class _TextDiffScreenState extends State<TextDiffScreen>
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: theme.colorScheme.outline.withOpacity(0.3),
+                            color: theme.colorScheme.outline
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: SingleChildScrollView(
@@ -1088,9 +1091,9 @@ class _StatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1111,7 +1114,7 @@ class _StatChip extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: color.withOpacity(0.8),
+                  color: color.withValues(alpha: 0.8),
                 ),
               ),
             ],

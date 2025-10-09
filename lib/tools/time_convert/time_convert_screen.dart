@@ -127,7 +127,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF9C27B0).withOpacity(0.2),
+                color: const Color(0xFF9C27B0).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -170,7 +170,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
               decoration: BoxDecoration(
                 border: Border(
                   right: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -221,7 +221,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(
                                 0xFF9C27B0,
-                              ).withOpacity(0.1),
+                              ).withValues(alpha: 0.1),
                               foregroundColor: const Color(0xFF9C27B0),
                             ),
                           ),
@@ -327,7 +327,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                           },
                           selectedColor: const Color(
                             0xFF9C27B0,
-                          ).withOpacity(0.2),
+                          ).withValues(alpha: 0.2),
                           checkmarkColor: const Color(0xFF9C27B0),
                         );
                       }).toList(),
@@ -394,12 +394,12 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
                                     decoration: BoxDecoration(
                                       color: const Color(
                                         0xFF9C27B0,
-                                      ).withOpacity(0.1),
+                                      ).withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                         color: const Color(
                                           0xFF9C27B0,
-                                        ).withOpacity(0.3),
+                                        ).withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: SelectableText(
@@ -480,7 +480,7 @@ class _TimeConvertScreenState extends State<TimeConvertScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

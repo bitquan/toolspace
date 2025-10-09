@@ -3,20 +3,70 @@ name: Auto PR
 on:
   push:
     branches:
-      - 'feat/**'
-      - 'fix/**'
-      - 'chore/**'
-      - 'docs/**'
+      - "feat/**"
+      - "fix/**"
+      - "chore/**"
+      - "docs/**"
 
 permissions:
   contents: read
   pull-requests: write
   issues: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  verify-local-gate:
+    name: 🔒 Verify Local Gate
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check local preflight artifacts
+        run: |
+          echo "🔒 Checking local preflight artifacts..."
+
+          if [ ! -f "local-ci/pr-ci-summary.json" ]; then
+            echo "❌ ERROR: local-ci/pr-ci-summary.json not found!"
+            echo ""
+            echo "This means preflight was not run before push."
+            echo "The local gate should have blocked this push."
+            echo ""
+            echo "To fix:"
+            echo "  1. Run: npm run preflight"
+            echo "  2. Verify all checks pass"
+            echo "  3. Push again"
+            exit 1
+          fi
+
+          echo "✓ pr-ci-summary.json found"
+          cat local-ci/pr-ci-summary.json
+
+      - name: ✅ Verify preflight passed
+        run: |
+          SUCCESS=$(jq -r '.summary.success' local-ci/pr-ci-summary.json)
+
+          if [ "$SUCCESS" != "true" ]; then
+            echo "❌ ERROR: Local preflight did not pass!"
+            echo ""
+            jq '.summary' local-ci/pr-ci-summary.json
+            echo ""
+            echo "Fix all preflight errors before pushing."
+            exit 1
+          fi
+
+          echo "✅ Local preflight passed!"
+          jq '.summary' local-ci/pr-ci-summary.json
+
   check-ci-status:
     name: Check CI Status
     runs-on: ubuntu-latest
+    needs: verify-local-gate
     outputs:
       should_create_pr: ${{ steps.check.outputs.should_create }}
       issue_number: ${{ steps.extract.outputs.issue_number }}

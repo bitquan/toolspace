@@ -44,6 +44,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
         _quotaStatus = QuotaStatus.fromMap(result.data);
       });
     } catch (e) {
+      // ignore: avoid_print
       print('Failed to load quota status: $e');
     }
   }
@@ -382,6 +383,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
     // For web, we can use html.window.open
     // For mobile, use url_launcher package
     // This is a placeholder implementation
+    // ignore: avoid_print
     print('Would open URL: $url');
     _showSuccessSnackBar('Download started');
   }

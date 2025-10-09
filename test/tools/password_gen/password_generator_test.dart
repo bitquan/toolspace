@@ -318,7 +318,8 @@ void main() {
         includeSymbols: true,
       );
 
-      final strongEntropy = PasswordGenerator.calculateCharsetEntropy(strongConfig);
+      final strongEntropy =
+          PasswordGenerator.calculateCharsetEntropy(strongConfig);
       final strongScore = PasswordGenerator.getStrengthScore(strongEntropy);
       expect(strongScore, greaterThan(80));
     });

@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import '../../shared/shared_data_service.dart';
+
+// ignore: avoid_web_libraries_in_flutter, deprecated_member_use
+import 'dart:html' as html;
 
 class CsvCleanerScreen extends StatefulWidget {
   const CsvCleanerScreen({super.key});

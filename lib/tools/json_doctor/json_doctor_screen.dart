@@ -29,10 +29,9 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
 
   JsonDoctorStatus _status = JsonDoctorStatus.empty;
   String _errorMessage = '';
+  // ignore: unused_field
   final int _indentLevel = 2;
   List<SchemaValidationError> _schemaErrors = [];
-  // ignore: unused_field
-  String _jsonPathResult = '';
 
   @override
   void initState() {
@@ -151,7 +150,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF388E3C).withOpacity(0.2),
+                color: const Color(0xFF388E3C).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -220,10 +219,10 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _getStatusColor(theme).withOpacity(0.1),
+            color: _getStatusColor(theme).withValues(alpha: 0.1),
             border: Border(
               bottom: BorderSide(
-                color: _getStatusColor(theme).withOpacity(0.3),
+                color: _getStatusColor(theme).withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
@@ -283,7 +282,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -391,7 +390,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -448,7 +447,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -520,7 +519,8 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: theme.colorScheme.outline.withOpacity(0.3),
+                              color: theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -563,7 +563,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
                                         color: theme.colorScheme.errorContainer
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Column(
@@ -624,7 +624,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -820,18 +820,18 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
           '  ',
         ).convert(result.value);
         setState(() {
-          _jsonPathResult = 'Found ${result.matches.length} match(es)';
+          // Query succeeded with ${result.matches.length} match(es)
         });
       } else {
         _queryResultController.text = 'Error: ${result.error}';
         setState(() {
-          _jsonPathResult = 'Query failed';
+          // Query failed
         });
       }
     } catch (e) {
       _queryResultController.text = 'Error: $e';
       setState(() {
-        _jsonPathResult = 'Invalid JSON or query';
+        // Invalid JSON or query
       });
     }
   }

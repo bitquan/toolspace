@@ -236,10 +236,10 @@ void main() {
               r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
     });
 
-    test('generateV7 creates sortable UUIDs', () {
+    test('generateV7 creates sortable UUIDs', () async {
       final uuid1 = UuidGenerator.generateV7();
       // Small delay to ensure different timestamp
-      Future.delayed(const Duration(milliseconds: 2));
+      await Future.delayed(const Duration(milliseconds: 2));
       final uuid2 = UuidGenerator.generateV7();
 
       // UUID v7 should be sortable by timestamp (first part of UUID)

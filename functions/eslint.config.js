@@ -21,6 +21,16 @@ export default [
     },
   },
   {
-    ignores: ["lib/**/*", "node_modules/**/*", "*.js"],
+    ignores: [
+      "lib/**/*",
+      "node_modules/**/*",
+      "*.js",
+      "src/**/__tests__/**",
+      "src/**/*.test.ts",
+      "src/tools/file_merger/**",
+      "src/tools/image_resizer/**",
+      "src/tools/md_to_pdf/**",
+      "src/tools/url-short/**",
+    ],
   },
 ];

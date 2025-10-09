@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "🔒 Local gate: running preflight..."
+npm run preflight
+
+echo "📋 Running postflight checks..."
+npm run postflight || true

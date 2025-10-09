@@ -22,18 +22,18 @@ void main() {
       const hex = '#FF5733';
       final color = ColorUtils.fromHex(hex);
 
-      expect(color.red, equals(255));
-      expect(color.green, equals(87));
-      expect(color.blue, equals(51));
+      expect(((color.r * 255.0).round() & 0xff), equals(255));
+      expect(((color.g * 255.0).round() & 0xff), equals(87));
+      expect(((color.b * 255.0).round() & 0xff), equals(51));
     });
 
     test('converts hex string without # to Color correctly', () {
       const hex = 'FF5733';
       final color = ColorUtils.fromHex(hex);
 
-      expect(color.red, equals(255));
-      expect(color.green, equals(87));
-      expect(color.blue, equals(51));
+      expect(((color.r * 255.0).round() & 0xff), equals(255));
+      expect(((color.g * 255.0).round() & 0xff), equals(87));
+      expect(((color.b * 255.0).round() & 0xff), equals(51));
     });
 
     test('calculates color distance correctly', () {
@@ -98,8 +98,8 @@ void main() {
       final mixed = ColorUtils.mix(red, blue, 0.5);
 
       // Should be purple-ish (mix of red and blue)
-      expect(mixed.red, lessThan(255));
-      expect(mixed.blue, greaterThan(0));
+      expect(((mixed.r * 255.0).round() & 0xff), lessThan(255));
+      expect(((mixed.b * 255.0).round() & 0xff), greaterThan(0));
     });
 
     test('mixes colors with weight 0 returns first color', () {
@@ -108,8 +108,10 @@ void main() {
 
       final mixed = ColorUtils.mix(red, blue, 0.0);
 
-      expect(mixed.red, equals(red.red));
-      expect(mixed.blue, equals(red.blue));
+      expect(((mixed.r * 255.0).round() & 0xff),
+          equals(((red.r * 255.0).round() & 0xff)));
+      expect(((mixed.b * 255.0).round() & 0xff),
+          equals(((red.b * 255.0).round() & 0xff)));
     });
 
     test('mixes colors with weight 1 returns second color', () {
@@ -118,8 +120,10 @@ void main() {
 
       final mixed = ColorUtils.mix(red, blue, 1.0);
 
-      expect(mixed.red, equals(blue.red));
-      expect(mixed.blue, equals(blue.blue));
+      expect(((mixed.r * 255.0).round() & 0xff),
+          equals(((blue.r * 255.0).round() & 0xff)));
+      expect(((mixed.b * 255.0).round() & 0xff),
+          equals(((blue.b * 255.0).round() & 0xff)));
     });
   });
 }

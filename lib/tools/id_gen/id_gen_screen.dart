@@ -181,7 +181,7 @@ class _IdGenScreenState extends State<IdGenScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF9C27B0).withOpacity(0.2),
+                color: const Color(0xFF9C27B0).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -218,7 +218,7 @@ class _IdGenScreenState extends State<IdGenScreen>
               decoration: BoxDecoration(
                 border: Border(
                   right: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -251,7 +251,7 @@ class _IdGenScreenState extends State<IdGenScreen>
                             }
                           },
                           selectedColor:
-                              const Color(0xFF9C27B0).withOpacity(0.2),
+                              const Color(0xFF9C27B0).withValues(alpha: 0.2),
                           checkmarkColor: const Color(0xFF9C27B0),
                         );
                       }).toList(),
@@ -263,7 +263,7 @@ class _IdGenScreenState extends State<IdGenScreen>
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest
-                            .withOpacity(0.5),
+                            .withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -388,7 +388,7 @@ class _IdGenScreenState extends State<IdGenScreen>
                               }
                             },
                             selectedColor:
-                                const Color(0xFF9C27B0).withOpacity(0.2),
+                                const Color(0xFF9C27B0).withValues(alpha: 0.2),
                             checkmarkColor: const Color(0xFF9C27B0),
                           );
                         }).toList(),
@@ -417,10 +417,10 @@ class _IdGenScreenState extends State<IdGenScreen>
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: Colors.blue.withOpacity(0.3),
+                              color: Colors.blue.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Column(
@@ -478,7 +478,7 @@ class _IdGenScreenState extends State<IdGenScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -547,7 +547,7 @@ class _IdGenScreenState extends State<IdGenScreen>
                                     child: ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: const Color(0xFF9C27B0)
-                                            .withOpacity(0.2),
+                                            .withValues(alpha: 0.2),
                                         child: Text(
                                           '${index + 1}',
                                           style: const TextStyle(

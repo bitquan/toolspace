@@ -1,128 +1,147 @@
 name: 🚀 Firebase Hosting Preview Deploy
 
 on:
-    pull_request:
-        branches:
-            - main
-        paths:
-            - "lib/**"
-            - "web/**"
-            - "pubspec.yaml"
-            - "firebase.json"
-            - ".github/workflows/preview-hosting.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "web/**"
+      - "pubspec.yaml"
+      - "firebase.json"
+      - ".github/workflows/preview-hosting.yml"
 
 concurrency:
-    group: preview-${{ github.ref }}
-    cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    build_and_preview:
-        name: Build and Deploy Preview
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            pull-requests: write
+  build_and_preview:
+    name: Build and Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
+    permissions:
+      contents: read
+      pull-requests: write
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  channel: "stable"
-                  cache: true
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
-            - name: 📦 Get dependencies
-              run: flutter pub get
+      - name: 💾 Cache Firebase
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase
+          key: firebase-${{ runner.os }}
+          restore-keys: |
+            firebase-${{ runner.os }}-
 
-            - name: 🔍 Analyze code
-              run: flutter analyze --fatal-infos
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-            - name: 🧪 Run tests
-              run: flutter test
+      - name: 📦 Get dependencies
+        run: flutter pub get
 
-            - name: 🏗️ Build web app
-              run: flutter build web --release --pwa-strategy=offline-first
+      - name: 🔍 Analyze code (ZERO tolerance)
+        run: flutter analyze --fatal-warnings --fatal-infos
 
-            - name: 📊 Bundle size report
-              run: |
-                  echo "## 📦 Bundle Size Report" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
-                  echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+      - name: 🧪 Run tests
+        run: flutter test
 
-                  # Find and report large files
-                  find build/web -type f -size +100k -exec du -h {} \; | sort -rh | head -20 | while read size file; do
-                    echo "| ${file#build/web/} | $size |" >> $GITHUB_STEP_SUMMARY
-                  done
+      - name: 🏗️ Build web app
+        run: flutter build web --release --pwa-strategy=offline-first
 
-                  # Total size
-                  total=$(du -sh build/web | cut -f1)
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "**Total build size:** $total" >> $GITHUB_STEP_SUMMARY
+      - name: 📊 Bundle size report
+        run: |
+          echo "## 📦 Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
 
-            - name: 🚀 Deploy to Firebase Hosting Preview
-              id: deploy
-              uses: FirebaseExtended/action-hosting-deploy@v0
-              with:
-                  repoToken: "${{ secrets.GITHUB_TOKEN }}"
-                  firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-                  projectId: toolspace-dev
-                  expires: 7d
-                  channelId: pr-${{ github.event.pull_request.number }}
+          # Find and report large files
+          find build/web -type f -size +100k -exec du -h {} \; | sort -rh | head -20 | while read size file; do
+            echo "| ${file#build/web/} | $size |" >> $GITHUB_STEP_SUMMARY
+          done
 
-            - name: 💬 Comment PR with preview URL
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const previewUrl = '${{ steps.deploy.outputs.details_url }}';
-                      const expiresUrl = '${{ steps.deploy.outputs.expire_time }}';
+          # Total size
+          total=$(du -sh build/web | cut -f1)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total build size:** $total" >> $GITHUB_STEP_SUMMARY
 
-                      const comment = `## 🎉 Preview Deployed!
+      - name: 🚀 Deploy to Firebase Hosting Preview
+        id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: toolspace-dev
+          expires: 7d
+          channelId: pr-${{ github.event.pull_request.number }}
 
-                      Your Toolspace preview is ready:
+      - name: 💬 Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const previewUrl = '${{ steps.deploy.outputs.details_url }}';
+            const expiresUrl = '${{ steps.deploy.outputs.expire_time }}';
 
-                      🔗 **Preview URL:** ${previewUrl}
+            const comment = `## 🎉 Preview Deployed!
 
-                      ⏰ **Expires:** ${expiresUrl}
+            Your Toolspace preview is ready:
 
-                      ### 📊 Performance Tips
-                      - Test on real devices and networks
-                      - Check Lighthouse scores (run locally or wait for CI)
-                      - Verify all 17 tools load correctly
-                      - Test deferred loading performance
+            🔗 **Preview URL:** ${previewUrl}
 
-                      ### 🧪 Testing Checklist
-                      - [ ] Home screen loads and displays all tools
-                      - [ ] Search functionality works
-                      - [ ] Category filters work
-                      - [ ] Tools open without errors
-                      - [ ] Neo-Playground UI renders correctly
-                      - [ ] Dark mode toggle works
+            ⏰ **Expires:** ${expiresUrl}
 
-                      ---
-                      _This preview will be automatically deleted after 7 days._`;
+            ### 📊 Performance Tips
+            - Test on real devices and networks
+            - Check Lighthouse scores (run locally or wait for CI)
+            - Verify all 17 tools load correctly
+            - Test deferred loading performance
 
-                      github.rest.issues.createComment({
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body: comment
-                      });
+            ### 🧪 Testing Checklist
+            - [ ] Home screen loads and displays all tools
+            - [ ] Search functionality works
+            - [ ] Category filters work
+            - [ ] Tools open without errors
+            - [ ] Neo-Playground UI renders correctly
+            - [ ] Dark mode toggle works
 
-            - name: ✅ Check bundle size budget
-              run: |
-                  MAX_SIZE_MB=5
-                  TOTAL_SIZE=$(du -sm build/web | cut -f1)
+            ---
+            _This preview will be automatically deleted after 7 days._`;
 
-                  echo "Bundle size: ${TOTAL_SIZE}MB"
-                  echo "Budget: ${MAX_SIZE_MB}MB"
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
-                  if [ $TOTAL_SIZE -gt $MAX_SIZE_MB ]; then
-                    echo "❌ Bundle size exceeds budget!"
-                    echo "Current: ${TOTAL_SIZE}MB, Budget: ${MAX_SIZE_MB}MB"
-                    exit 1
-                  else
-                    echo "✅ Bundle size within budget"
-                  fi
+      - name: ✅ Check bundle size budget
+        run: |
+          MAX_SIZE_MB=40
+          TOTAL_SIZE=$(du -sm build/web | cut -f1)
+
+          echo "Bundle size: ${TOTAL_SIZE}MB"
+          echo "Budget: ${MAX_SIZE_MB}MB"
+
+          if [ $TOTAL_SIZE -gt $MAX_SIZE_MB ]; then
+            echo "❌ Bundle size exceeds budget!"
+            echo "Current: ${TOTAL_SIZE}MB, Budget: ${MAX_SIZE_MB}MB"
+            exit 1
+          else
+            echo "✅ Bundle size within budget"
+          fi

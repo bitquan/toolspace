@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+    <base href="$FLUTTER_BASE_HREF" />
+
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title>
+      Toolspace - Developer Productivity Tools | Build Smarter, Ship Faster
+    </title>
+    <meta
+      name="title"
+      content="Toolspace - Developer Productivity Tools | Build Smarter, Ship Faster"
+    />
+    <meta
+      name="description"
+      content="All-in-one developer toolkit with 17+ premium tools including Quick Invoice, File Merger, Palette Extractor, and more. Start free, upgrade as you grow."
+    />
+    <meta
+      name="keywords"
+      content="developer tools, productivity, invoice generator, file merger, color palette, text tools, markdown, code tools, developer utilities"
+    />
+    <meta name="author" content="Toolspace" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://toolspace.dev/" />
+    <meta
+      property="og:title"
+      content="Toolspace - Developer Productivity Tools | Build Smarter, Ship Faster"
+    />
+    <meta
+      property="og:description"
+      content="All-in-one developer toolkit with 17+ premium tools including Quick Invoice, File Merger, Palette Extractor, and more. Start free, upgrade as you grow."
+    />
+    <meta
+      property="og:image"
+      content="https://toolspace.dev/icons/Icon-512.png"
+    />
+    <meta property="og:site_name" content="Toolspace" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://toolspace.dev/" />
+    <meta
+      name="twitter:title"
+      content="Toolspace - Developer Productivity Tools"
+    />
+    <meta
+      name="twitter:description"
+      content="All-in-one developer toolkit with 17+ premium tools. Start free, upgrade as you grow."
+    />
+    <meta
+      name="twitter:image"
+      content="https://toolspace.dev/icons/Icon-512.png"
+    />
+
+    <!-- iOS meta tags & icons -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Toolspace" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://toolspace.dev/" />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="msapplication-TileColor" content="#1a1a2e" />
+    <meta name="msapplication-navbutton-color" content="#1a1a2e" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://toolspace.dev/#organization",
+            "name": "Toolspace",
+            "url": "https://toolspace.dev/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://toolspace.dev/icons/Icon-512.png",
+              "width": 512,
+              "height": 512
+            },
+            "description": "All-in-one developer productivity toolkit",
+            "sameAs": ["https://github.com/bitquan/toolspace"]
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://toolspace.dev/#webapp",
+            "name": "Toolspace",
+            "url": "https://toolspace.dev/",
+            "description": "All-in-one developer toolkit with 17+ premium tools including Quick Invoice, File Merger, Palette Extractor, and more. Start free, upgrade as you grow.",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
+              "@type": "AggregateOffer",
+              "priceCurrency": "USD",
+              "lowPrice": "0",
+              "highPrice": "29",
+              "offerCount": "3"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "reviewCount": "127"
+            },
+            "browserRequirements": "Requires JavaScript. Requires HTML5.",
+            "softwareVersion": "1.0.0",
+            "author": {
+              "@id": "https://toolspace.dev/#organization"
+            }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Toolspace",
+            "applicationCategory": "Productivity",
+            "operatingSystem": "Web, iOS, Android",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Free Plan",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro Plan",
+                "price": "9",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "9.00",
+                  "priceCurrency": "USD",
+                  "unitText": "MONTH"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Premium Plan",
+                "price": "29",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "29.00",
+                  "priceCurrency": "USD",
+                  "unitText": "MONTH"
+                }
+              }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://toolspace.dev/#website",
+            "url": "https://toolspace.dev/",
+            "name": "Toolspace",
+            "description": "Developer Productivity Tools",
+            "publisher": {
+              "@id": "https://toolspace.dev/#organization"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://toolspace.dev/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@type": "ItemList",
+            "name": "Premium Developer Tools",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Quick Invoice Generator",
+                  "description": "Professional invoice generation tool"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "File Merger",
+                  "description": "Combine multiple files with smart merging"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Palette Extractor",
+                  "description": "Extract color palettes from images"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Text Tools Suite",
+                  "description": "Comprehensive text manipulation utilities"
+                }
+              },
+              {
+                "@type": "ListItem",
+                "position": 5,
+                "item": {
+                  "@type": "SoftwareApplication",
+                  "name": "Markdown to PDF",
+                  "description": "Convert markdown documents to PDF"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <script src="flutter_bootstrap.js" async></script>
+  </body>
+</html>

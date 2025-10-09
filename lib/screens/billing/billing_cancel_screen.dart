@@ -17,7 +17,7 @@ class BillingCancelScreen extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.blue.withOpacity(0.05),
+              Colors.blue.withValues(alpha: 0.05),
               theme.colorScheme.surface,
             ],
             begin: Alignment.topCenter,
@@ -34,10 +34,10 @@ class BillingCancelScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.5),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                         width: 2,
                       ),
                     ),
@@ -59,7 +59,7 @@ class BillingCancelScreen extends StatelessWidget {
                   Text(
                     'No worries! You can upgrade anytime.',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -67,10 +67,10 @@ class BillingCancelScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.5),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
