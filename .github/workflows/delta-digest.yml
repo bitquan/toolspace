@@ -27,8 +27,7 @@ on:
         type: string
 
 permissions:
-  contents: write
-  issues: read
+  contents: read
   actions: read
 
 jobs:

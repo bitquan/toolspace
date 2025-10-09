@@ -16,7 +16,7 @@ on:
 
 permissions:
   contents: read
-  actions: read
+  actions: write
 
 jobs:
   nuclear-cleanup:

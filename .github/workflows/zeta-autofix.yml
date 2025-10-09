@@ -22,8 +22,9 @@ on:
           - imports-only
 
 permissions:
-  contents: read
+  contents: write
   actions: read
+  pull-requests: write
 
 jobs:
   autofix:

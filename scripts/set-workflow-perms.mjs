@@ -27,28 +27,80 @@ const ELEVATE = {
     pull_requests: "write",
     issues: "write",
   },
-  // writes dev logs back to repo
-  "dev-log-updater.yml": { contents: "write" },
+  // writes dev logs back to repo + reads PRs/issues
+  "dev-log-updater.yml": {
+    contents: "write",
+    pull_requests: "read",
+    issues: "read",
+  },
   // roadmap -> issues generator
-  "roadmap-to-issues.yml": { issues: "write", contents: "read" },
+  "roadmap-to-issues.yml": {
+    contents: "read",
+    issues: "write",
+    pull_requests: "write",
+  },
   // adaptive sprint manager (creates milestones/comments/labels/issues)
   "delta-scheduler.yml": {
+    contents: "write",
     issues: "write",
     pull_requests: "write",
-    contents: "read",
   },
   "delta-progress.yml": {
+    contents: "write",
     issues: "write",
-    pull_requests: "write",
-    contents: "read",
+    pull_requests: "read",
   },
   "delta-report.yml": { contents: "write" }, // writes reports to repo
-  "delta-watchdog.yml": { issues: "write", contents: "read" },
+  "delta-watchdog.yml": {
+    contents: "read",
+    issues: "write",
+    actions: "read",
+  },
   // notifications only (reads repo, posts to webhooks only)
   "delta-notify.yml": { contents: "read" },
-  "delta-digest.yml": { contents: "write" }, // writes digest files
-  // deploy needs only read unless it commits; keep read (Firebase uses its own token)
+  "delta-digest.yml": { contents: "read", issues: "read", actions: "read" }, // reads data for digest
+  // Firebase hosting needs to post PR comments and check status
+  "firebase-hosting-pull-request.yml": {
+    contents: "read",
+    checks: "write",
+    pull_requests: "write",
+  },
   "firebase-hosting-merge.yml": { contents: "read" },
+  // Preview hosting
+  "preview-hosting.yml": {
+    contents: "read",
+    pull_requests: "write",
+  },
+  // OPS-Zeta security/quality scans
+  "zeta-scan.yml": {
+    contents: "read",
+    issues: "write",
+    pull_requests: "write",
+    security_events: "write",
+  },
+  "zeta-autofix.yml": {
+    contents: "write",
+    pull_requests: "write",
+  },
+  "zeta-autodev.yml": {
+    contents: "write",
+    pull_requests: "write",
+    issues: "write",
+    actions: "read",
+  },
+  // Workflow cleanup tools
+  "workflow-cleanup.yml": {
+    actions: "write",
+    contents: "read",
+  },
+  "nuclear-cleanup.yml": {
+    actions: "write",
+    contents: "read",
+  },
+  "auto-approve-actions.yml": {
+    actions: "write",
+    contents: "read",
+  },
   // CI/test-only pipelines → read-only
   "branch-ci.yml": { contents: "read", actions: "read" },
   "test-runner.yml": { contents: "read", actions: "read" },

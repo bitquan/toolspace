@@ -16,8 +16,10 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write
   actions: read
+  pull-requests: write
+  issues: write
 
 jobs:
   autodev:
