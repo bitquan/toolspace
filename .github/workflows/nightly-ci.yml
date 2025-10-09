@@ -1,331 +1,337 @@
 name: 🌙 Nightly CI (Heavy Scans)
 
 on:
-    schedule:
-        - cron: "30 0 * * *" # 00:30 UTC daily
-    workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * *" # 00:30 UTC daily
+  workflow_dispatch:
+
 
 jobs:
-    e2e_full:
-        name: E2E Full Suite
-        runs-on: ubuntu-latest
-        timeout-minutes: 30
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
+  e2e_full:
+    name: E2E Full Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: "3.24.0"
-                  channel: "stable"
-                  cache: true
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+          cache: true
 
-            - name: 🟢 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-                  cache: "npm"
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
 
-            - name: 📦 Install Dependencies
-              run: |
-                  flutter pub get
-                  npm install -g firebase-tools
-                  npm ci
-                  npx playwright install chromium
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          npm install -g firebase-tools
+          npm ci
+          npx playwright install chromium
 
-            - name: 🔥 Start Firebase Emulators
-              run: |
-                  firebase emulators:start --only auth,firestore,functions,storage &
-                  sleep 10
+      - name: 🔥 Start Firebase Emulators
+        run: |
+          firebase emulators:start --only auth,firestore,functions,storage &
+          sleep 10
 
-            - name: 🏗️ Build Flutter Web
-              run: flutter build web --release
+      - name: 🏗️ Build Flutter Web
+        run: flutter build web --release
 
-            - name: 🧪 Run All E2E Tests
-              run: npx playwright test --reporter=line,junit
-              env:
-                  BASE_URL: http://localhost:51268
+      - name: 🧪 Run All E2E Tests
+        run: npx playwright test --reporter=line,junit
+        env:
+          BASE_URL: http://localhost:51268
 
-            - name: 📤 Upload Playwright Report
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: playwright-report
-                  path: playwright-report/
-                  retention-days: 30
-
-            - name: 📤 Upload Test Results
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: playwright-results
-                  path: test-results/
-                  retention-days: 30
-
-            - name: 📹 Upload Videos
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: playwright-videos
-                  path: test-results/**/*.webm
-                  retention-days: 14
-
-    deep_scan:
-        name: Deep Security Scan
-        runs-on: ubuntu-latest
-        timeout-minutes: 20
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
-
-            - name: 🔒 Initialize CodeQL
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: javascript
-
-            - name: 🔍 Perform CodeQL Analysis
-              uses: github/codeql-action/analyze@v3
-
-            - name: 🟢 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-                  cache: "npm"
-                  cache-dependency-path: functions/package-lock.json
-
-            - name: 📦 Install Dependencies
-              working-directory: functions
-              run: npm ci --production
-
-            - name: 🛡️ Run npm audit
-              working-directory: functions
-              run: |
-                  npm audit --production --audit-level=moderate || true
-                  npm audit --production --json > audit-report.json
-
-            - name: 🐳 Trivy Scan
-              uses: aquasecurity/trivy-action@master
-              with:
-                  scan-type: "fs"
-                  scan-ref: "."
-                  format: "sarif"
-                  output: "trivy-results.sarif"
-
-            - name: 📤 Upload Trivy Results
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: "trivy-results.sarif"
-
-            - name: 🎯 Flutter Outdated Check
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: "3.24.0"
-                  channel: "stable"
-
-            - name: 📊 Check Dependencies
-              run: |
-                  flutter pub get
-                  flutter pub outdated > flutter-outdated.txt || true
-
-            - name: 📤 Upload Scan Reports
-              uses: actions/upload-artifact@v4
-              with:
-                  name: security-scan-reports
-                  path: |
-                      functions/audit-report.json
-                      flutter-outdated.txt
-                  retention-days: 30
-
-    coverage_trend:
-        name: Coverage Trend
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0 # For trend analysis
-
-            - name: 🎯 Setup Flutter
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: "3.24.0"
-                  channel: "stable"
-                  cache: true
-
-            - name: 🟢 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-                  cache: "npm"
-                  cache-dependency-path: functions/package-lock.json
-
-            - name: 📦 Install Dependencies
-              run: |
-                  flutter pub get
-                  cd functions && npm ci
-
-            - name: 🧪 Run Flutter Tests with Coverage
-              run: flutter test --coverage
-
-            - name: 🧪 Run Functions Tests with Coverage
-              working-directory: functions
-              run: npm run test -- --coverage --coverageReporters=lcov
-
-            - name: 📊 Upload to Codecov
-              uses: codecov/codecov-action@v4
-              with:
-                  files: coverage/lcov.info,functions/coverage/lcov.info
-                  flags: nightly
-                  fail_ci_if_error: false
-              env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-            - name: 📉 Check Coverage Drop
-              run: |
-                  # Warn if coverage drops >10% but don't fail
-                  echo "ℹ️ Coverage trend analysis - warnings only, no blocking"
-
-    deps_health:
-        name: Dependencies Health
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
-
-            - name: 🟢 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-
-            - name: 📊 Check Dependency Health
-              run: |
-                  cd functions
-                  npm ci
-                  npm outdated > ../deps-outdated.txt || true
-                  npm audit --json > ../deps-audit.json || true
-
-            - name: 🎯 Flutter Dependencies
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: "3.24.0"
-                  channel: "stable"
-
-            - name: 📊 Flutter Dependency Health
-              run: |
-                  flutter pub get
-                  flutter pub outdated >> deps-outdated.txt || true
-
-            - name: 📝 Create/Update Dependencies Issue
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const fs = require('fs');
-                      const outdated = fs.readFileSync('deps-outdated.txt', 'utf8');
-
-                      const issueTitle = '🔧 Dependencies Health Report';
-                      const issueBody = `## Automated Dependencies Health Check
-
-                      **Generated:** ${new Date().toISOString()}
-
-                      ### Outdated Packages
-
-                      \`\`\`
-                      ${outdated}
-                      \`\`\`
-
-                      **Action Required:**
-                      - Review outdated packages
-                      - Update non-breaking changes
-                      - Test breaking changes in feature branch
-
-                      _This issue is automatically updated by nightly CI._
-                      `;
-
-                      // Find existing issue
-                      const issues = await github.rest.issues.listForRepo({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        labels: 'maintenance',
-                        state: 'open'
-                      });
-
-                      const existingIssue = issues.data.find(issue =>
-                        issue.title === issueTitle
-                      );
-
-                      if (existingIssue) {
-                        await github.rest.issues.update({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: existingIssue.number,
-                          body: issueBody
-                        });
-                        console.log(`Updated issue #${existingIssue.number}`);
-                      } else {
-                        const newIssue = await github.rest.issues.create({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          title: issueTitle,
-                          body: issueBody,
-                          labels: ['maintenance', 'dependencies']
-                        });
-                        console.log(`Created issue #${newIssue.data.number}`);
-                      }
-
-    weekly_digest:
-        name: Weekly Digest
-        runs-on: ubuntu-latest
-        if: github.event.schedule == '30 0 * * 0' || github.event_name == 'workflow_dispatch'
-        timeout-minutes: 10
-        steps:
-            - name: 📥 Checkout
-              uses: actions/checkout@v4
-
-            - name: 🟢 Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-                  cache: "npm"
-
-            - name: 📦 Install Dependencies
-              run: npm ci
-
-            - name: 📊 Generate Velocity Report
-              run: npm run velocity
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: 📊 Generate Insights
-              run: npm run insights
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: 📝 Commit Reports
-              run: |
-                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
-                  git config --local user.name "github-actions[bot]"
-                  git add docs/reports/ || true
-                  git commit -m "docs: weekly digest $(date +%Y-%m-%d)" || true
-                  git push || true
-
-    nightly_summary:
-        name: Nightly Summary
-        runs-on: ubuntu-latest
-        needs: [e2e_full, deep_scan, coverage_trend, deps_health]
+      - name: 📤 Upload Playwright Report
         if: always()
-        steps:
-            - name: 📊 Generate Summary
-              run: |
-                  echo "## 🌙 Nightly CI Results" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-                  echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-                  echo "| E2E Full Suite | ${{ needs.e2e_full.result }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Deep Security Scan | ${{ needs.deep_scan.result }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Coverage Trend | ${{ needs.coverage_trend.result }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Dependencies Health | ${{ needs.deps_health.result }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "ℹ️ **Note**: Nightly checks are informational and don't block PRs" >> $GITHUB_STEP_SUMMARY
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: 📤 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 30
+
+      - name: 📹 Upload Videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: test-results/**/*.webm
+          retention-days: 14
+
+  deep_scan:
+    name: Deep Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔒 Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: functions/package-lock.json
+
+      - name: 📦 Install Dependencies
+        working-directory: functions
+        run: npm ci --production
+
+      - name: 🛡️ Run npm audit
+        working-directory: functions
+        run: |
+          npm audit --production --audit-level=moderate || true
+          npm audit --production --json > audit-report.json
+
+      - name: 🐳 Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: 📤 Upload Trivy Results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: 🎯 Flutter Outdated Check
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+
+      - name: 📊 Check Dependencies
+        run: |
+          flutter pub get
+          flutter pub outdated > flutter-outdated.txt || true
+
+      - name: 📤 Upload Scan Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-reports
+          path: |
+            functions/audit-report.json
+            flutter-outdated.txt
+          retention-days: 30
+
+  coverage_trend:
+    name: Coverage Trend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # For trend analysis
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+          cache: true
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: functions/package-lock.json
+
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+          cd functions && npm ci
+
+      - name: 🧪 Run Flutter Tests with Coverage
+        run: flutter test --coverage
+
+      - name: 🧪 Run Functions Tests with Coverage
+        working-directory: functions
+        run: npm run test -- --coverage --coverageReporters=lcov
+
+      - name: 📊 Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info,functions/coverage/lcov.info
+          flags: nightly
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: 📉 Check Coverage Drop
+        run: |
+          # Warn if coverage drops >10% but don't fail
+          echo "ℹ️ Coverage trend analysis - warnings only, no blocking"
+
+  deps_health:
+    name: Dependencies Health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 📊 Check Dependency Health
+        run: |
+          cd functions
+          npm ci
+          npm outdated > ../deps-outdated.txt || true
+          npm audit --json > ../deps-audit.json || true
+
+      - name: 🎯 Flutter Dependencies
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+
+      - name: 📊 Flutter Dependency Health
+        run: |
+          flutter pub get
+          flutter pub outdated >> deps-outdated.txt || true
+
+      - name: 📝 Create/Update Dependencies Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const outdated = fs.readFileSync('deps-outdated.txt', 'utf8');
+
+            const issueTitle = '🔧 Dependencies Health Report';
+            const issueBody = `## Automated Dependencies Health Check
+
+            **Generated:** ${new Date().toISOString()}
+
+            ### Outdated Packages
+
+            \`\`\`
+            ${outdated}
+            \`\`\`
+
+            **Action Required:**
+            - Review outdated packages
+            - Update non-breaking changes
+            - Test breaking changes in feature branch
+
+            _This issue is automatically updated by nightly CI._
+            `;
+
+            // Find existing issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'maintenance',
+              state: 'open'
+            });
+
+            const existingIssue = issues.data.find(issue =>
+              issue.title === issueTitle
+            );
+
+            if (existingIssue) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: issueBody
+              });
+              console.log(`Updated issue #${existingIssue.number}`);
+            } else {
+              const newIssue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['maintenance', 'dependencies']
+              });
+              console.log(`Created issue #${newIssue.data.number}`);
+            }
+
+  weekly_digest:
+    name: Weekly Digest
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '30 0 * * 0' || github.event_name ==
+      'workflow_dispatch'
+    timeout-minutes: 10
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 📊 Generate Velocity Report
+        run: npm run velocity
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📊 Generate Insights
+        run: npm run insights
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📝 Commit Reports
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/reports/ || true
+          git commit -m "docs: weekly digest $(date +%Y-%m-%d)" || true
+          git push || true
+
+  nightly_summary:
+    name: Nightly Summary
+    runs-on: ubuntu-latest
+    needs: [ e2e_full, deep_scan, coverage_trend, deps_health ]
+    if: always()
+    steps:
+      - name: 📊 Generate Summary
+        run: |
+          echo "## 🌙 Nightly CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Full Suite | ${{ needs.e2e_full.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deep Security Scan | ${{ needs.deep_scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Trend | ${{ needs.coverage_trend.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependencies Health | ${{ needs.deps_health.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ **Note**: Nightly checks are informational and don't block PRs" >> $GITHUB_STEP_SUMMARY
+permissions:
+  contents: write
+  actions: read
+  issues: write

@@ -1,501 +1,500 @@
 name: 🤖 OPS-Zeta AutoDev Agent
 
 on:
-    issues:
-        types: [labeled]
-    workflow_dispatch:
-        inputs:
-            issue_number:
-                description: "Issue number to process"
-                required: true
-                type: string
-            dry_run:
-                description: "Dry run mode (prints actions without executing)"
-                required: false
-                type: boolean
-                default: true
+  issues:
+    types: [ labeled ]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number to process"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run mode (prints actions without executing)"
+        required: false
+        type: boolean
+        default: true
 
 permissions:
-    contents: write
-    pull-requests: write
-    issues: write
-    actions: read
+  contents: read
+  actions: read
 
 jobs:
-    autodev:
-        name: Auto-Development Agent
-        runs-on: ubuntu-latest
-        if: |
-            (github.event_name == 'issues' && github.event.action == 'labeled' && contains(github.event.label.name, 'ready')) ||
-            (github.event_name == 'workflow_dispatch')
-
-        steps:
-            - name: 🚀 Initialize AutoDev Session
-              run: |
-                  echo "🤖 OPS-Zeta AutoDev Agent Starting..."
-                  echo "Event: ${{ github.event_name }}"
-                  if [ "${{ github.event_name }}" = "issues" ]; then
-                    echo "Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
-                  else
-                    echo "Manual dispatch for Issue #${{ github.event.inputs.issue_number }}"
-                  fi
-                  echo "Dry Run: ${{ github.event.inputs.dry_run || 'true' }}"
-
-            - name: 📋 Extract Issue Information
-              id: issue_info
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      let issueNumber, issue;
-
-                      if (context.eventName === 'issues') {
-                        issueNumber = context.payload.issue.number;
-                        issue = context.payload.issue;
-                      } else {
-                        issueNumber = context.payload.inputs.issue_number;
-                        issue = await github.rest.issues.get({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: issueNumber
-                        }).then(response => response.data);
-                      }
-
-                      const labels = issue.labels.map(l => l.name);
-                      const hasToolsLabel = labels.includes('tools') || labels.includes('area:frontend');
-                      const hasBackendLabel = labels.includes('area:backend') || labels.includes('backend');
-                      const isBlocked = labels.includes('blocked') || labels.includes('needs-spec');
-
-                      core.setOutput('issue_number', issueNumber);
-                      core.setOutput('issue_title', issue.title);
-                      core.setOutput('issue_body', issue.body || '');
-                      core.setOutput('labels', labels.join(','));
-                      core.setOutput('has_tools_label', hasToolsLabel);
-                      core.setOutput('has_backend_label', hasBackendLabel);
-                      core.setOutput('is_blocked', isBlocked);
-                      core.setOutput('assignee', issue.assignee?.login || '');
-
-                      core.info(`Issue #${issueNumber}: "${issue.title}"`);
-                      core.info(`Labels: ${labels.join(', ')}`);
-                      core.info(`Tools/Frontend: ${hasToolsLabel}`);
-                      core.info(`Backend: ${hasBackendLabel}`);
-                      core.info(`Blocked: ${isBlocked}`);
-
-            - name: 🛡️ Validate Issue Eligibility
-              run: |
-                  echo "🔍 Checking issue eligibility..."
-
-                  if [ "${{ steps.issue_info.outputs.is_blocked }}" = "true" ]; then
-                    echo "❌ Issue is blocked or needs specification"
-                    exit 1
-                  fi
-
-                  if [ "${{ steps.issue_info.outputs.has_tools_label }}" != "true" ]; then
-                    echo "❌ Issue must have 'tools' or 'area:frontend' label"
-                    exit 1
-                  fi
-
-                  echo "✅ Issue is eligible for auto-development"
-
-            - name: 🔧 Checkout Repository
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: 🔍 Resolve Feature Branch
-              id: branch_info
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const issueNumber = '${{ steps.issue_info.outputs.issue_number }}';
-
-                      // Check if OPS-Gamma created a feature branch
-                      try {
-                        const branches = await github.rest.repos.listBranches({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          per_page: 100
-                        });
-
-                        const featureBranches = branches.data.filter(branch =>
-                          branch.name.includes(`issue-${issueNumber}`) &&
-                          (branch.name.startsWith('feat/') || branch.name.startsWith('fix/') || branch.name.startsWith('chore/'))
-                        );
-
-                        let targetBranch = 'main';
-                        let featureBranch = '';
-
-                        if (featureBranches.length > 0) {
-                          featureBranch = featureBranches[0].name;
-                          targetBranch = featureBranch;
-                          core.info(`Found feature branch: ${featureBranch}`);
-                        } else {
-                          core.info('No feature branch found, using main');
-                        }
-
-                        const botBranch = `bot/issue-${issueNumber}-autodev`;
-
-                        core.setOutput('feature_branch', featureBranch);
-                        core.setOutput('target_branch', targetBranch);
-                        core.setOutput('bot_branch', botBranch);
-
-                      } catch (error) {
-                        core.setFailed(`Failed to resolve branches: ${error.message}`);
-                      }
-
-            - name: 🌿 Create Bot Branch
-              run: |
-                  DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
-                  BOT_BRANCH="${{ steps.branch_info.outputs.bot_branch }}"
-                  TARGET_BRANCH="${{ steps.branch_info.outputs.target_branch }}"
-
-                  echo "🌿 Creating bot branch: $BOT_BRANCH from $TARGET_BRANCH"
-
-                  if [ "$DRY_RUN" = "true" ]; then
-                    echo "🔍 [DRY RUN] Would create branch: $BOT_BRANCH"
-                    echo "🔍 [DRY RUN] Would base on: $TARGET_BRANCH"
-                  else
-                    git config --global user.name "OPS-Zeta AutoDev"
-                    git config --global user.email "ops-zeta@toolspace.dev"
-
-                    # Checkout target branch
-                    git checkout $TARGET_BRANCH
-                    git pull origin $TARGET_BRANCH
-
-                    # Create and push bot branch
-                    git checkout -b $BOT_BRANCH
-                    git push -u origin $BOT_BRANCH
-                    echo "✅ Created bot branch: $BOT_BRANCH"
-                  fi
-
-            - name: 🛠️ Setup Flutter Environment
-              uses: subosito/flutter-action@v2
-              with:
-                  flutter-version: "3.24.x"
-                  channel: "stable"
-
-            - name: 🟢 Setup Node.js Environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20.x"
-                  cache: "npm"
-                  cache-dependency-path: "functions/package-lock.json"
-
-            - name: 📦 Install Dependencies
-              run: |
-                  echo "📦 Installing Flutter dependencies..."
-                  flutter pub get
-
-                  echo "📦 Installing Functions dependencies..."
-                  cd functions
-                  npm ci
-
-            - name: 🏗️ Run Tool Scaffolding
-              run: |
-                  DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
-                  ISSUE_NUMBER="${{ steps.issue_info.outputs.issue_number }}"
-
-                  echo "🏗️ Running tool scaffolding for issue #$ISSUE_NUMBER"
-
-                  if [ "$DRY_RUN" = "true" ]; then
-                    echo "🔍 [DRY RUN] Would run: node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER --dry-run"
-                    node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER --dry-run || echo "Scaffold script not found, skipping..."
-                  else
-                    node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER || echo "Scaffold script not found, skipping..."
-                  fi
-
-            - name: 🔧 Auto-fix Pass
-              run: |
-                  DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
-
-                  echo "🔧 Running auto-fix pass..."
-
-                  if [ "$DRY_RUN" = "true" ]; then
-                    echo "🔍 [DRY RUN] Would run code formatting and linting"
-                    echo "🔍 [DRY RUN] dart format ."
-                    echo "🔍 [DRY RUN] dart run dart_code_metrics:metrics analyze --fatal-style=true"
-                    echo "🔍 [DRY RUN] cd functions && npm run lint"
-                    echo "🔍 [DRY RUN] eslint --fix --ext .ts functions/src"
-                  else
-                    echo "🎨 Formatting Dart code..."
-                    dart format .
-
-                    echo "📊 Running code metrics..."
-                    dart run dart_code_metrics:metrics analyze --fatal-style=true || true
-
-                    echo "🔍 Linting Functions..."
-                    cd functions
-                    npm run lint || true
-
-                    echo "🔧 Auto-fixing TypeScript..."
-                    npx eslint --fix --ext .ts src || true
-                    cd ..
-                  fi
-
-            - name: 🧪 Test Pass
-              run: |
-                  DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
-
-                  echo "🧪 Running test suite..."
-
-                  if [ "$DRY_RUN" = "true" ]; then
-                    echo "🔍 [DRY RUN] Would run Flutter tests and analysis"
-                    echo "🔍 [DRY RUN] flutter analyze"
-                    echo "🔍 [DRY RUN] flutter test --coverage"
-                    echo "🔍 [DRY RUN] cd functions && npm test"
-                  else
-                    echo "🔍 Analyzing Flutter code..."
-                    flutter analyze
-
-                    echo "🧪 Running Flutter tests..."
-                    flutter test --coverage
-
-                    echo "🧪 Running Functions tests..."
-                    cd functions
-                    npm test
-                    cd ..
-                  fi
-
-            - name: 📝 Commit & Push Changes
-              id: commit_changes
-              run: |
-                  DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
-                  BOT_BRANCH="${{ steps.branch_info.outputs.bot_branch }}"
-                  ISSUE_NUMBER="${{ steps.issue_info.outputs.issue_number }}"
-                  ISSUE_TITLE="${{ steps.issue_info.outputs.issue_title }}"
-
-                  echo "📝 Committing changes..."
-
-                  if [ "$DRY_RUN" = "true" ]; then
-                    echo "🔍 [DRY RUN] Would commit and push changes to $BOT_BRANCH"
-                    echo "🔍 [DRY RUN] Commit message: 'feat: Auto-implement #$ISSUE_NUMBER - $ISSUE_TITLE'"
-                  else
-                    # Check if there are any changes
-                    if git diff --quiet && git diff --cached --quiet; then
-                      echo "ℹ️ No changes to commit"
-                      echo "has_changes=false" >> $GITHUB_OUTPUT
-                    else
-                      git add .
-                      git commit -m "feat: Auto-implement #$ISSUE_NUMBER - $ISSUE_TITLE
-
-                      🤖 Auto-generated by OPS-Zeta AutoDev Agent
-
-                      - Scaffolded tool structure
-                      - Applied code formatting and linting
-                      - Added tests and documentation
-                      - Ready for review
-
-                      Resolves #$ISSUE_NUMBER"
-
-                      git push origin $BOT_BRANCH
-                      echo "✅ Committed and pushed changes"
-                      echo "has_changes=true" >> $GITHUB_OUTPUT
-                    fi
-                  fi
-
-            - name: 🔀 Create Pull Request
-              id: create_pr
-              if: steps.commit_changes.outputs.has_changes == 'true' || github.event.inputs.dry_run == 'true'
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
-                      const issueNumber = ${{ steps.issue_info.outputs.issue_number }};
-                      const issueTitle = `${{ steps.issue_info.outputs.issue_title }}`;
-                      const botBranch = `${{ steps.branch_info.outputs.bot_branch }}`;
-                      const targetBranch = `${{ steps.branch_info.outputs.target_branch }}`;
-                      const hasBackend = '${{ steps.issue_info.outputs.has_backend_label }}' === 'true';
-
-                      const prTitle = `🤖 Auto-implement: ${issueTitle}`;
-                      const prBody = `## 🤖 Auto-Generated Implementation
-
-                      This PR was automatically created by **OPS-Zeta AutoDev Agent** for issue #${issueNumber}.
-
-                      ### 📋 Implementation Checklist
-                      - [x] 🏗️ Tool scaffolding generated
-                      - [x] 🎨 Code formatting applied
-                      - [x] 🔍 Static analysis passed
-                      - [x] 🧪 Tests created and passing
-                      - [x] 📚 Documentation updated
-                      ${hasBackend ? '- [x] 🔧 Backend callable created' : ''}
-
-                      ### 🔗 Related Issue
-                      Resolves #${issueNumber}
-
-                      ### 🤖 Auto-Dev Details
-                      - **Source Branch**: \`${targetBranch}\`
-                      - **Bot Branch**: \`${botBranch}\`
-                      - **Generated**: ${new Date().toISOString()}
-                      - **Agent**: OPS-Zeta v1.0
-
-                      ### 🧪 Quality Gates
-                      - ✅ Flutter analysis passed
-                      - ✅ Tests passing with coverage
-                      - ✅ Code formatting applied
-                      ${hasBackend ? '- ✅ Backend tests passing' : ''}
-
-                      ### 📊 Coverage & Metrics
-                      Coverage report and code metrics will be attached after CI completion.
-
-                      ---
-                      🤖 *This is an automated PR. Review the changes and merge when ready.*
-                      `;
-
-                      if (dryRun) {
-                        core.info('🔍 [DRY RUN] Would create PR:');
-                        core.info(`Title: ${prTitle}`);
-                        core.info(`Base: ${targetBranch}`);
-                        core.info(`Head: ${botBranch}`);
-                        core.info(`Body: ${prBody.substring(0, 200)}...`);
-                        return;
-                      }
-
-                      try {
-                        const pr = await github.rest.pulls.create({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          title: prTitle,
-                          head: botBranch,
-                          base: targetBranch,
-                          body: prBody
-                        });
-
-                        core.setOutput('pr_number', pr.data.number);
-                        core.setOutput('pr_url', pr.data.html_url);
-
-                        core.info(`✅ Created PR #${pr.data.number}: ${pr.data.html_url}`);
-
-                        // Add labels
-                        await github.rest.issues.addLabels({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: pr.data.number,
-                          labels: ['autodev', 'qa:pending']
-                        });
-
-                      } catch (error) {
-                        core.setFailed(`Failed to create PR: ${error.message}`);
-                      }
-
-            - name: 💬 Update Issue with Progress
-              if: steps.create_pr.outputs.pr_number || github.event.inputs.dry_run == 'true'
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
-                      const issueNumber = ${{ steps.issue_info.outputs.issue_number }};
-                      const prNumber = '${{ steps.create_pr.outputs.pr_number }}';
-                      const prUrl = '${{ steps.create_pr.outputs.pr_url }}';
-                      const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-
-                      let commentBody;
-
-                      if (dryRun) {
-                        commentBody = `## 🔍 OPS-Zeta AutoDev - Dry Run Complete
-
-                        **Dry run completed successfully!** Here's what would happen in live mode:
-
-                        ### 📋 Planned Actions
-                        - ✅ Issue validated and eligible for auto-development
-                        - ✅ Bot branch would be created: \`bot/issue-${issueNumber}-autodev\`
-                        - ✅ Tool scaffolding would be generated
-                        - ✅ Code formatting and linting would be applied
-                        - ✅ Tests would be run and coverage collected
-                        - ✅ Changes would be committed and pushed
-                        - ✅ Pull request would be created for review
-
-                        ### 🚀 Ready for Live Run
-                        To execute the auto-development:
-                        1. Go to [Actions → OPS-Zeta AutoDev](../../actions/workflows/zeta-autodev.yml)
-                        2. Click "Run workflow"
-                        3. Enter issue number: \`${issueNumber}\`
-                        4. Set "Dry run mode" to \`false\`
-                        5. Click "Run workflow"
-
-                        ---
-                        🤖 *Auto-generated by [OPS-Zeta AutoDev Agent](${runUrl})*`;
-                      } else {
-                        commentBody = `## 🤖 OPS-Zeta AutoDev - Implementation Complete
-
-                        **Auto-development completed successfully!**
-
-                        ### 📋 Generated Assets
-                        - 🔀 **Pull Request**: #${prNumber} - ${prUrl}
-                        - 🌿 **Bot Branch**: \`bot/issue-${issueNumber}-autodev\`
-                        - 🧪 **Tests**: All tests passing with coverage
-                        - 📚 **Documentation**: Updated and generated
-
-                        ### ✅ Quality Gates Passed
-                        - Flutter analysis ✅
-                        - Code formatting ✅
-                        - Test suite ✅
-                        - Coverage targets ✅
-
-                        ### 🔄 Next Steps
-                        1. Review the generated PR
-                        2. Test the implementation locally if needed
-                        3. Merge when ready
-
-                        The PR will auto-merge if all CI checks pass and no conflicts are detected.
-
-                        ---
-                        🤖 *Auto-generated by [OPS-Zeta AutoDev Agent](${runUrl})*`;
-                      }
-
-                      await github.rest.issues.createComment({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issue_number: issueNumber,
-                        body: commentBody
-                      });
-
-            - name: 🎯 Auto-Merge Setup
-              if: steps.create_pr.outputs.pr_number && github.event.inputs.dry_run != 'true'
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const prNumber = ${{ steps.create_pr.outputs.pr_number }};
-
-                      // Wait a bit for CI to start
-                      await new Promise(resolve => setTimeout(resolve, 10000));
-
-                      try {
-                        // Check if CI is passing
-                        const checks = await github.rest.checks.listForRef({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          ref: `${{ steps.branch_info.outputs.bot_branch }}`
-                        });
-
-                        const allPassed = checks.data.check_runs.every(check =>
-                          check.status === 'completed' && check.conclusion === 'success'
-                        );
-
-                        if (allPassed) {
-                          // Add auto-merge label to trigger pr-merge.yml
-                          await github.rest.issues.addLabels({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: prNumber,
-                            labels: ['auto-merge']
-                          });
-
-                          core.info('✅ Added auto-merge label - PR will be merged automatically');
-                        } else {
-                          core.info('⏳ CI still running - auto-merge will be handled by pr-merge.yml');
-                        }
-
-                      } catch (error) {
-                        core.warning(`Could not set up auto-merge: ${error.message}`);
-                      }
-
-            - name: 🎉 Session Complete
-              run: |
-                  echo "🎉 OPS-Zeta AutoDev session complete!"
-                  echo "Issue: #${{ steps.issue_info.outputs.issue_number }}"
-                  echo "Dry Run: ${{ github.event.inputs.dry_run || 'true' }}"
-                  if [ "${{ steps.create_pr.outputs.pr_number }}" != "" ]; then
-                    echo "PR Created: #${{ steps.create_pr.outputs.pr_number }}"
-                    echo "PR URL: ${{ steps.create_pr.outputs.pr_url }}"
-                  fi
-                  echo "All operations completed successfully! 🚀"
+  autodev:
+    name: Auto-Development Agent
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'issues' && github.event.action == 'labeled' && contains(github.event.label.name, 'ready')) ||
+      (github.event_name == 'workflow_dispatch')
+
+    steps:
+      - name: 🚀 Initialize AutoDev Session
+        run: |
+          echo "🤖 OPS-Zeta AutoDev Agent Starting..."
+          echo "Event: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            echo "Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+          else
+            echo "Manual dispatch for Issue #${{ github.event.inputs.issue_number }}"
+          fi
+          echo "Dry Run: ${{ github.event.inputs.dry_run || 'true' }}"
+
+      - name: 📋 Extract Issue Information
+        id: issue_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let issueNumber, issue;
+
+            if (context.eventName === 'issues') {
+              issueNumber = context.payload.issue.number;
+              issue = context.payload.issue;
+            } else {
+              issueNumber = context.payload.inputs.issue_number;
+              issue = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              }).then(response => response.data);
+            }
+
+            const labels = issue.labels.map(l => l.name);
+            const hasToolsLabel = labels.includes('tools') || labels.includes('area:frontend');
+            const hasBackendLabel = labels.includes('area:backend') || labels.includes('backend');
+            const isBlocked = labels.includes('blocked') || labels.includes('needs-spec');
+
+            core.setOutput('issue_number', issueNumber);
+            core.setOutput('issue_title', issue.title);
+            core.setOutput('issue_body', issue.body || '');
+            core.setOutput('labels', labels.join(','));
+            core.setOutput('has_tools_label', hasToolsLabel);
+            core.setOutput('has_backend_label', hasBackendLabel);
+            core.setOutput('is_blocked', isBlocked);
+            core.setOutput('assignee', issue.assignee?.login || '');
+
+            core.info(`Issue #${issueNumber}: "${issue.title}"`);
+            core.info(`Labels: ${labels.join(', ')}`);
+            core.info(`Tools/Frontend: ${hasToolsLabel}`);
+            core.info(`Backend: ${hasBackendLabel}`);
+            core.info(`Blocked: ${isBlocked}`);
+
+      - name: 🛡️ Validate Issue Eligibility
+        run: |
+          echo "🔍 Checking issue eligibility..."
+
+          if [ "${{ steps.issue_info.outputs.is_blocked }}" = "true" ]; then
+            echo "❌ Issue is blocked or needs specification"
+            exit 1
+          fi
+
+          if [ "${{ steps.issue_info.outputs.has_tools_label }}" != "true" ]; then
+            echo "❌ Issue must have 'tools' or 'area:frontend' label"
+            exit 1
+          fi
+
+          echo "✅ Issue is eligible for auto-development"
+
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔍 Resolve Feature Branch
+        id: branch_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = '${{ steps.issue_info.outputs.issue_number }}';
+
+            // Check if OPS-Gamma created a feature branch
+            try {
+              const branches = await github.rest.repos.listBranches({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              });
+
+              const featureBranches = branches.data.filter(branch =>
+                branch.name.includes(`issue-${issueNumber}`) &&
+                (branch.name.startsWith('feat/') || branch.name.startsWith('fix/') || branch.name.startsWith('chore/'))
+              );
+
+              let targetBranch = 'main';
+              let featureBranch = '';
+
+              if (featureBranches.length > 0) {
+                featureBranch = featureBranches[0].name;
+                targetBranch = featureBranch;
+                core.info(`Found feature branch: ${featureBranch}`);
+              } else {
+                core.info('No feature branch found, using main');
+              }
+
+              const botBranch = `bot/issue-${issueNumber}-autodev`;
+
+              core.setOutput('feature_branch', featureBranch);
+              core.setOutput('target_branch', targetBranch);
+              core.setOutput('bot_branch', botBranch);
+
+            } catch (error) {
+              core.setFailed(`Failed to resolve branches: ${error.message}`);
+            }
+
+      - name: 🌿 Create Bot Branch
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+          BOT_BRANCH="${{ steps.branch_info.outputs.bot_branch }}"
+          TARGET_BRANCH="${{ steps.branch_info.outputs.target_branch }}"
+
+          echo "🌿 Creating bot branch: $BOT_BRANCH from $TARGET_BRANCH"
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🔍 [DRY RUN] Would create branch: $BOT_BRANCH"
+            echo "🔍 [DRY RUN] Would base on: $TARGET_BRANCH"
+          else
+            git config --global user.name "OPS-Zeta AutoDev"
+            git config --global user.email "ops-zeta@toolspace.dev"
+
+            # Checkout target branch
+            git checkout $TARGET_BRANCH
+            git pull origin $TARGET_BRANCH
+
+            # Create and push bot branch
+            git checkout -b $BOT_BRANCH
+            git push -u origin $BOT_BRANCH
+            echo "✅ Created bot branch: $BOT_BRANCH"
+          fi
+
+      - name: 🛠️ Setup Flutter Environment
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.x"
+          channel: "stable"
+
+      - name: 🟢 Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: "functions/package-lock.json"
+
+      - name: 📦 Install Dependencies
+        run: |
+          echo "📦 Installing Flutter dependencies..."
+          flutter pub get
+
+          echo "📦 Installing Functions dependencies..."
+          cd functions
+          npm ci
+
+      - name: 🏗️ Run Tool Scaffolding
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+          ISSUE_NUMBER="${{ steps.issue_info.outputs.issue_number }}"
+
+          echo "🏗️ Running tool scaffolding for issue #$ISSUE_NUMBER"
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🔍 [DRY RUN] Would run: node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER --dry-run"
+            node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER --dry-run || echo "Scaffold script not found, skipping..."
+          else
+            node scripts/scaffold-tool.mjs --issue $ISSUE_NUMBER || echo "Scaffold script not found, skipping..."
+          fi
+
+      - name: 🔧 Auto-fix Pass
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+
+          echo "🔧 Running auto-fix pass..."
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🔍 [DRY RUN] Would run code formatting and linting"
+            echo "🔍 [DRY RUN] dart format ."
+            echo "🔍 [DRY RUN] dart run dart_code_metrics:metrics analyze --fatal-style=true"
+            echo "🔍 [DRY RUN] cd functions && npm run lint"
+            echo "🔍 [DRY RUN] eslint --fix --ext .ts functions/src"
+          else
+            echo "🎨 Formatting Dart code..."
+            dart format .
+
+            echo "📊 Running code metrics..."
+            dart run dart_code_metrics:metrics analyze --fatal-style=true || true
+
+            echo "🔍 Linting Functions..."
+            cd functions
+            npm run lint || true
+
+            echo "🔧 Auto-fixing TypeScript..."
+            npx eslint --fix --ext .ts src || true
+            cd ..
+          fi
+
+      - name: 🧪 Test Pass
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+
+          echo "🧪 Running test suite..."
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🔍 [DRY RUN] Would run Flutter tests and analysis"
+            echo "🔍 [DRY RUN] flutter analyze"
+            echo "🔍 [DRY RUN] flutter test --coverage"
+            echo "🔍 [DRY RUN] cd functions && npm test"
+          else
+            echo "🔍 Analyzing Flutter code..."
+            flutter analyze
+
+            echo "🧪 Running Flutter tests..."
+            flutter test --coverage
+
+            echo "🧪 Running Functions tests..."
+            cd functions
+            npm test
+            cd ..
+          fi
+
+      - name: 📝 Commit & Push Changes
+        id: commit_changes
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'true' }}"
+          BOT_BRANCH="${{ steps.branch_info.outputs.bot_branch }}"
+          ISSUE_NUMBER="${{ steps.issue_info.outputs.issue_number }}"
+          ISSUE_TITLE="${{ steps.issue_info.outputs.issue_title }}"
+
+          echo "📝 Committing changes..."
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🔍 [DRY RUN] Would commit and push changes to $BOT_BRANCH"
+            echo "🔍 [DRY RUN] Commit message: 'feat: Auto-implement #$ISSUE_NUMBER - $ISSUE_TITLE'"
+          else
+            # Check if there are any changes
+            if git diff --quiet && git diff --cached --quiet; then
+              echo "ℹ️ No changes to commit"
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            else
+              git add .
+              git commit -m "feat: Auto-implement #$ISSUE_NUMBER - $ISSUE_TITLE
+
+              🤖 Auto-generated by OPS-Zeta AutoDev Agent
+
+              - Scaffolded tool structure
+              - Applied code formatting and linting
+              - Added tests and documentation
+              - Ready for review
+
+              Resolves #$ISSUE_NUMBER"
+
+              git push origin $BOT_BRANCH
+              echo "✅ Committed and pushed changes"
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: 🔀 Create Pull Request
+        id: create_pr
+        if: steps.commit_changes.outputs.has_changes == 'true' ||
+          github.event.inputs.dry_run == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
+            const issueNumber = ${{ steps.issue_info.outputs.issue_number }};
+            const issueTitle = `${{ steps.issue_info.outputs.issue_title }}`;
+            const botBranch = `${{ steps.branch_info.outputs.bot_branch }}`;
+            const targetBranch = `${{ steps.branch_info.outputs.target_branch }}`;
+            const hasBackend = '${{ steps.issue_info.outputs.has_backend_label }}' === 'true';
+
+            const prTitle = `🤖 Auto-implement: ${issueTitle}`;
+            const prBody = `## 🤖 Auto-Generated Implementation
+
+            This PR was automatically created by **OPS-Zeta AutoDev Agent** for issue #${issueNumber}.
+
+            ### 📋 Implementation Checklist
+            - [x] 🏗️ Tool scaffolding generated
+            - [x] 🎨 Code formatting applied
+            - [x] 🔍 Static analysis passed
+            - [x] 🧪 Tests created and passing
+            - [x] 📚 Documentation updated
+            ${hasBackend ? '- [x] 🔧 Backend callable created' : ''}
+
+            ### 🔗 Related Issue
+            Resolves #${issueNumber}
+
+            ### 🤖 Auto-Dev Details
+            - **Source Branch**: \`${targetBranch}\`
+            - **Bot Branch**: \`${botBranch}\`
+            - **Generated**: ${new Date().toISOString()}
+            - **Agent**: OPS-Zeta v1.0
+
+            ### 🧪 Quality Gates
+            - ✅ Flutter analysis passed
+            - ✅ Tests passing with coverage
+            - ✅ Code formatting applied
+            ${hasBackend ? '- ✅ Backend tests passing' : ''}
+
+            ### 📊 Coverage & Metrics
+            Coverage report and code metrics will be attached after CI completion.
+
+            ---
+            🤖 *This is an automated PR. Review the changes and merge when ready.*
+            `;
+
+            if (dryRun) {
+              core.info('🔍 [DRY RUN] Would create PR:');
+              core.info(`Title: ${prTitle}`);
+              core.info(`Base: ${targetBranch}`);
+              core.info(`Head: ${botBranch}`);
+              core.info(`Body: ${prBody.substring(0, 200)}...`);
+              return;
+            }
+
+            try {
+              const pr = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: prTitle,
+                head: botBranch,
+                base: targetBranch,
+                body: prBody
+              });
+
+              core.setOutput('pr_number', pr.data.number);
+              core.setOutput('pr_url', pr.data.html_url);
+
+              core.info(`✅ Created PR #${pr.data.number}: ${pr.data.html_url}`);
+
+              // Add labels
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.data.number,
+                labels: ['autodev', 'qa:pending']
+              });
+
+            } catch (error) {
+              core.setFailed(`Failed to create PR: ${error.message}`);
+            }
+
+      - name: 💬 Update Issue with Progress
+        if: steps.create_pr.outputs.pr_number || github.event.inputs.dry_run == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dryRun = '${{ github.event.inputs.dry_run || 'true' }}' === 'true';
+            const issueNumber = ${{ steps.issue_info.outputs.issue_number }};
+            const prNumber = '${{ steps.create_pr.outputs.pr_number }}';
+            const prUrl = '${{ steps.create_pr.outputs.pr_url }}';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            let commentBody;
+
+            if (dryRun) {
+              commentBody = `## 🔍 OPS-Zeta AutoDev - Dry Run Complete
+
+              **Dry run completed successfully!** Here's what would happen in live mode:
+
+              ### 📋 Planned Actions
+              - ✅ Issue validated and eligible for auto-development
+              - ✅ Bot branch would be created: \`bot/issue-${issueNumber}-autodev\`
+              - ✅ Tool scaffolding would be generated
+              - ✅ Code formatting and linting would be applied
+              - ✅ Tests would be run and coverage collected
+              - ✅ Changes would be committed and pushed
+              - ✅ Pull request would be created for review
+
+              ### 🚀 Ready for Live Run
+              To execute the auto-development:
+              1. Go to [Actions → OPS-Zeta AutoDev](../../actions/workflows/zeta-autodev.yml)
+              2. Click "Run workflow"
+              3. Enter issue number: \`${issueNumber}\`
+              4. Set "Dry run mode" to \`false\`
+              5. Click "Run workflow"
+
+              ---
+              🤖 *Auto-generated by [OPS-Zeta AutoDev Agent](${runUrl})*`;
+            } else {
+              commentBody = `## 🤖 OPS-Zeta AutoDev - Implementation Complete
+
+              **Auto-development completed successfully!**
+
+              ### 📋 Generated Assets
+              - 🔀 **Pull Request**: #${prNumber} - ${prUrl}
+              - 🌿 **Bot Branch**: \`bot/issue-${issueNumber}-autodev\`
+              - 🧪 **Tests**: All tests passing with coverage
+              - 📚 **Documentation**: Updated and generated
+
+              ### ✅ Quality Gates Passed
+              - Flutter analysis ✅
+              - Code formatting ✅
+              - Test suite ✅
+              - Coverage targets ✅
+
+              ### 🔄 Next Steps
+              1. Review the generated PR
+              2. Test the implementation locally if needed
+              3. Merge when ready
+
+              The PR will auto-merge if all CI checks pass and no conflicts are detected.
+
+              ---
+              🤖 *Auto-generated by [OPS-Zeta AutoDev Agent](${runUrl})*`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: commentBody
+            });
+
+      - name: 🎯 Auto-Merge Setup
+        if: steps.create_pr.outputs.pr_number && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.create_pr.outputs.pr_number }};
+
+            // Wait a bit for CI to start
+            await new Promise(resolve => setTimeout(resolve, 10000));
+
+            try {
+              // Check if CI is passing
+              const checks = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `${{ steps.branch_info.outputs.bot_branch }}`
+              });
+
+              const allPassed = checks.data.check_runs.every(check =>
+                check.status === 'completed' && check.conclusion === 'success'
+              );
+
+              if (allPassed) {
+                // Add auto-merge label to trigger pr-merge.yml
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  labels: ['auto-merge']
+                });
+
+                core.info('✅ Added auto-merge label - PR will be merged automatically');
+              } else {
+                core.info('⏳ CI still running - auto-merge will be handled by pr-merge.yml');
+              }
+
+            } catch (error) {
+              core.warning(`Could not set up auto-merge: ${error.message}`);
+            }
+
+      - name: 🎉 Session Complete
+        run: |
+          echo "🎉 OPS-Zeta AutoDev session complete!"
+          echo "Issue: #${{ steps.issue_info.outputs.issue_number }}"
+          echo "Dry Run: ${{ github.event.inputs.dry_run || 'true' }}"
+          if [ "${{ steps.create_pr.outputs.pr_number }}" != "" ]; then
+            echo "PR Created: #${{ steps.create_pr.outputs.pr_number }}"
+            echo "PR URL: ${{ steps.create_pr.outputs.pr_url }}"
+          fi
+          echo "All operations completed successfully! 🚀"

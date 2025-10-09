@@ -1,173 +1,174 @@
 name: OPS-Delta Weekly Report
 
 on:
-    schedule:
-        - cron: "0 12 * * MON" # Mondays at 12:00 UTC
-    workflow_dispatch:
-        inputs:
-            dry_run:
-                description: "Dry run (true/false)"
-                required: true
-                default: "true"
-                type: string
+  schedule:
+    - cron: "0 12 * * MON" # Mondays at 12:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (true/false)"
+        required: true
+        default: "true"
+        type: string
 
 permissions:
-    contents: write
+  contents: write
+  actions: read
 
 jobs:
-    generate-report:
-        runs-on: ubuntu-latest
+  generate-report:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-            - name: Install dependencies
-              run: |
-                  npm init -y
-                  npm install dayjs @octokit/rest
+      - name: Install dependencies
+        run: |
+          npm init -y
+          npm install dayjs @octokit/rest
 
-            - name: Generate velocity data and sprint report
-              id: report
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  GITHUB_REPOSITORY: ${{ github.repository }}
-              run: |
-                  # Set dry run mode
-                  DRY_RUN="${{ github.event.inputs.dry_run }}"
-                  if [ "$DRY_RUN" != "false" ]; then
-                    echo "🔍 Running in dry-run mode"
-                    node scripts/velocity.mjs --dry-run > velocity-output.txt
-                    node scripts/report.mjs --dry-run > report-output.txt
+      - name: Generate velocity data and sprint report
+        id: report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # Set dry run mode
+          DRY_RUN="${{ github.event.inputs.dry_run }}"
+          if [ "$DRY_RUN" != "false" ]; then
+            echo "🔍 Running in dry-run mode"
+            node scripts/velocity.mjs --dry-run > velocity-output.txt
+            node scripts/report.mjs --dry-run > report-output.txt
 
-                    echo "📊 Velocity Output:"
-                    cat velocity-output.txt
-                    echo ""
-                    echo "📋 Report Output:"
-                    cat report-output.txt
-                  else
-                    echo "🚀 Running in live mode"
-                    node scripts/velocity.mjs > velocity-output.txt 2>&1
-                    node scripts/report.mjs > report-output.txt 2>&1
-                  fi
+            echo "📊 Velocity Output:"
+            cat velocity-output.txt
+            echo ""
+            echo "📋 Report Output:"
+            cat report-output.txt
+          else
+            echo "🚀 Running in live mode"
+            node scripts/velocity.mjs > velocity-output.txt 2>&1
+            node scripts/report.mjs > report-output.txt 2>&1
+          fi
 
-            - name: Process and write reports
-              if: ${{ github.event.inputs.dry_run != 'true' }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  GITHUB_REPOSITORY: ${{ github.repository }}
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const fs = require('fs');
-                      const path = require('path');
+      - name: Process and write reports
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
 
-                      // Read generated report
-                      const reportContent = fs.readFileSync('report-output.txt', 'utf8');
+            // Read generated report
+            const reportContent = fs.readFileSync('report-output.txt', 'utf8');
 
-                      console.log('📋 Processing generated report...');
+            console.log('📋 Processing generated report...');
 
-                      // Extract ISO week from report for archive filename
-                      const weekMatch = reportContent.match(/Week\s+(\d{4}-\d{2})/);
-                      const weekId = weekMatch ? weekMatch[1] : new Date().toISOString().slice(0, 7);
+            // Extract ISO week from report for archive filename
+            const weekMatch = reportContent.match(/Week\s+(\d{4}-\d{2})/);
+            const weekId = weekMatch ? weekMatch[1] : new Date().toISOString().slice(0, 7);
 
-                      // Ensure directories exist
-                      const reportsDir = 'docs/reports';
-                      const historyDir = 'docs/reports/history';
+            // Ensure directories exist
+            const reportsDir = 'docs/reports';
+            const historyDir = 'docs/reports/history';
 
-                      if (!fs.existsSync(reportsDir)) {
-                        fs.mkdirSync(reportsDir, { recursive: true });
-                      }
-                      if (!fs.existsSync(historyDir)) {
-                        fs.mkdirSync(historyDir, { recursive: true });
-                      }
+            if (!fs.existsSync(reportsDir)) {
+              fs.mkdirSync(reportsDir, { recursive: true });
+            }
+            if (!fs.existsSync(historyDir)) {
+              fs.mkdirSync(historyDir, { recursive: true });
+            }
 
-                      // Write main report (overwrites previous)
-                      const mainReportPath = 'docs/reports/sprint-summary.md';
-                      fs.writeFileSync(mainReportPath, reportContent);
+            // Write main report (overwrites previous)
+            const mainReportPath = 'docs/reports/sprint-summary.md';
+            fs.writeFileSync(mainReportPath, reportContent);
 
-                      // Write archive copy
-                      const archivePath = `docs/reports/history/${weekId}.md`;
-                      fs.writeFileSync(archivePath, reportContent);
+            // Write archive copy
+            const archivePath = `docs/reports/history/${weekId}.md`;
+            fs.writeFileSync(archivePath, reportContent);
 
-                      console.log(`✅ Created reports:`);
-                      console.log(`  - Main: ${mainReportPath}`);
-                      console.log(`  - Archive: ${archivePath}`);
+            console.log(`✅ Created reports:`);
+            console.log(`  - Main: ${mainReportPath}`);
+            console.log(`  - Archive: ${archivePath}`);
 
-                      // Add files to git
-                      const { execSync } = require('child_process');
-                      try {
-                        execSync('git add docs/reports/', { stdio: 'inherit' });
-                        console.log('📝 Added report files to git');
-                      } catch (error) {
-                        console.log('ℹ️ Git add completed (may have warnings)');
-                      }
+            // Add files to git
+            const { execSync } = require('child_process');
+            try {
+              execSync('git add docs/reports/', { stdio: 'inherit' });
+              console.log('📝 Added report files to git');
+            } catch (error) {
+              console.log('ℹ️ Git add completed (may have warnings)');
+            }
 
-            - name: Commit and push reports
-              if: ${{ github.event.inputs.dry_run != 'true' }}
-              uses: stefanzweifel/git-auto-commit-action@v5
-              with:
-                  commit_message: "docs(delta): weekly sprint summary + velocity charts"
-                  file_pattern: "docs/reports/*"
+      - name: Commit and push reports
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(delta): weekly sprint summary + velocity charts"
+          file_pattern: "docs/reports/*"
 
-            - name: Generate workflow summary
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const fs = require('fs');
-                      const dry = '${{ github.event.inputs.dry_run }}' !== 'false';
+      - name: Generate workflow summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const dry = '${{ github.event.inputs.dry_run }}' !== 'false';
 
-                      console.log(`🎯 OPS-Delta Weekly Report Complete`);
-                      console.log(`Mode: ${dry ? 'Dry Run' : 'Live'}`);
+            console.log(`🎯 OPS-Delta Weekly Report Complete`);
+            console.log(`Mode: ${dry ? 'Dry Run' : 'Live'}`);
 
-                      // Read report content for summary
-                      let reportPreview = 'Report generation failed';
-                      try {
-                        if (fs.existsSync('report-output.txt')) {
-                          const content = fs.readFileSync('report-output.txt', 'utf8');
-                          const lines = content.split('\n');
-                          reportPreview = lines.slice(0, 10).join('\n') + '\n...(truncated)';
-                        }
-                      } catch (error) {
-                        reportPreview = `Error reading report: ${error.message}`;
-                      }
+            // Read report content for summary
+            let reportPreview = 'Report generation failed';
+            try {
+              if (fs.existsSync('report-output.txt')) {
+                const content = fs.readFileSync('report-output.txt', 'utf8');
+                const lines = content.split('\n');
+                reportPreview = lines.slice(0, 10).join('\n') + '\n...(truncated)';
+              }
+            } catch (error) {
+              reportPreview = `Error reading report: ${error.message}`;
+            }
 
-                      core.summary.addHeading('OPS-Delta Weekly Report', 2);
-                      core.summary.addTable([
-                        ['Metric', 'Value'],
-                        ['Generation Mode', dry ? 'Dry Run' : 'Live'],
-                        ['Status', dry ? 'Preview Only' : 'Published'],
-                        ['Report Location', dry ? 'Console Output' : 'docs/reports/sprint-summary.md'],
-                        ['Archive Created', dry ? 'No' : 'Yes']
-                      ]);
+            core.summary.addHeading('OPS-Delta Weekly Report', 2);
+            core.summary.addTable([
+              ['Metric', 'Value'],
+              ['Generation Mode', dry ? 'Dry Run' : 'Live'],
+              ['Status', dry ? 'Preview Only' : 'Published'],
+              ['Report Location', dry ? 'Console Output' : 'docs/reports/sprint-summary.md'],
+              ['Archive Created', dry ? 'No' : 'Yes']
+            ]);
 
-                      if (dry) {
-                        core.summary.addHeading('Report Preview', 3);
-                        core.summary.addCodeBlock(reportPreview, 'markdown');
-                      } else {
-                        core.summary.addHeading('Published Reports', 3);
-                        core.summary.addList([
-                          'docs/reports/sprint-summary.md (main report)',
-                          'docs/reports/history/[WEEK].md (archive)'
-                        ]);
-                      }
+            if (dry) {
+              core.summary.addHeading('Report Preview', 3);
+              core.summary.addCodeBlock(reportPreview, 'markdown');
+            } else {
+              core.summary.addHeading('Published Reports', 3);
+              core.summary.addList([
+                'docs/reports/sprint-summary.md (main report)',
+                'docs/reports/history/[WEEK].md (archive)'
+              ]);
+            }
 
-                      await core.summary.write();
+            await core.summary.write();
 
-            - name: Send report notification
-              if: ${{ github.event.inputs.dry_run != 'true' }}
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  echo "Sending weekly report notification..."
-                  gh workflow run delta-notify.yml \
-                    -f event_type="report_generated" \
-                    -f title="📊 Weekly Sprint Report Generated" \
-                    -f message="Sprint summary and velocity charts have been updated. Check docs/reports/sprint-summary.md for the latest insights." \
-                    -f severity="info" \
-                    -f dry_run="false"
+      - name: Send report notification
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Sending weekly report notification..."
+          gh workflow run delta-notify.yml \
+            -f event_type="report_generated" \
+            -f title="📊 Weekly Sprint Report Generated" \
+            -f message="Sprint summary and velocity charts have been updated. Check docs/reports/sprint-summary.md for the latest insights." \
+            -f severity="info" \
+            -f dry_run="false"

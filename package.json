@@ -15,6 +15,8 @@
     "test-watchdog": "echo 'Use: gh workflow run delta-watchdog.yml -f dry_run=true'",
     "test-notify": "echo 'Use: gh workflow run delta-notify.yml -f dry_run=true'",
     "test-digest": "echo 'Use: gh workflow run delta-digest.yml -f dry_run=true'",
+    "perms:dry": "node scripts/set-workflow-perms.mjs --dry-run",
+    "perms:apply": "node scripts/set-workflow-perms.mjs",
     "push:preflight": "powershell -ExecutionPolicy Bypass -File scripts/git/push-preflight.ps1",
     "push": "npm run push:preflight && git push",
     "cleanup:preview": "gh workflow run workflow-cleanup.yml -f cleanup_scope=failed_runs -f dry_run=true",
@@ -30,7 +32,8 @@
   },
   "dependencies": {
     "@octokit/rest": "^20.0.2",
-    "dayjs": "^1.11.10"
+    "dayjs": "^1.11.10",
+    "yaml": "^2.4.5"
   },
   "keywords": [
     "sprint-management",

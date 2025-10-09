@@ -15,12 +15,13 @@ on:
     branches:
       - main
     paths:
-      - '!docs/dev-log/**'  # Don't trigger on dev-log changes to avoid loops
+      - '!docs/dev-log/**' # Don't trigger on dev-log changes to avoid loops
 
 permissions:
   contents: write
   pull-requests: read
   issues: read
+  actions: read
 
 jobs:
   update-dev-log:

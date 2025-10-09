@@ -1,324 +1,327 @@
 name: OPS-Delta Progress Tracker
 
 on:
-    pull_request:
-        types: [closed]
-    workflow_dispatch:
-        inputs:
-            dry_run:
-                description: "Dry run (true/false)"
-                required: true
-                default: "true"
-                type: string
-            pr_number:
-                description: "PR number to process (optional, for manual runs)"
-                required: false
-                type: string
+  pull_request:
+    types: [ closed ]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (true/false)"
+        required: true
+        default: "true"
+        type: string
+      pr_number:
+        description: "PR number to process (optional, for manual runs)"
+        required: false
+        type: string
 
 permissions:
-    contents: write
-    issues: write
-    pull-requests: read
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
 
 jobs:
-    track-progress:
-        runs-on: ubuntu-latest
-        if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+  track-progress:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true || github.event_name ==
+      'workflow_dispatch'
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Process merged PR and update progress
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const dry = (core.getInput('dry_run') || '${{ github.event.inputs.dry_run }}' || 'false').toLowerCase() === 'true';
-                      const manualPrNumber = '${{ github.event.inputs.pr_number }}';
+      - name: Process merged PR and update progress
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dry = (core.getInput('dry_run') || '${{ github.event.inputs.dry_run }}' || 'false').toLowerCase() === 'true';
+            const manualPrNumber = '${{ github.event.inputs.pr_number }}';
 
-                      core.info(`🔄 OPS-Delta Progress Tracker Starting`);
-                      core.info(`Dry Run: ${dry}`);
+            core.info(`🔄 OPS-Delta Progress Tracker Starting`);
+            core.info(`Dry Run: ${dry}`);
 
-                      // Determine which PR to process
-                      let prNumber;
-                      if (manualPrNumber) {
-                        prNumber = parseInt(manualPrNumber);
-                      } else if (context.payload.pull_request) {
-                        prNumber = context.payload.pull_request.number;
-                      } else {
-                        core.setFailed('No PR number provided or found in context');
-                        return;
-                      }
+            // Determine which PR to process
+            let prNumber;
+            if (manualPrNumber) {
+              prNumber = parseInt(manualPrNumber);
+            } else if (context.payload.pull_request) {
+              prNumber = context.payload.pull_request.number;
+            } else {
+              core.setFailed('No PR number provided or found in context');
+              return;
+            }
 
-                      core.info(`Processing PR #${prNumber}`);
+            core.info(`Processing PR #${prNumber}`);
 
-                      // Get PR details with error handling
-                      let pr;
-                      try {
-                        const { data: prData } = await github.rest.pulls.get({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          pull_number: prNumber
-                        });
-                        pr = prData;
-                      } catch (error) {
-                        if (error.status === 404) {
-                          core.warning(`PR #${prNumber} not found (may have been deleted). Skipping progress tracking.`);
-                          return;
-                        } else {
-                          core.error(`Failed to fetch PR #${prNumber}: ${error.message}`);
-                          throw error;
-                        }
-                      }
+            // Get PR details with error handling
+            let pr;
+            try {
+              const { data: prData } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              pr = prData;
+            } catch (error) {
+              if (error.status === 404) {
+                core.warning(`PR #${prNumber} not found (may have been deleted). Skipping progress tracking.`);
+                return;
+              } else {
+                core.error(`Failed to fetch PR #${prNumber}: ${error.message}`);
+                throw error;
+              }
+            }
 
-                      if (!pr.merged) {
-                        core.info('PR is not merged, skipping progress tracking');
-                        return;
-                      }
+            if (!pr.merged) {
+              core.info('PR is not merged, skipping progress tracking');
+              return;
+            }
 
-                      // Parse PR body for "Closes #NNN" patterns
-                      const prBody = pr.body || '';
-                      const closesPattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
-                      const closedIssues = [];
-                      let match;
+            // Parse PR body for "Closes #NNN" patterns
+            const prBody = pr.body || '';
+            const closesPattern = /(?:closes?|fixes?|resolves?)\s+#(\d+)/gi;
+            const closedIssues = [];
+            let match;
 
-                      while ((match = closesPattern.exec(prBody)) !== null) {
-                        closedIssues.push(parseInt(match[1]));
-                      }
+            while ((match = closesPattern.exec(prBody)) !== null) {
+              closedIssues.push(parseInt(match[1]));
+            }
 
-                      core.info(`Found ${closedIssues.length} issues to close: ${closedIssues.join(', ')}`);
+            core.info(`Found ${closedIssues.length} issues to close: ${closedIssues.join(', ')}`);
 
-                      if (closedIssues.length === 0) {
-                        core.info('No issues found to close in PR body');
-                        return;
-                      }
+            if (closedIssues.length === 0) {
+              core.info('No issues found to close in PR body');
+              return;
+            }
 
-                      const processedIssues = [];
+            const processedIssues = [];
 
-                      // Process each closed issue
-                      for (const issueNumber of closedIssues) {
-                        try {
-                          // Get issue details
-                          const { data: issue } = await github.rest.issues.get({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: issueNumber
-                          });
+            // Process each closed issue
+            for (const issueNumber of closedIssues) {
+              try {
+                // Get issue details
+                const { data: issue } = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber
+                });
 
-                          if (issue.state === 'closed') {
-                            core.info(`Issue #${issueNumber} already closed, skipping`);
-                            continue;
-                          }
+                if (issue.state === 'closed') {
+                  core.info(`Issue #${issueNumber} already closed, skipping`);
+                  continue;
+                }
 
-                          const labels = issue.labels.map(l => l.name);
-                          const hasReady = labels.includes('ready');
+                const labels = issue.labels.map(l => l.name);
+                const hasReady = labels.includes('ready');
 
-                          if (!dry) {
-                            // Close the issue
-                            await github.rest.issues.update({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: issueNumber,
-                              state: 'closed'
-                            });
+                if (!dry) {
+                  // Close the issue
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    state: 'closed'
+                  });
 
-                            // Remove ready label if present
-                            if (hasReady) {
-                              await github.rest.issues.removeLabel({
-                                owner: context.repo.owner,
-                                repo: context.repo.repo,
-                                issue_number: issueNumber,
-                                name: 'ready'
-                              });
-                            }
+                  // Remove ready label if present
+                  if (hasReady) {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issueNumber,
+                      name: 'ready'
+                    });
+                  }
 
-                            // Add done label
-                            await github.rest.issues.addLabels({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: issueNumber,
-                              labels: ['done']
-                            });
+                  // Add done label
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    labels: ['done']
+                  });
 
-                            // Add completion comment
-                            await github.rest.issues.createComment({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: issueNumber,
-                              body: `✅ **Completed via PR #${prNumber}**\n\n` +
-                                    `This issue has been resolved and merged into main.\n\n` +
-                                    `**Changes:** ${pr.title}\n` +
-                                    `**Merged:** ${pr.merged_at}\n` +
-                                    `**Author:** @${pr.user.login}\n\n` +
-                                    `*Automatically tracked by OPS-Delta Progress Tracker*`
-                            });
+                  // Add completion comment
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    body: `✅ **Completed via PR #${prNumber}**\n\n` +
+                          `This issue has been resolved and merged into main.\n\n` +
+                          `**Changes:** ${pr.title}\n` +
+                          `**Merged:** ${pr.merged_at}\n` +
+                          `**Author:** @${pr.user.login}\n\n` +
+                          `*Automatically tracked by OPS-Delta Progress Tracker*`
+                  });
 
-                            core.info(`✅ Closed issue #${issueNumber} and added done label`);
-                          } else {
-                            core.info(`[DRY] Would close #${issueNumber}, remove ready label, add done label`);
-                          }
+                  core.info(`✅ Closed issue #${issueNumber} and added done label`);
+                } else {
+                  core.info(`[DRY] Would close #${issueNumber}, remove ready label, add done label`);
+                }
 
-                          processedIssues.push({
-                            number: issueNumber,
-                            title: issue.title,
-                            labels: labels,
-                            hadReady: hasReady
-                          });
+                processedIssues.push({
+                  number: issueNumber,
+                  title: issue.title,
+                  labels: labels,
+                  hadReady: hasReady
+                });
 
-                        } catch (error) {
-                          core.error(`Failed to process issue #${issueNumber}: ${error.message}`);
-                        }
-                      }
+              } catch (error) {
+                core.error(`Failed to process issue #${issueNumber}: ${error.message}`);
+              }
+            }
 
-                      // Update Epic comments with checkmark list
-                      if (processedIssues.length > 0) {
-                        // Find Epic issues that might reference these completed issues
-                        const { data: epicIssues } = await github.rest.issues.listForRepo({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          state: 'open',
-                          labels: 'epic',
-                          per_page: 100
-                        });
+            // Update Epic comments with checkmark list
+            if (processedIssues.length > 0) {
+              // Find Epic issues that might reference these completed issues
+              const { data: epicIssues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'epic',
+                per_page: 100
+              });
 
-                        for (const epic of epicIssues) {
-                          let epicBody = epic.body || '';
-                          let updated = false;
+              for (const epic of epicIssues) {
+                let epicBody = epic.body || '';
+                let updated = false;
 
-                          // Update Epic body with checkmarks for completed issues
-                          for (const completedIssue of processedIssues) {
-                            // Look for references to this issue in the epic
-                            const issueRef = `#${completedIssue.number}`;
-                            const patterns = [
-                              new RegExp(`- \\[ \\] (.*)${issueRef}(.*)`, 'gi'),
-                              new RegExp(`- \\[ \\] (.*)${completedIssue.title}(.*)`, 'gi'),
-                              new RegExp(`\\* \\[ \\] (.*)${issueRef}(.*)`, 'gi')
-                            ];
+                // Update Epic body with checkmarks for completed issues
+                for (const completedIssue of processedIssues) {
+                  // Look for references to this issue in the epic
+                  const issueRef = `#${completedIssue.number}`;
+                  const patterns = [
+                    new RegExp(`- \\[ \\] (.*)${issueRef}(.*)`, 'gi'),
+                    new RegExp(`- \\[ \\] (.*)${completedIssue.title}(.*)`, 'gi'),
+                    new RegExp(`\\* \\[ \\] (.*)${issueRef}(.*)`, 'gi')
+                  ];
 
-                            for (const pattern of patterns) {
-                              if (pattern.test(epicBody)) {
-                                epicBody = epicBody.replace(pattern, `- [x] $1${issueRef}$2`);
-                                updated = true;
-                                core.info(`✅ Updated Epic #${epic.number} with checkmark for #${completedIssue.number}`);
-                                break;
-                              }
-                            }
-                          }
+                  for (const pattern of patterns) {
+                    if (pattern.test(epicBody)) {
+                      epicBody = epicBody.replace(pattern, `- [x] $1${issueRef}$2`);
+                      updated = true;
+                      core.info(`✅ Updated Epic #${epic.number} with checkmark for #${completedIssue.number}`);
+                      break;
+                    }
+                  }
+                }
 
-                          // Update the Epic if changes were made
-                          if (updated && !dry) {
-                            await github.rest.issues.update({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: epic.number,
-                              body: epicBody
-                            });
+                // Update the Epic if changes were made
+                if (updated && !dry) {
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: epic.number,
+                    body: epicBody
+                  });
 
-                            // Add progress comment to Epic
-                            const progressComment = `🎯 **Progress Update from PR #${prNumber}**\n\n` +
-                                                  `Completed issues:\n` +
-                                                  processedIssues.map(i => `- [x] #${i.number} ${i.title}`).join('\n') + '\n\n' +
-                                                  `*Updated by OPS-Delta Progress Tracker*`;
+                  // Add progress comment to Epic
+                  const progressComment = `🎯 **Progress Update from PR #${prNumber}**\n\n` +
+                                        `Completed issues:\n` +
+                                        processedIssues.map(i => `- [x] #${i.number} ${i.title}`).join('\n') + '\n\n' +
+                                        `*Updated by OPS-Delta Progress Tracker*`;
 
-                            await github.rest.issues.createComment({
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              issue_number: epic.number,
-                              body: progressComment
-                            });
-                          } else if (updated && dry) {
-                            core.info(`[DRY] Would update Epic #${epic.number} with checkmarks`);
-                          }
-                        }
-                      }
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: epic.number,
+                    body: progressComment
+                  });
+                } else if (updated && dry) {
+                  core.info(`[DRY] Would update Epic #${epic.number} with checkmarks`);
+                }
+              }
+            }
 
-                      // Append to dev-log
-                      if (processedIssues.length > 0 && !dry) {
-                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                        const logPath = `dev-log/operations/${timestamp}-delta-progress.md`;
+            // Append to dev-log
+            if (processedIssues.length > 0 && !dry) {
+              const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+              const logPath = `dev-log/operations/${timestamp}-delta-progress.md`;
 
-                        const logContent = `# Delta Progress Log - ${new Date().toISOString().split('T')[0]}\n\n` +
-                                         `## PR #${prNumber}: ${pr.title}\n\n` +
-                                         `**Merged:** ${pr.merged_at}\n` +
-                                         `**Author:** @${pr.user.login}\n` +
-                                         `**Branch:** ${pr.head.ref} → ${pr.base.ref}\n\n` +
-                                         `## Completed Issues\n\n` +
-                                         processedIssues.map(issue =>
-                                           `- [x] #${issue.number} ${issue.title}\n` +
-                                           `  - Labels: ${issue.labels.join(', ')}\n` +
-                                           `  - Had ready label: ${issue.hadReady ? 'Yes' : 'No'}`
-                                         ).join('\n') + '\n\n' +
-                                         `## Impact\n\n` +
-                                         `- Issues closed: ${processedIssues.length}\n` +
-                                         `- Ready queue freed: ${processedIssues.filter(i => i.hadReady).length} slots\n\n` +
-                                         `---\n` +
-                                         `*Generated by OPS-Delta Progress Tracker*\n`;
+              const logContent = `# Delta Progress Log - ${new Date().toISOString().split('T')[0]}\n\n` +
+                               `## PR #${prNumber}: ${pr.title}\n\n` +
+                               `**Merged:** ${pr.merged_at}\n` +
+                               `**Author:** @${pr.user.login}\n` +
+                               `**Branch:** ${pr.head.ref} → ${pr.base.ref}\n\n` +
+                               `## Completed Issues\n\n` +
+                               processedIssues.map(issue =>
+                                 `- [x] #${issue.number} ${issue.title}\n` +
+                                 `  - Labels: ${issue.labels.join(', ')}\n` +
+                                 `  - Had ready label: ${issue.hadReady ? 'Yes' : 'No'}`
+                               ).join('\n') + '\n\n' +
+                               `## Impact\n\n` +
+                               `- Issues closed: ${processedIssues.length}\n` +
+                               `- Ready queue freed: ${processedIssues.filter(i => i.hadReady).length} slots\n\n` +
+                               `---\n` +
+                               `*Generated by OPS-Delta Progress Tracker*\n`;
 
-                        // Ensure directory exists and write log
-                        const fs = require('fs');
-                        const path = require('path');
-                        const logDir = path.dirname(logPath);
+              // Ensure directory exists and write log
+              const fs = require('fs');
+              const path = require('path');
+              const logDir = path.dirname(logPath);
 
-                        if (!fs.existsSync(logDir)) {
-                          fs.mkdirSync(logDir, { recursive: true });
-                        }
+              if (!fs.existsSync(logDir)) {
+                fs.mkdirSync(logDir, { recursive: true });
+              }
 
-                        fs.writeFileSync(logPath, logContent);
-                        core.info(`📝 Created dev-log entry: ${logPath}`);
+              fs.writeFileSync(logPath, logContent);
+              core.info(`📝 Created dev-log entry: ${logPath}`);
 
-                        // Commit the log file
-                        try {
-                          await github.rest.repos.createOrUpdateFileContents({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            path: logPath,
-                            message: `docs(delta): progress log for PR #${prNumber}`,
-                            content: Buffer.from(logContent).toString('base64'),
-                            branch: 'main'
-                          });
-                          core.info(`✅ Committed dev-log entry to repository`);
-                        } catch (error) {
-                          core.error(`Failed to commit dev-log: ${error.message}`);
-                        }
-                      }
+              // Commit the log file
+              try {
+                await github.rest.repos.createOrUpdateFileContents({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: logPath,
+                  message: `docs(delta): progress log for PR #${prNumber}`,
+                  content: Buffer.from(logContent).toString('base64'),
+                  branch: 'main'
+                });
+                core.info(`✅ Committed dev-log entry to repository`);
+              } catch (error) {
+                core.error(`Failed to commit dev-log: ${error.message}`);
+              }
+            }
 
-                      // Generate summary
-                      core.summary.addHeading('OPS-Delta Progress Tracker Results', 2);
-                      core.summary.addTable([
-                        ['Metric', 'Value'],
-                        ['PR Number', prNumber.toString()],
-                        ['PR Title', pr.title],
-                        ['Mode', dry ? 'Dry Run' : 'Live'],
-                        ['Issues Found', closedIssues.length.toString()],
-                        ['Issues Processed', processedIssues.length.toString()],
-                        ['Dev Log Created', (!dry && processedIssues.length > 0) ? 'Yes' : 'No']
-                      ]);
+            // Generate summary
+            core.summary.addHeading('OPS-Delta Progress Tracker Results', 2);
+            core.summary.addTable([
+              ['Metric', 'Value'],
+              ['PR Number', prNumber.toString()],
+              ['PR Title', pr.title],
+              ['Mode', dry ? 'Dry Run' : 'Live'],
+              ['Issues Found', closedIssues.length.toString()],
+              ['Issues Processed', processedIssues.length.toString()],
+              ['Dev Log Created', (!dry && processedIssues.length > 0) ? 'Yes' : 'No']
+            ]);
 
-                      if (processedIssues.length > 0) {
-                        core.summary.addHeading('Processed Issues', 3);
-                        const issueTable = [['Issue', 'Title', 'Had Ready Label']];
-                        processedIssues.forEach(issue => {
-                          issueTable.push([
-                            `#${issue.number}`,
-                            issue.title,
-                            issue.hadReady ? 'Yes' : 'No'
-                          ]);
-                        });
-                        core.summary.addTable(issueTable);
-                      }
+            if (processedIssues.length > 0) {
+              core.summary.addHeading('Processed Issues', 3);
+              const issueTable = [['Issue', 'Title', 'Had Ready Label']];
+              processedIssues.forEach(issue => {
+                issueTable.push([
+                  `#${issue.number}`,
+                  issue.title,
+                  issue.hadReady ? 'Yes' : 'No'
+                ]);
+              });
+              core.summary.addTable(issueTable);
+            }
 
-                      await core.summary.write();
-                      core.info(`🎯 Progress tracking complete - Processed ${processedIssues.length} issues`);
+            await core.summary.write();
+            core.info(`🎯 Progress tracking complete - Processed ${processedIssues.length} issues`);
 
-            - name: Send progress notification
-              if: github.event.pull_request.merged == true && github.event.inputs.dry_run != 'true'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  echo "Sending progress tracking notification..."
-                  gh workflow run delta-notify.yml \
-                    -f event_type="progress_update" \
-                    -f title="📈 Sprint Progress Updated" \
-                    -f message="PR #${{ github.event.pull_request.number }} '${{ github.event.pull_request.title }}' has been processed. Issues closed and progress tracked." \
-                    -f severity="info" \
-                    -f dry_run="false"
+      - name: Send progress notification
+        if: github.event.pull_request.merged == true && github.event.inputs.dry_run !=
+          'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Sending progress tracking notification..."
+          gh workflow run delta-notify.yml \
+            -f event_type="progress_update" \
+            -f title="📈 Sprint Progress Updated" \
+            -f message="PR #${{ github.event.pull_request.number }} '${{ github.event.pull_request.title }}' has been processed. Issues closed and progress tracked." \
+            -f severity="info" \
+            -f dry_run="false"

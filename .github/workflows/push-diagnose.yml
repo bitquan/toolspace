@@ -1,205 +1,208 @@
 name: "🔧 Push Diagnostics"
 
 on:
-    workflow_dispatch:
-        inputs:
-            branch_to_check:
-                description: "Branch to check (leave empty for current default)"
-                required: false
-                default: ""
+  workflow_dispatch:
+    inputs:
+      branch_to_check:
+        description: "Branch to check (leave empty for current default)"
+        required: false
+        default: ""
 
 jobs:
-    diagnose:
-        name: "Git Push Diagnostics"
-        runs-on: ubuntu-latest
+  diagnose:
+    name: "Git Push Diagnostics"
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: "📋 Checkout Repository"
-              uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0 # Full history for complete diagnosis
+    steps:
+      - name: "📋 Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for complete diagnosis
 
-            - name: "🔍 Repository Information"
-              run: |
-                  echo "## 📊 Repository Diagnostics" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "🔍 Repository Information"
+        run: |
+          echo "## 📊 Repository Diagnostics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  echo "### Repository Details" >> $GITHUB_STEP_SUMMARY
-                  echo "- **Repository**: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
-                  echo "- **Owner**: ${{ github.repository_owner }}" >> $GITHUB_STEP_SUMMARY
-                  echo "- **Workflow run**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Repository Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository**: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Owner**: ${{ github.repository_owner }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow run**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "🎯 Default Branch Analysis"
-              run: |
-                  echo "### 🎯 Default Branch Information" >> $GITHUB_STEP_SUMMARY
+      - name: "🎯 Default Branch Analysis"
+        run: |
+          echo "### 🎯 Default Branch Information" >> $GITHUB_STEP_SUMMARY
 
-                  # Get default branch from GitHub API
-                  DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
-                  echo "- **GitHub default branch**: \`$DEFAULT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
+          # Get default branch from GitHub API
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          echo "- **GitHub default branch**: \`$DEFAULT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
 
-                  # Get current branch
-                  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-                  echo "- **Current checkout**: \`$CURRENT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
+          # Get current branch
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "- **Current checkout**: \`$CURRENT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
 
-                  # Check if they match
-                  if [ "$DEFAULT_BRANCH" = "$CURRENT_BRANCH" ]; then
-                    echo "- **Status**: ✅ On default branch" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Status**: ⚠️  On different branch" >> $GITHUB_STEP_SUMMARY
-                  fi
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          # Check if they match
+          if [ "$DEFAULT_BRANCH" = "$CURRENT_BRANCH" ]; then
+            echo "- **Status**: ✅ On default branch" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ⚠️  On different branch" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "📝 Recent Commits"
-              run: |
-                  echo "### 📝 Last 3 Commits" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "📝 Recent Commits"
+        run: |
+          echo "### 📝 Last 3 Commits" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Get last 3 commits with formatting
-                  git log --oneline -3 --pretty=format:"- \`%h\` %s (%an, %ar)" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          # Get last 3 commits with formatting
+          git log --oneline -3 --pretty=format:"- \`%h\` %s (%an, %ar)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "🛡️ Branch Protection Analysis"
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  echo "### 🛡️ Branch Protection Status" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "🛡️ Branch Protection Analysis"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "### 🛡️ Branch Protection Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
 
-                  # Check branch protection using GitHub API
-                  PROTECTION_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                    -H "Accept: application/vnd.github.v3+json" \
-                    "https://api.github.com/repos/${{ github.repository }}/branches/$DEFAULT_BRANCH/protection" \
-                    | jq -r '.url // "not_protected"')
+          # Check branch protection using GitHub API
+          PROTECTION_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/branches/$DEFAULT_BRANCH/protection" \
+            | jq -r '.url // "not_protected"')
 
-                  if [ "$PROTECTION_STATUS" = "not_protected" ]; then
-                    echo "- **Protection**: ❌ No branch protection found" >> $GITHUB_STEP_SUMMARY
-                    echo "- **Recommendation**: Enable branch protection for \`$DEFAULT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Protection**: ✅ Branch protection enabled" >> $GITHUB_STEP_SUMMARY
+          if [ "$PROTECTION_STATUS" = "not_protected" ]; then
+            echo "- **Protection**: ❌ No branch protection found" >> $GITHUB_STEP_SUMMARY
+            echo "- **Recommendation**: Enable branch protection for \`$DEFAULT_BRANCH\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Protection**: ✅ Branch protection enabled" >> $GITHUB_STEP_SUMMARY
 
-                    # Get protection details
-                    curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                      -H "Accept: application/vnd.github.v3+json" \
-                      "https://api.github.com/repos/${{ github.repository }}/branches/$DEFAULT_BRANCH/protection" \
-                      | jq -r '
-                        "- **Required reviews**: " + (.required_pull_request_reviews.required_approving_review_count // 0 | tostring),
-                        "- **Dismiss stale reviews**: " + (.required_pull_request_reviews.dismiss_stale_reviews // false | tostring),
-                        "- **Require status checks**: " + (.required_status_checks.strict // false | tostring),
-                        "- **Restrict pushes**: " + (.restrictions != null | tostring)
-                      ' >> $GITHUB_STEP_SUMMARY
-                  fi
-                  echo "" >> $GITHUB_STEP_SUMMARY
+            # Get protection details
+            curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/branches/$DEFAULT_BRANCH/protection" \
+              | jq -r '
+                "- **Required reviews**: " + (.required_pull_request_reviews.required_approving_review_count // 0 | tostring),
+                "- **Dismiss stale reviews**: " + (.required_pull_request_reviews.dismiss_stale_reviews // false | tostring),
+                "- **Require status checks**: " + (.required_status_checks.strict // false | tostring),
+                "- **Restrict pushes**: " + (.restrictions != null | tostring)
+              ' >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "🤖 Auto-PR Rules (OPS-Gamma)"
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  echo "### 🤖 Auto-PR Configuration (OPS-Gamma)" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "🤖 Auto-PR Rules (OPS-Gamma)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "### 🤖 Auto-PR Configuration (OPS-Gamma)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Check for GitHub Actions workflows that might handle auto-PR
-                  if [ -f ".github/workflows/gamma-auto-pr.yml" ]; then
-                    echo "- **OPS-Gamma workflow**: ✅ Found \`.github/workflows/gamma-auto-pr.yml\`" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **OPS-Gamma workflow**: ❌ Not found" >> $GITHUB_STEP_SUMMARY
-                  fi
+          # Check for GitHub Actions workflows that might handle auto-PR
+          if [ -f ".github/workflows/gamma-auto-pr.yml" ]; then
+            echo "- **OPS-Gamma workflow**: ✅ Found \`.github/workflows/gamma-auto-pr.yml\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **OPS-Gamma workflow**: ❌ Not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
-                  # Check for auto-merge configurations
-                  if [ -f ".github/workflows/auto-merge.yml" ]; then
-                    echo "- **Auto-merge workflow**: ✅ Found \`.github/workflows/auto-merge.yml\`" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Auto-merge workflow**: ⚠️ Not found" >> $GITHUB_STEP_SUMMARY
-                  fi
+          # Check for auto-merge configurations
+          if [ -f ".github/workflows/auto-merge.yml" ]; then
+            echo "- **Auto-merge workflow**: ✅ Found \`.github/workflows/auto-merge.yml\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Auto-merge workflow**: ⚠️ Not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
-                  # Check repository settings for auto-merge
-                  AUTO_MERGE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                    -H "Accept: application/vnd.github.v3+json" \
-                    "https://api.github.com/repos/${{ github.repository }}" \
-                    | jq -r '.allow_auto_merge // false')
+          # Check repository settings for auto-merge
+          AUTO_MERGE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}" \
+            | jq -r '.allow_auto_merge // false')
 
-                  if [ "$AUTO_MERGE" = "true" ]; then
-                    echo "- **Repository auto-merge**: ✅ Enabled" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Repository auto-merge**: ❌ Disabled" >> $GITHUB_STEP_SUMMARY
-                  fi
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$AUTO_MERGE" = "true" ]; then
+            echo "- **Repository auto-merge**: ✅ Enabled" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Repository auto-merge**: ❌ Disabled" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "🔧 Git Configuration"
-              run: |
-                  echo "### 🔧 Git Configuration" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "🔧 Git Configuration"
+        run: |
+          echo "### 🔧 Git Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Git remotes
-                  echo "**Remotes:**" >> $GITHUB_STEP_SUMMARY
-                  git remote -v | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          # Git remotes
+          echo "**Remotes:**" >> $GITHUB_STEP_SUMMARY
+          git remote -v | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Git user config
-                  echo "**User Configuration:**" >> $GITHUB_STEP_SUMMARY
-                  USER_NAME=$(git config user.name || echo "Not set")
-                  USER_EMAIL=$(git config user.email || echo "Not set")
-                  echo "- **Name**: $USER_NAME" >> $GITHUB_STEP_SUMMARY
-                  echo "- **Email**: $USER_EMAIL" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+          # Git user config
+          echo "**User Configuration:**" >> $GITHUB_STEP_SUMMARY
+          USER_NAME=$(git config user.name || echo "Not set")
+          USER_EMAIL=$(git config user.email || echo "Not set")
+          echo "- **Name**: $USER_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Email**: $USER_EMAIL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-            - name: "✅ Push Health Check"
-              run: |
-                  echo "### ✅ Push Health Summary" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "✅ Push Health Check"
+        run: |
+          echo "### ✅ Push Health Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Overall health score
-                  HEALTH_SCORE=0
+          # Overall health score
+          HEALTH_SCORE=0
 
-                  # Check default branch
-                  DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
-                  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-                  if [ "$DEFAULT_BRANCH" = "$CURRENT_BRANCH" ]; then
-                    HEALTH_SCORE=$((HEALTH_SCORE + 1))
-                  fi
+          # Check default branch
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [ "$DEFAULT_BRANCH" = "$CURRENT_BRANCH" ]; then
+            HEALTH_SCORE=$((HEALTH_SCORE + 1))
+          fi
 
-                  # Check remotes
-                  if git remote -v | grep -q "origin"; then
-                    HEALTH_SCORE=$((HEALTH_SCORE + 1))
-                  fi
+          # Check remotes
+          if git remote -v | grep -q "origin"; then
+            HEALTH_SCORE=$((HEALTH_SCORE + 1))
+          fi
 
-                  # Check user config
-                  if git config user.name >/dev/null 2>&1 && git config user.email >/dev/null 2>&1; then
-                    HEALTH_SCORE=$((HEALTH_SCORE + 1))
-                  fi
+          # Check user config
+          if git config user.name >/dev/null 2>&1 && git config user.email >/dev/null 2>&1; then
+            HEALTH_SCORE=$((HEALTH_SCORE + 1))
+          fi
 
-                  # Check working directory
-                  if git diff-index --quiet HEAD --; then
-                    HEALTH_SCORE=$((HEALTH_SCORE + 1))
-                  fi
+          # Check working directory
+          if git diff-index --quiet HEAD --; then
+            HEALTH_SCORE=$((HEALTH_SCORE + 1))
+          fi
 
-                  echo "- **Health Score**: $HEALTH_SCORE/4" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health Score**: $HEALTH_SCORE/4" >> $GITHUB_STEP_SUMMARY
 
-                  if [ $HEALTH_SCORE -eq 4 ]; then
-                    echo "- **Status**: 🟢 Excellent - Ready for reliable pushes" >> $GITHUB_STEP_SUMMARY
-                  elif [ $HEALTH_SCORE -eq 3 ]; then
-                    echo "- **Status**: 🟡 Good - Minor issues to address" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Status**: 🔴 Needs attention - Several issues found" >> $GITHUB_STEP_SUMMARY
-                  fi
+          if [ $HEALTH_SCORE -eq 4 ]; then
+            echo "- **Status**: 🟢 Excellent - Ready for reliable pushes" >> $GITHUB_STEP_SUMMARY
+          elif [ $HEALTH_SCORE -eq 3 ]; then
+            echo "- **Status**: 🟡 Good - Minor issues to address" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: 🔴 Needs attention - Several issues found" >> $GITHUB_STEP_SUMMARY
+          fi
 
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "**Recommendations:**" >> $GITHUB_STEP_SUMMARY
-                  echo "- Use \`npm run push\` for safer pushes" >> $GITHUB_STEP_SUMMARY
-                  echo "- Run \`npm run push:preflight\` to check before pushing" >> $GITHUB_STEP_SUMMARY
-                  echo "- See [push troubleshooting docs](./docs/ops/push-troubleshooting.md)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Recommendations:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Use \`npm run push\` for safer pushes" >> $GITHUB_STEP_SUMMARY
+          echo "- Run \`npm run push:preflight\` to check before pushing" >> $GITHUB_STEP_SUMMARY
+          echo "- See [push troubleshooting docs](./docs/ops/push-troubleshooting.md)" >> $GITHUB_STEP_SUMMARY
 
-            - name: "🚀 Test Push Preflight"
-              run: |
-                  echo "### 🚀 Push Preflight Test" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: "🚀 Test Push Preflight"
+        run: |
+          echo "### 🚀 Push Preflight Test" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-                  # Test the preflight script
-                  if bash scripts/git/push-preflight.sh; then
-                    echo "- **Preflight check**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "- **Preflight check**: ❌ Failed" >> $GITHUB_STEP_SUMMARY
-                  fi
+          # Test the preflight script
+          if bash scripts/git/push-preflight.sh; then
+            echo "- **Preflight check**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Preflight check**: ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+permissions:
+  contents: read
+  actions: read

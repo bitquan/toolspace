@@ -7,22 +7,23 @@ on:
     branches:
       - main
   workflow_run:
-    workflows: ["🚀 PR CI (Lean & Fast)"]
-    types: [completed]
-    branches: [main]
+    workflows: [ "🚀 PR CI (Lean & Fast)" ]
+    types: [ completed ]
+    branches: [ main ]
 
 jobs:
   check_pr_ci:
     name: Check PR CI Passed
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'push'
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name ==
+      'push'
     steps:
       - name: ✅ PR CI Passed
         run: echo "PR CI checks passed, proceeding with deployment"
 
   build_and_deploy:
     runs-on: ubuntu-latest
-    needs: [check_pr_ci]
+    needs: [ check_pr_ci ]
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
@@ -35,3 +36,6 @@ jobs:
           projectId: toolspace-beta
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+permissions:
+  contents: read
+  actions: read

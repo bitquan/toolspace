@@ -1,68 +1,70 @@
 name: E2E Tests
 
 on:
-    workflow_dispatch:
-        inputs:
-            environment:
-                description: "Environment to test against"
-                required: true
-                default: "staging"
-                type: choice
-                options:
-                    - staging
-                    - production
-    schedule:
-        - cron: "0 2 * * *" # Run daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to test against"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+  schedule:
+    - cron: "0 2 * * *" # Run daily at 2 AM UTC
 
 jobs:
-    e2e-placeholder:
-        name: E2E Tests (Placeholder)
-        runs-on: ubuntu-latest
+  e2e-placeholder:
+    name: E2E Tests (Placeholder)
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: "20"
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
 
-            - name: E2E Placeholder
-              run: |
-                  echo "E2E placeholder — add Playwright tests after first tool ships."
-                  echo "Environment: ${{ github.event.inputs.environment || 'staging' }}"
-                  echo "Will implement:"
-                  echo "- User authentication flow"
-                  echo "- Tool navigation and basic functionality" 
-                  echo "- Cross-browser compatibility tests"
-                  echo "- Mobile responsive tests"
-
-    # TODO: Implement actual E2E tests
-    # e2e-tests:
-    #   name: E2E Tests
-    #   runs-on: ubuntu-latest
-    #
-    #   steps:
-    #     - name: Checkout code
-    #       uses: actions/checkout@v5
-    #
-    #     - name: Setup Node.js
-    #       uses: actions/setup-node@v5
-    #       with:
-    #         node-version: '20'
-    #
-    #     - name: Install Playwright
-    #       run: |
-    #         npm install -g @playwright/test
-    #         playwright install
-    #
-    #     - name: Run E2E tests
-    #       run: playwright test
-    #
-    #     - name: Upload test results
-    #       uses: actions/upload-artifact@v4
-    #       if: always()
-    #       with:
-    #         name: playwright-report
-    #         path: playwright-report/
+      - name: E2E Placeholder
+        run: |
+          echo "E2E placeholder — add Playwright tests after first tool ships."
+          echo "Environment: ${{ github.event.inputs.environment || 'staging' }}"
+          echo "Will implement:"
+          echo "- User authentication flow"
+          echo "- Tool navigation and basic functionality" 
+          echo "- Cross-browser compatibility tests"
+          echo "- Mobile responsive tests"
+  # TODO: Implement actual E2E tests
+  # e2e-tests:
+  #   name: E2E Tests
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v5
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v5
+  #       with:
+  #         node-version: '20'
+  #
+  #     - name: Install Playwright
+  #       run: |
+  #         npm install -g @playwright/test
+  #         playwright install
+  #
+  #     - name: Run E2E tests
+  #       run: playwright test
+  #
+  #     - name: Upload test results
+  #       uses: actions/upload-artifact@v4
+  #       if: always()
+  #       with:
+  #         name: playwright-report
+  #         path: playwright-report/
+permissions:
+  contents: read
+  actions: read
