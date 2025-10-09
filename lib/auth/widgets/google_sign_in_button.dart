@@ -51,18 +51,18 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
         onPressed: _isLoading ? null : _signInWithGoogle,
         style: OutlinedButton.styleFrom(
           backgroundColor:
-              isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+              isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
           side: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.3),
+                ? Colors.white.withValues(alpha: 0.2)
+                : Colors.grey.withValues(alpha: 0.3),
             width: 1,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withValues(alpha: 0.1),
         ),
         child: _isLoading
             ? const SizedBox(

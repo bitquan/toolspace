@@ -223,7 +223,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                             elevation: 8,
                             shadowColor:
-                                theme.colorScheme.primary.withOpacity(0.3),
+                                theme.colorScheme.primary.withValues(alpha: 0.3),
                           ),
                           child: _isLoading
                               ? const SizedBox(

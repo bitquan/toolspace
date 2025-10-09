@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-10-09T05:10:03.205Z",
+  "timestamp": "2025-10-09T16:12:48.248Z",
   "summary": {
-    "success": true,
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "duration": 95982
+    "success": false,
+    "passed": 1,
+    "failed": 1,
+    "total": 2,
+    "duration": 10780
   },
   "flags": {
     "quick": false,
@@ -16,66 +16,18 @@
     {
       "name": "Flutter pub get",
       "success": true,
-      "duration": 1456,
+      "duration": 1497,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-pub-get.log"
     },
     {
       "name": "Flutter analyze (ZERO tolerance)",
-      "success": true,
-      "duration": 5019,
-      "exitCode": 0,
-      "error": null,
+      "success": false,
+      "duration": 6273,
+      "exitCode": 1,
+      "error": "76 issues found. (ran in 4.5s)",
       "logFile": "flutter-analyze-zero-tolerance-.log"
-    },
-    {
-      "name": "Flutter test",
-      "success": true,
-      "duration": 8915,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "flutter-test.log"
-    },
-    {
-      "name": "Flutter build web",
-      "success": true,
-      "duration": 6985,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "flutter-build-web.log"
-    },
-    {
-      "name": "Functions npm ci",
-      "success": true,
-      "duration": 66103,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "functions-npm-ci.log"
-    },
-    {
-      "name": "Functions lint (ZERO warnings)",
-      "success": true,
-      "duration": 2715,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "functions-lint-zero-warnings-.log"
-    },
-    {
-      "name": "Functions test",
-      "success": true,
-      "duration": 241,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "functions-test.log"
-    },
-    {
-      "name": "E2E with emulators",
-      "success": true,
-      "duration": 1669,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "e2e-with-emulators.log"
     }
   ]
 }

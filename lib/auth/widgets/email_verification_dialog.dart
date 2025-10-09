@@ -155,17 +155,17 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                theme.colorScheme.surface.withOpacity(0.9),
-                theme.colorScheme.surfaceContainerHighest.withOpacity(0.8),
+                theme.colorScheme.surface.withValues(alpha: 0.9),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -180,8 +180,8 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.orange.withOpacity(0.2),
-                      Colors.deepOrange.withOpacity(0.2),
+                      Colors.orange.withValues(alpha: 0.2),
+                      Colors.deepOrange.withValues(alpha: 0.2),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -206,7 +206,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                                   end: Alignment.centerRight,
                                   colors: [
                                     Colors.transparent,
-                                    Colors.white.withOpacity(0.3),
+                                    Colors.white.withValues(alpha: 0.3),
                                     Colors.transparent,
                                   ],
                                   stops: [
@@ -242,7 +242,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
               Text(
                 'Please verify your email address before purchasing a subscription. This helps us ensure account security and payment notifications reach you.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),

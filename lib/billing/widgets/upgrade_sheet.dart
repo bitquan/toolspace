@@ -295,7 +295,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                 : null,
         color: isCurrent || isPopular
             ? null
-        : theme.colorScheme.surface.withValues(alpha: 0.5),
+            : theme.colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCurrent

@@ -78,7 +78,7 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
     }
 
     final theme = Theme.of(context);
-    final planColor = _getPlanColor();
+  final planColor = _getPlanColor();
     final heavyOpsUsed = widget.usage.heavyOps;
     final heavyOpsLimit = widget.entitlements.heavyOpsPerDay;
     final heavyOpsProgress =
@@ -92,20 +92,20 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            planColor.withOpacity(0.1),
-            planColor.withOpacity(0.05),
+            planColor.withValues(alpha: 0.1),
+            planColor.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: planColor.withOpacity(0.3),
+          color: planColor.withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: planColor.withOpacity(0.1),
+            color: planColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -125,7 +125,7 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: planColor.withOpacity(0.2),
+                    color: planColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -153,7 +153,7 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
                     icon: Icon(
                       Icons.close,
                       size: 20,
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     onPressed: () => setState(() => _dismissed = true),
                     padding: EdgeInsets.zero,

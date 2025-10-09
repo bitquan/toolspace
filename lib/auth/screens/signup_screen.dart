@@ -265,7 +265,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             elevation: 8,
                             shadowColor:
-                                theme.colorScheme.primary.withOpacity(0.3),
+                                theme.colorScheme.primary.withValues(alpha: 0.3),
                           ),
                           child: _isLoading
                               ? const SizedBox(

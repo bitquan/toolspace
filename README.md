@@ -11,6 +11,7 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 **Current Status:** Complete production blueprint implemented with single-environment deployment strategy
 
 **Key Features:**
+
 - ✅ Real user authentication (Google, Apple, Email)
 - ✅ Secure database rules and functions
 - ✅ Stripe billing integration (Free/Pro $9/Pro+ $19)
@@ -19,6 +20,7 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 - ✅ Production monitoring and alerts
 
 **Production Deployment:**
+
 - 🌐 Live at: [toolspace.app](https://toolspace.app)
 - 📊 Status: [![Production Deployment](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml)
 - 🔧 Staging: [![Staging Deployment](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml)

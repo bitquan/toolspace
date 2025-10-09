@@ -31,7 +31,7 @@ class AuthFormField extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: isDark
-            ? Colors.white.withOpacity(0.05)
+            ? Colors.white.withValues(alpha: 0.05)
             : Colors.white.withOpacity(0.8),
         border: Border.all(
           color: isDark
