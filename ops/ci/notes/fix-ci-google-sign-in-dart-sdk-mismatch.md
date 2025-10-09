@@ -1,7 +1,7 @@
 # Google Sign-In Dependency Conflict
 
-**Branch:** `fix/ci-google-sign-in-dart-sdk-mismatch`  
-**Issue:** #99  
+**Branch:** `fix/ci-google-sign-in-dart-sdk-mismatch`
+**Issue:** #99
 **Status:** Scaffold created, ready for implementation
 
 ---
@@ -26,15 +26,17 @@
 ```yaml
 # pubspec.yaml
 dependencies:
-  google_sign_in: ^6.2.2  # Last version compatible with Dart 3.5.3
+  google_sign_in: ^6.2.2 # Last version compatible with Dart 3.5.3
 ```
 
 **Pros:**
+
 - Minimal change
 - Maintains current Flutter version
 - Low risk
 
 **Cons:**
+
 - Misses latest google_sign_in features (if any)
 
 ### Option 2: Upgrade Flutter
@@ -45,15 +47,17 @@ Update all workflow files to use Flutter with Dart 3.7.0+:
 # All .github/workflows/*.yml with Flutter
 - uses: subosito/flutter-action@v2
   with:
-    flutter-version: '3.35.5'  # or latest stable with Dart 3.7.0+
-    channel: 'stable'
+    flutter-version: "3.35.5" # or latest stable with Dart 3.7.0+
+    channel: "stable"
 ```
 
 **Pros:**
+
 - Access to latest packages
 - Future-proof
 
 **Cons:**
+
 - More disruptive
 - Potential breaking changes
 - Must test entire app

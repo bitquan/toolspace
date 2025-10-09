@@ -1,7 +1,7 @@
 # CI Hygiene - Unified Pipeline
 
-**Branch:** `feat/ci-hygiene-unified-pipeline`  
-**Issue:** #100  
+**Branch:** `feat/ci-hygiene-unified-pipeline`
+**Issue:** #100
 **Status:** Scaffold created, planning phase
 
 ---
@@ -70,21 +70,25 @@ zeta-security.yml: (security-only, no duplication)
 ## Implementation Plan
 
 1. **Audit Phase** (Week 1)
+
    - [ ] Document all workflow overlaps in spreadsheet
    - [ ] Calculate compute waste (redundant minutes)
    - [ ] Survey team for "must-have" vs "nice-to-have" checks
 
 2. **Design Phase** (Week 1-2)
+
    - [ ] Prototype unified pr-pipeline.yml
    - [ ] Define matrix strategy
    - [ ] Map old jobs → new jobs
 
 3. **Testing Phase** (Week 2)
+
    - [ ] Test unified pipeline on feature branch
    - [ ] Compare results with current pipelines
    - [ ] Measure time savings
 
 4. **Migration Phase** (Week 3)
+
    - [ ] Enable unified pipeline (parallel with old)
    - [ ] Monitor for 1 week
    - [ ] Disable old workflows incrementally
@@ -107,13 +111,13 @@ zeta-security.yml: (security-only, no duplication)
 
 ## Risks & Mitigations
 
-**Risk:** Breaking required checks  
+**Risk:** Breaking required checks
 **Mitigation:** Run unified pipeline in parallel for 1 week before switching
 
-**Risk:** Missing edge cases  
+**Risk:** Missing edge cases
 **Mitigation:** Comprehensive audit phase with team review
 
-**Risk:** Team confusion during transition  
+**Risk:** Team confusion during transition
 **Mitigation:** Clear documentation, Slack announcements, gradual rollout
 
 ---

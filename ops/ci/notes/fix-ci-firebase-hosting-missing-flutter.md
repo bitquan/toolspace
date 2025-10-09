@@ -1,7 +1,7 @@
 # Firebase Hosting Workflows - Missing Flutter Setup
 
-**Branch:** `fix/ci-firebase-hosting-missing-flutter`  
-**Issue:** #98  
+**Branch:** `fix/ci-firebase-hosting-missing-flutter`
+**Issue:** #98
 **Status:** Scaffold created, ready for implementation
 
 ---
@@ -34,8 +34,8 @@ Firebase hosting deployment workflows fail with "flutter: command not found" bec
 ```yaml
 - uses: subosito/flutter-action@v2
   with:
-    flutter-version: '3.24.3'
-    channel: 'stable'
+    flutter-version: "3.24.3"
+    channel: "stable"
 
 - run: flutter pub get
 ```

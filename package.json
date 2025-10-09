@@ -33,7 +33,10 @@
     "cleanup:all": "gh workflow run workflow-cleanup.yml -f cleanup_scope=all_runs -f dry_run=false && echo '⚠️ DELETING ALL WORKFLOWS! Monitor with: gh run list --workflow=workflow-cleanup.yml'",
     "cleanup:nuclear": "gh workflow run nuclear-cleanup.yml -f confirmation=DELETE_ALL_WORKFLOWS -f keep_recent=0 && echo '🔥 NUCLEAR CLEANUP TRIGGERED! This will delete EVERYTHING!'",
     "cleanup:all-preview": "gh workflow run workflow-cleanup.yml -f cleanup_scope=all_runs -f dry_run=true && echo 'Preview mode: showing what ALL workflows would be deleted'",
-    "cleanup:help": "echo 'Workflow Cleanup Commands:' && echo '  npm run cleanup:preview     - Preview what would be cleaned' && echo '  npm run cleanup:execute     - Execute failed runs cleanup' && echo '  npm run cleanup:failed      - Clean failed/cancelled runs' && echo '  npm run cleanup:old         - Clean runs older than 7 days' && echo '  npm run cleanup:cache       - Clean cache and artifacts' && echo '  npm run cleanup:full        - ⚠️  FULL cleanup (ALL data)' && echo '  npm run cleanup:all         - 🔥 DELETE ALL WORKFLOWS' && echo '  npm run cleanup:all-preview - Preview ALL workflows deletion' && echo '  npm run cleanup:nuclear     - 🔥 NUCLEAR: Delete everything instantly'"
+    "cleanup:help": "echo 'Workflow Cleanup Commands:' && echo '  npm run cleanup:preview     - Preview what would be cleaned' && echo '  npm run cleanup:execute     - Execute failed runs cleanup' && echo '  npm run cleanup:failed      - Clean failed/cancelled runs' && echo '  npm run cleanup:old         - Clean runs older than 7 days' && echo '  npm run cleanup:cache       - Clean cache and artifacts' && echo '  npm run cleanup:full        - ⚠️  FULL cleanup (ALL data)' && echo '  npm run cleanup:all         - 🔥 DELETE ALL WORKFLOWS' && echo '  npm run cleanup:all-preview - Preview ALL workflows deletion' && echo '  npm run cleanup:nuclear     - 🔥 NUCLEAR: Delete everything instantly'",
+    "repo:audit": "node scripts/audit-repo-cleanup.mjs",
+    "repo:cleanup": "node scripts/audit-repo-cleanup.mjs --execute",
+    "repo:safe-cleanup": "node scripts/safe-workflow-cleanup.mjs"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
