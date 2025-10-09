@@ -28,15 +28,27 @@ jobs:
               run: cd test/security && npm ci
             - name: Setup emulators and run rules tests
               run: |
-                  # Temporarily rename firebase.json to avoid webframeworks experiment requirement
+                  # Create minimal firebase.json with only storage config (no hosting/webframeworks)
+                  cat > firebase-emulators.json << 'EOF'
+                  {
+                    "storage": {
+                      "rules": "storage.rules"
+                    },
+                    "firestore": {
+                      "rules": "firestore.rules"
+                    }
+                  }
+                  EOF
+                  # Temporarily use minimal config
                   mv firebase.json firebase.json.bak
+                  mv firebase-emulators.json firebase.json
                   # Start emulators in background
                   (firebase emulators:start --only auth,firestore,storage --project demo-toolspace &)
                   sleep 10
                   # Run tests
                   cd test/security && npm run test:rules
-                  # Restore firebase.json
-                  mv ../firebase.json.bak ../firebase.json || true
+                  # Restore original firebase.json
+                  cd .. && mv firebase.json.bak firebase.json || true
 
     e2e-auth-quota:
         runs-on: ubuntu-latest
