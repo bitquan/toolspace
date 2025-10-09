@@ -36,11 +36,23 @@
     "cleanup:help": "echo 'Workflow Cleanup Commands:' && echo '  npm run cleanup:preview     - Preview what would be cleaned' && echo '  npm run cleanup:execute     - Execute failed runs cleanup' && echo '  npm run cleanup:failed      - Clean failed/cancelled runs' && echo '  npm run cleanup:old         - Clean runs older than 7 days' && echo '  npm run cleanup:cache       - Clean cache and artifacts' && echo '  npm run cleanup:full        - ⚠️  FULL cleanup (ALL data)' && echo '  npm run cleanup:all         - 🔥 DELETE ALL WORKFLOWS' && echo '  npm run cleanup:all-preview - Preview ALL workflows deletion' && echo '  npm run cleanup:nuclear     - 🔥 NUCLEAR: Delete everything instantly'",
     "repo:audit": "node scripts/audit-repo-cleanup.mjs",
     "repo:cleanup": "node scripts/audit-repo-cleanup.mjs --execute",
-    "repo:safe-cleanup": "node scripts/safe-workflow-cleanup.mjs"
+    "repo:safe-cleanup": "node scripts/safe-workflow-cleanup.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "preflight:quick": "node scripts/preflight.mjs --quick",
+    "setup:hooks": "husky install",
+    "prepare": "husky"
   },
   "dependencies": {
     "dayjs": "^1.11.10",
     "@octokit/rest": "^20.0.2"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0",
+    "zx": "^7.0.0",
+    "colorette": "^2.0.0",
+    "execa": "^9.0.0",
+    "tree-kill": "^1.0.0",
+    "@actions/core": "^1.0.0"
   },
   "keywords": [
     "sprint-management",

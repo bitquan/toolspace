@@ -166,18 +166,23 @@ toolspace/
 
 ### Contributing
 
+**All pushes are blocked by the Local Gate. Run `npm run preflight` until green.**
+
 1. Fork the repository
 2. Create a feature branch
-3. Make changes with tests
-4. Ensure QA passes (`npm run qa` + `flutter analyze`)
-5. Submit pull request
+3. Run `npm run setup:hooks` (one-time setup)
+4. Make changes with tests
+5. Run `npm run preflight` - must pass before push
+6. Submit pull request
+
+See [docs/ops/local-gate.md](docs/ops/local-gate.md) for details on the Local Gate system.
 
 ### Quality Standards
 
-- ✅ Backend: `npm run qa` must pass
-- ✅ Frontend: `flutter analyze` must be clean
-- ✅ All tests must pass
-- ✅ Security scans must pass
+- ✅ **Local Gate**: `npm run preflight` must pass (enforced pre-push)
+- ✅ Backend: All functions tests + lint
+- ✅ Frontend: Flutter analyze + tests + build
+- ✅ Security: Rules tests pass
 - ✅ Documentation must be updated
 
 ## 🔒 Security

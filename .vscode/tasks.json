@@ -2,6 +2,43 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Preflight: All checks (local == CI)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "preflight"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "🔒 OPS-LocalGate: Run full preflight checks before push"
+    },
+    {
+      "label": "Preflight (quick)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "preflight:quick"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "⚡ OPS-LocalGate: Quick preflight (skip Playwright + web build)"
+    },
+    {
       "label": "Assign Issue to Copilot",
       "type": "shell",
       "command": "node",
