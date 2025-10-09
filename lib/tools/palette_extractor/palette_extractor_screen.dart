@@ -27,7 +27,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
   Future<void> _pickImage() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
+        type: FileType.custom,
         allowedExtensions: ['png', 'jpg', 'jpeg', 'webp'],
         withData: true,
       );

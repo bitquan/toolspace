@@ -42,7 +42,9 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
     // Calculate max file size and batch size for paywall guard
     final maxFileBytes = _images.isEmpty
         ? null
-        : _images.map((img) => img.bytes.length).reduce((a, b) => a > b ? a : b);
+        : _images
+            .map((img) => img.bytes.length)
+            .reduce((a, b) => a > b ? a : b);
     final batchSize = _images.length;
 
     return PaywallGuard(
@@ -431,8 +433,9 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
             requestData,
           );
 
-      final results =
-          (result.data['results'] as List).map((r) => ResizedImage.fromJson(r)).toList();
+      final results = (result.data['results'] as List)
+          .map((r) => ResizedImage.fromJson(r))
+          .toList();
 
       setState(() {
         _isResizing = false;
@@ -469,8 +472,10 @@ class _ImageResizerScreenState extends State<ImageResizerScreen> {
   }
 
   void _showCustomDimensionsDialog() {
-    final widthController = TextEditingController(text: _customWidth?.toString() ?? '');
-    final heightController = TextEditingController(text: _customHeight?.toString() ?? '');
+    final widthController =
+        TextEditingController(text: _customWidth?.toString() ?? '');
+    final heightController =
+        TextEditingController(text: _customHeight?.toString() ?? '');
 
     showDialog(
       context: context,

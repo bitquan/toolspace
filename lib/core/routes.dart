@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
+import '../screens/neo_home_screen.dart';
+import '../screens/landing/landing_page.dart';
 import '../tools/text_tools/text_tools_screen.dart';
 import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
@@ -26,6 +28,7 @@ import '../auth/screens/account_screen.dart';
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
   static const String home = '/';
+  static const String dashboard = '/dashboard';
   static const String textTools = '/tools/text-tools';
   static const String fileMerger = '/tools/file-merger';
   static const String jsonDoctor = '/tools/json-doctor';
@@ -54,8 +57,13 @@ class ToolspaceRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
+        // TEMPORARY: Skip landing page due to rendering issues, go straight to dashboard
         return MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const NeoHomeScreen(),
+        );
+      case dashboard:
+        return MaterialPageRoute(
+          builder: (_) => const NeoHomeScreen(),
         );
       case textTools:
         return MaterialPageRoute(

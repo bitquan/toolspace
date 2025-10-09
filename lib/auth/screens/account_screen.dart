@@ -40,7 +40,8 @@ class _AccountScreenState extends State<AccountScreen> {
     try {
       final profile = await _billingService.getBillingProfile();
       final usage = await _billingService.getTodayUsage();
-      final entitlements = await _billingService.getEntitlements(profile.planId);
+      final entitlements =
+          await _billingService.getEntitlements(profile.planId);
 
       if (mounted) {
         setState(() {
@@ -380,13 +381,17 @@ class _AccountScreenState extends State<AccountScreen> {
                 const SizedBox(height: 24),
 
                 // Plan Status Banner
-                if (_billingProfile != null && _usageRecord != null && _entitlements != null)
+                if (_billingProfile != null &&
+                    _usageRecord != null &&
+                    _entitlements != null)
                   PlanStatusBanner(
                     profile: _billingProfile!,
                     usage: _usageRecord!,
                     entitlements: _entitlements!,
                     billingService: _billingService,
-                    onManageBilling: _billingProfile!.planId != PlanId.free ? _openBillingPortal : null,
+                    onManageBilling: _billingProfile!.planId != PlanId.free
+                        ? _openBillingPortal
+                        : null,
                     showOnlyWhenLimited: false,
                     dismissible: false,
                   ),
@@ -416,7 +421,6 @@ class _AccountScreenState extends State<AccountScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-
                       if (_billingProfile != null) ...[
                         // Current plan
                         _buildInfoRow(
@@ -433,9 +437,11 @@ class _AccountScreenState extends State<AccountScreen> {
                           _buildInfoRow(
                             icon: Icons.info_outline,
                             label: 'Status',
-                            value: _getStatusDisplayName(_billingProfile!.status),
+                            value:
+                                _getStatusDisplayName(_billingProfile!.status),
                             context: context,
-                            valueColor: _getStatusColor(_billingProfile!.status),
+                            valueColor:
+                                _getStatusColor(_billingProfile!.status),
                           ),
                           const SizedBox(height: 16),
 
@@ -444,7 +450,8 @@ class _AccountScreenState extends State<AccountScreen> {
                             _buildInfoRow(
                               icon: Icons.schedule_outlined,
                               label: 'Next Billing',
-                              value: _formatDate(_billingProfile!.currentPeriodEnd!),
+                              value: _formatDate(
+                                  _billingProfile!.currentPeriodEnd!),
                               context: context,
                             ),
                         ],
@@ -458,10 +465,12 @@ class _AccountScreenState extends State<AccountScreen> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _showUpgradeSheet,
-                                  icon: const Icon(Icons.rocket_launch, size: 18),
+                                  icon:
+                                      const Icon(Icons.rocket_launch, size: 18),
                                   label: const Text('Upgrade Plan'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -475,7 +484,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                   icon: const Icon(Icons.settings, size: 18),
                                   label: const Text('Manage Billing'),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -489,7 +499,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                   icon: const Icon(Icons.upgrade, size: 18),
                                   label: const Text('Upgrade'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -540,14 +551,17 @@ class _AccountScreenState extends State<AccountScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          onPressed: _isLoading ? null : () {
-                            // TODO: Implement password change with reauth
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Password change coming soon!'),
-                              ),
-                            );
-                          },
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  // TODO: Implement password change with reauth
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Password change coming soon!'),
+                                    ),
+                                  );
+                                },
                           icon: const Icon(Icons.lock_outline, size: 18),
                           label: const Text('Change Password'),
                           style: OutlinedButton.styleFrom(

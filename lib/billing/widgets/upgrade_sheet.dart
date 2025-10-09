@@ -6,6 +6,7 @@ library;
 
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -84,12 +85,21 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
     // Check if user is authenticated and email is verified
     final authService = AuthService();
     final currentUser = authService.currentUser;
-    
+
     if (currentUser == null) {
       _showError('Please sign in to upgrade your plan');
       return;
     }
-    
+
+    // In debug mode (emulator), skip email verification
+    if (kDebugMode) {
+      _showError(
+        'Debug Mode: Stripe checkout disabled in emulator.\n'
+        'In production, this would open Stripe checkout for ${planId.name} plan.',
+      );
+      return;
+    }
+
     if (!currentUser.emailVerified) {
       // Show email verification dialog
       await EmailVerificationDialog.show(
@@ -99,7 +109,7 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
       );
       return;
     }
-    
+
     await _proceedToCheckout(planId);
   }
 
@@ -232,7 +242,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   shrinkWrap: false,
                   itemCount: _plans!.length,
-                  itemBuilder: (context, index) => _buildPlanCard(_plans![index]),
+                  itemBuilder: (context, index) =>
+                      _buildPlanCard(_plans![index]),
                 ),
               ),
 
@@ -258,7 +269,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
 
     final priceData = plan['price'] as Map<String, dynamic>;
     final amount = priceData['amount'] as int;
-    final displayPrice = amount == 0 ? 'Free' : '\$${(amount / 100).toStringAsFixed(0)}';
+    final displayPrice =
+        amount == 0 ? 'Free' : '\$${(amount / 100).toStringAsFixed(0)}';
     final interval = priceData['interval'] as String?;
 
     final features = (plan['features'] as List<dynamic>).cast<String>();
@@ -281,7 +293,9 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                     ],
                   )
                 : null,
-        color: isCurrent || isPopular ? null : theme.colorScheme.surface.withOpacity(0.5),
+        color: isCurrent || isPopular
+            ? null
+            : theme.colorScheme.surface.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCurrent
@@ -310,7 +324,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                     if (isCurrent) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.green.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
@@ -390,8 +405,9 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
                       onPressed: () => _upgradeToPlan(planId),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor:
-                            isPopular ? theme.colorScheme.primary : theme.colorScheme.secondary,
+                        backgroundColor: isPopular
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
                         foregroundColor: Colors.white,
                       ),
                       child: Text(
@@ -413,7 +429,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
               top: 12,
               right: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Colors.blue, Colors.purple],

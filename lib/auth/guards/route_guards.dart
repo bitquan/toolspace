@@ -90,7 +90,8 @@ class EmailVerificationPrompt extends StatefulWidget {
   const EmailVerificationPrompt({super.key});
 
   @override
-  State<EmailVerificationPrompt> createState() => _EmailVerificationPromptState();
+  State<EmailVerificationPrompt> createState() =>
+      _EmailVerificationPromptState();
 }
 
 class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
@@ -259,7 +260,8 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
                                   ),
                                 )
                               : const Text(
@@ -306,7 +308,8 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                         onPressed: () async {
                           await AuthService().signOut();
                           if (mounted) {
-                            Navigator.of(context).pushReplacementNamed('/auth/signin');
+                            Navigator.of(context)
+                                .pushReplacementNamed('/auth/signin');
                           }
                         },
                         child: Text(

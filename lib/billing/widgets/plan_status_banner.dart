@@ -81,7 +81,8 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
     final planColor = _getPlanColor();
     final heavyOpsUsed = widget.usage.heavyOps;
     final heavyOpsLimit = widget.entitlements.heavyOpsPerDay;
-    final heavyOpsProgress = heavyOpsLimit > 0 ? heavyOpsUsed / heavyOpsLimit : 0.0;
+    final heavyOpsProgress =
+        heavyOpsLimit > 0 ? heavyOpsUsed / heavyOpsLimit : 0.0;
 
     final isLimitReached = heavyOpsUsed >= heavyOpsLimit;
     final isApproachingLimit = heavyOpsProgress >= 0.8;
@@ -198,7 +199,8 @@ class _PlanStatusBannerState extends State<PlanStatusBanner>
                   builder: (context, child) {
                     return LinearProgressIndicator(
                       value: heavyOpsProgress * _progressAnimation.value,
-                      backgroundColor: theme.colorScheme.outline.withOpacity(0.2),
+                      backgroundColor:
+                          theme.colorScheme.outline.withOpacity(0.2),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isLimitReached
                             ? Colors.red

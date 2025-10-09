@@ -1,22 +1,31 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Users can only access files in their own folders
+    // Users can only access files in their own folders (200MB limit)
     match /users/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId
+                         && request.resource.size <= 200 * 1024 * 1024;  // 200 MB limit
     }
-    
+
+    // Temp directory for temporary uploads (200MB limit)
+    match /temp/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId
+                         && request.resource.size <= 200 * 1024 * 1024;  // 200 MB limit
+    }
+
     // File Merger: User uploads (temporary storage before merging)
     // Users can write their own uploads and read them for processing
     match /uploads/{userId}/{fileName} {
-      allow write: if request.auth != null 
+      allow write: if request.auth != null
                    && request.auth.uid == userId
-                   && request.resource.size <= 10 * 1024 * 1024  // 10 MB limit
-                   && request.resource.contentType.matches('application/pdf|image/png|image/jpeg');
+                   && request.resource.size <= 200 * 1024 * 1024  // 200 MB limit
+                   && request.resource.contentType.matches('application/pdf|image/png|image/jpeg|image/gif|image/webp|text/.*|application/json');
       allow read: if request.auth != null && request.auth.uid == userId;
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
-    
+
     // File Merger: Merged output files
     // Only the backend can write, users can read their own merged files
     match /merged/{userId}/{fileName} {
@@ -24,13 +33,13 @@ service firebase.storage {
       allow write: if false;  // Only backend (admin) can write merged files
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
-    
+
     // Public assets (logos, etc.) - read only
     match /public/{allPaths=**} {
       allow read: if true;
       allow write: if false;
     }
-    
+
     // Default: deny all
     match /{allPaths=**} {
       allow read, write: if false;

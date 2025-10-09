@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../widgets/auth_form_field.dart';
 import '../widgets/auth_glass_panel.dart';
@@ -35,21 +36,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final authService = AuthService();
-      await authService.signUpWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
 
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/auth/verify');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Account created! Please check your email to verify your account.'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 5),
-          ),
+      // Check if user is currently anonymous - if so, link the account
+      if (authService.isAnonymous) {
+        final credential = EmailAuthProvider.credential(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
         );
+        await authService.linkAnonymousAccount(credential);
+
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/auth/verify');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Account linked! Your data has been preserved. Please check your email to verify.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      } else {
+        // Not anonymous, create new account
+        await authService.signUpWithEmail(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/auth/verify');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Account created! Please check your email to verify your account.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -156,8 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your email';
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(value)) {
+                                if (!AuthService().isValidEmail(value)) {
                                   return 'Please enter a valid email';
                                 }
                                 return null;
@@ -183,10 +206,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter a password';
                                 }
-                                if (value.length < 6) {
-                                  return 'Password must be at least 6 characters';
-                                }
-                                return null;
+                                return AuthService().getPasswordError(value);
                               },
                             ),
                             const SizedBox(height: 16),

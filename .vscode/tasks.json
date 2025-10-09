@@ -367,6 +367,43 @@
       "detail": "Interactive PowerShell cleanup helper with confirmation prompts"
     },
     {
+      "label": "Flutter Run (Chrome)",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["run", "-d", "chrome"],
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "owner": "flutter",
+        "pattern": [
+          {
+            "regexp": "^(.*)$",
+            "file": 1
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^Launching",
+          "endsPattern": "Flutter run key commands\\."
+        }
+      },
+      "detail": "Run Flutter app in Chrome browser with hot reload"
+    },
+    {
       "label": "Firebase Emulators",
       "type": "shell",
       "command": "powershell",

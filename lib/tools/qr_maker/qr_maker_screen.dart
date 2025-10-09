@@ -15,7 +15,8 @@ class QrMakerScreen extends StatefulWidget {
   State<QrMakerScreen> createState() => _QrMakerScreenState();
 }
 
-class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateMixin {
+class _QrMakerScreenState extends State<QrMakerScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _batchTextController = TextEditingController();
   final BillingService _billingService = BillingService();
@@ -115,7 +116,8 @@ class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateM
       return;
     }
 
-    final items = input.split('\n').where((line) => line.trim().isNotEmpty).toList();
+    final items =
+        input.split('\n').where((line) => line.trim().isNotEmpty).toList();
 
     setState(() {
       _batchItems = items;
@@ -234,9 +236,12 @@ class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateM
                 tooltip: 'Copy Data',
               ),
             IconButton(
-              onPressed: _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
+              onPressed: _tabController.index == 0
+                  ? _downloadQr
+                  : _downloadAllBatchQrs,
               icon: const Icon(Icons.download),
-              tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
+              tooltip:
+                  _tabController.index == 0 ? 'Download QR' : 'Download All',
             ),
           ],
           bottom: TabBar(
@@ -350,11 +355,13 @@ class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateM
                         const SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () => _useQuickTemplate(_getQuickTemplate(_selectedType)),
+                            onPressed: () => _useQuickTemplate(
+                                _getQuickTemplate(_selectedType)),
                             icon: const Icon(Icons.auto_fix_high),
                             label: const Text('Template'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5722).withOpacity(0.1),
+                              backgroundColor:
+                                  const Color(0xFFFF5722).withOpacity(0.1),
                               foregroundColor: const Color(0xFFFF5722),
                             ),
                           ),
@@ -498,7 +505,8 @@ class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateM
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withOpacity(0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

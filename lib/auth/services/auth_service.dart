@@ -11,10 +11,14 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Stream controllers for reactive state management
-  final StreamController<User?> _userController = StreamController<User?>.broadcast();
-  final StreamController<bool> _verifiedController = StreamController<bool>.broadcast();
-  final StreamController<bool> _anonymousController = StreamController<bool>.broadcast();
-  final StreamController<List<String>> _providersController = StreamController<List<String>>.broadcast();
+  final StreamController<User?> _userController =
+      StreamController<User?>.broadcast();
+  final StreamController<bool> _verifiedController =
+      StreamController<bool>.broadcast();
+  final StreamController<bool> _anonymousController =
+      StreamController<bool>.broadcast();
+  final StreamController<List<String>> _providersController =
+      StreamController<List<String>>.broadcast();
 
   StreamSubscription<User?>? _authStateSubscription;
   bool _isInitialized = false;
@@ -47,8 +51,17 @@ class AuthService {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
+    // Set persistence to local storage for session persistence
+    try {
+      await _auth.setPersistence(Persistence.LOCAL);
+    } catch (e) {
+      // Persistence might fail in some environments, log but continue
+      print('Warning: Could not set auth persistence: $e');
+    }
+
     // Listen to auth state changes
-    _authStateSubscription = _auth.authStateChanges().listen(_onAuthStateChanged);
+    _authStateSubscription =
+        _auth.authStateChanges().listen(_onAuthStateChanged);
 
     // Emit initial state
     _onAuthStateChanged(_auth.currentUser);
@@ -62,7 +75,9 @@ class AuthService {
     _verifiedController.add(user?.emailVerified ?? false);
     _anonymousController.add(user?.isAnonymous ?? false);
 
-    final providers = user?.providerData.map((info) => info.providerId).toList() ?? <String>[];
+    final providers =
+        user?.providerData.map((info) => info.providerId).toList() ??
+            <String>[];
     _providersController.add(providers);
   }
 
@@ -128,7 +143,8 @@ class AuthService {
   Future<void> sendEmailVerification() async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     try {
@@ -136,7 +152,8 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthException(e);
     } catch (e) {
-      throw AuthException(AuthErrorCode.unknown, 'Email verification failed: $e');
+      throw AuthException(
+          AuthErrorCode.unknown, 'Email verification failed: $e');
     }
   }
 
@@ -144,7 +161,8 @@ class AuthService {
   Future<void> reloadUser() async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     try {
@@ -196,7 +214,8 @@ class AuthService {
   }
 
   /// Require recent authentication for sensitive operations
-  Future<bool> requireRecentAuth({Duration maxAge = const Duration(minutes: 5)}) async {
+  Future<bool> requireRecentAuth(
+      {Duration maxAge = const Duration(minutes: 5)}) async {
     final user = currentUser;
     if (user == null) return false;
 
@@ -211,7 +230,8 @@ class AuthService {
   Future<void> reauthenticateWithEmail(String email, String password) async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     try {
@@ -231,7 +251,8 @@ class AuthService {
   Future<void> updateEmail(String newEmail) async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     if (!await requireRecentAuth()) {
@@ -254,7 +275,8 @@ class AuthService {
   Future<void> updatePassword(String newPassword) async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     if (!await requireRecentAuth()) {
@@ -277,7 +299,8 @@ class AuthService {
   Future<void> deleteAccount() async {
     final user = currentUser;
     if (user == null) {
-      throw const AuthException(AuthErrorCode.userNotFound, 'No user signed in');
+      throw const AuthException(
+          AuthErrorCode.userNotFound, 'No user signed in');
     }
 
     if (!await requireRecentAuth()) {
@@ -300,28 +323,70 @@ class AuthService {
   AuthException _mapFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return const AuthException(AuthErrorCode.userNotFound, 'No account found with this email');
+        return const AuthException(
+            AuthErrorCode.userNotFound, 'No account found with this email');
       case 'wrong-password':
-        return const AuthException(AuthErrorCode.wrongPassword, 'Incorrect password');
+        return const AuthException(
+            AuthErrorCode.wrongPassword, 'Incorrect password');
       case 'email-already-in-use':
-        return const AuthException(AuthErrorCode.emailAlreadyInUse, 'Email is already registered');
+        return const AuthException(
+            AuthErrorCode.emailAlreadyInUse, 'Email is already registered');
       case 'weak-password':
-        return const AuthException(AuthErrorCode.weakPassword, 'Password should be at least 6 characters');
+        return const AuthException(AuthErrorCode.weakPassword,
+            'Password should be at least 6 characters');
       case 'invalid-email':
-        return const AuthException(AuthErrorCode.invalidEmail, 'Please enter a valid email address');
+        return const AuthException(
+            AuthErrorCode.invalidEmail, 'Please enter a valid email address');
       case 'user-disabled':
-        return const AuthException(AuthErrorCode.userDisabled, 'This account has been disabled');
+        return const AuthException(
+            AuthErrorCode.userDisabled, 'This account has been disabled');
       case 'network-request-failed':
-        return const AuthException(AuthErrorCode.networkError, 'Network error. Please check your connection');
+        return const AuthException(AuthErrorCode.networkError,
+            'Network error. Please check your connection');
       case 'requires-recent-login':
-        return const AuthException(AuthErrorCode.requiresRecentLogin, 'Please sign in again to continue');
+        return const AuthException(AuthErrorCode.requiresRecentLogin,
+            'Please sign in again to continue');
       case 'credential-already-in-use':
-        return const AuthException(AuthErrorCode.credentialAlreadyInUse, 'This account is already linked');
+        return const AuthException(AuthErrorCode.credentialAlreadyInUse,
+            'This account is already linked');
       case 'provider-already-linked':
-        return const AuthException(AuthErrorCode.providerAlreadyLinked, 'This provider is already linked');
+        return const AuthException(AuthErrorCode.providerAlreadyLinked,
+            'This provider is already linked');
       default:
-        return AuthException(AuthErrorCode.unknown, e.message ?? 'Authentication failed');
+        return AuthException(
+            AuthErrorCode.unknown, e.message ?? 'Authentication failed');
     }
+  }
+
+  /// Validate email format
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email.trim());
+  }
+
+  /// Validate password strength (min 8 chars, uppercase, number)
+  bool isValidPassword(String password) {
+    if (password.length < 8) return false;
+
+    final hasUppercase = password.contains(RegExp(r'[A-Z]'));
+    final hasNumber = password.contains(RegExp(r'[0-9]'));
+
+    return hasUppercase && hasNumber;
+  }
+
+  /// Get password validation error message
+  String? getPasswordError(String password) {
+    if (password.isEmpty) return 'Password is required';
+    if (password.length < 8) return 'Password must be at least 8 characters';
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      return 'Password must contain at least one number';
+    }
+    return null;
   }
 
   /// Clean up resources

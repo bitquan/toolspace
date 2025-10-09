@@ -4,6 +4,18 @@
 
 Toolspace is a collection of focused, web-based micro-tools designed to help small businesses, freelancers, and individuals accomplish common tasks quickly and efficiently.
 
+---
+
+## 🚫 NOT READY FOR LAUNCH
+
+> **⚠️ PRODUCTION DEPLOYMENT BLOCKED**
+>
+> Security CI gates must pass before deployment is allowed. The `auth-security-ok` workflow validates authentication, security rules, billing integration, and paywall enforcement.
+>
+> **Status:** [View CI Results](../../actions/workflows/auth-security-ok.yml) > **Epic:** [AUTH-01 - Production Auth & Security](docs/epics/AUTH-01.md)
+
+---
+
 ## 🚨 PRODUCTION STATUS
 
 ❌ **NOT READY FOR PRODUCTION**

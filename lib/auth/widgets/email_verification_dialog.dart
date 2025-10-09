@@ -20,7 +20,8 @@ class EmailVerificationDialog extends StatefulWidget {
   });
 
   @override
-  State<EmailVerificationDialog> createState() => _EmailVerificationDialogState();
+  State<EmailVerificationDialog> createState() =>
+      _EmailVerificationDialogState();
 
   static Future<void> show(
     BuildContext context, {
@@ -80,7 +81,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
     try {
       final authService = widget.authService ?? AuthService();
       await authService.sendEmailVerification();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -111,7 +112,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
     try {
       final authService = widget.authService ?? AuthService();
       await authService.reloadUser();
-      
+
       final currentUser = authService.currentUser;
       if (currentUser?.emailVerified == true) {
         // Email is verified!
@@ -124,7 +125,8 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
 
       // Still not verified
       setState(() {
-        _errorMessage = 'Email not yet verified. Please check your inbox and click the verification link.';
+        _errorMessage =
+            'Email not yet verified. Please check your inbox and click the verification link.';
       });
     } catch (e) {
       setState(() {
@@ -140,7 +142,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Dialog(
@@ -194,7 +196,8 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                           size: 48,
                           color: Colors.orange,
                         ),
-                        if (_shimmerAnimation.value > -0.5 && _shimmerAnimation.value < 0.5)
+                        if (_shimmerAnimation.value > -0.5 &&
+                            _shimmerAnimation.value < 0.5)
                           Positioned.fill(
                             child: Container(
                               decoration: BoxDecoration(
@@ -221,9 +224,9 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                   },
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Title
               Text(
                 'Email Verification Required',
@@ -232,9 +235,9 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Description
               Text(
                 'Please verify your email address before purchasing a subscription. This helps us ensure account security and payment notifications reach you.',
@@ -243,9 +246,9 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Error message
               if (_errorMessage != null) ...[
                 Container(
@@ -276,7 +279,7 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                 ),
                 const SizedBox(height: 24),
               ],
-              
+
               // Action buttons
               Row(
                 children: [
@@ -300,13 +303,14 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 16),
-                  
+
                   // Check verification button
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: _isCheckingVerification ? null : _checkVerification,
+                      onPressed:
+                          _isCheckingVerification ? null : _checkVerification,
                       icon: _isCheckingVerification
                           ? SizedBox(
                               width: 16,
@@ -317,7 +321,9 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                               ),
                             )
                           : const Icon(Icons.check_circle),
-                      label: Text(_isCheckingVerification ? 'Checking...' : 'I\'m Verified'),
+                      label: Text(_isCheckingVerification
+                          ? 'Checking...'
+                          : 'I\'m Verified'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         textStyle: const TextStyle(
@@ -328,9 +334,9 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Cancel button
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),

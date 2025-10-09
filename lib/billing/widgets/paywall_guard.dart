@@ -8,6 +8,7 @@
 /// Shows QuotaBanner when approaching limits.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../billing_service.dart';
 import '../billing_types.dart';
@@ -78,6 +79,26 @@ class _PaywallGuardState extends State<PaywallGuard> {
     setState(() => _checking = true);
 
     try {
+      // In debug mode, allow all access (emulator testing)
+      if (kDebugMode) {
+        // Free access for development/testing
+        final profile = BillingProfile.free();
+        final today = DateTime.now().toIso8601String().split('T')[0];
+        final usage = UsageRecord.empty(today);
+        final entitlements =
+            await widget.billingService.getEntitlements(profile.planId);
+
+        setState(() {
+          _profile = profile;
+          _usage = usage;
+          _entitlements = entitlements;
+          _allowed = true; // Always allow in debug mode
+          _blockReason = null;
+          _checking = false;
+        });
+        return;
+      }
+
       // Get current state
       final profile = await widget.billingService.getBillingProfile();
       final usage = await widget.billingService.getTodayUsage();
