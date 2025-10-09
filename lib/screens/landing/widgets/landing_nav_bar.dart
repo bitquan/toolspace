@@ -65,23 +65,34 @@ class LandingNavBar extends StatelessWidget implements PreferredSizeWidget {
 
           // Navigation Links (Desktop)
           if (!isMobile) ...[
-            _NavLink(
-              label: 'Features',
-              onTap: () {
-                // Scroll to features section
-              },
+            Semantics(
+              label: 'nav-features',
+              button: true,
+              child: _NavLink(
+                key: const Key('nav-features'),
+                label: 'Features',
+                onTap: () => Navigator.pushNamed(context, '/features'),
+              ),
             ),
             const SizedBox(width: 32),
-            _NavLink(
-              label: 'Pricing',
-              onTap: () {
-                // Scroll to pricing section
-              },
+            Semantics(
+              label: 'nav-pricing',
+              button: true,
+              child: _NavLink(
+                key: const Key('nav-pricing'),
+                label: 'Pricing',
+                onTap: () => Navigator.pushNamed(context, '/pricing'),
+              ),
             ),
             const SizedBox(width: 32),
-            _NavLink(
-              label: 'Dashboard',
-              onTap: () => Navigator.pushNamed(context, '/dashboard'),
+            Semantics(
+              label: 'nav-dashboard',
+              button: true,
+              child: _NavLink(
+                key: const Key('nav-dashboard'),
+                label: 'Dashboard',
+                onTap: () => Navigator.pushNamed(context, '/dashboard'),
+              ),
             ),
             const SizedBox(width: 24),
           ],
@@ -174,6 +185,7 @@ class _NavLink extends StatefulWidget {
   final VoidCallback onTap;
 
   const _NavLink({
+    super.key,
     required this.label,
     required this.onTap,
   });

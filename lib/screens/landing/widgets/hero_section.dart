@@ -114,24 +114,29 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
                     runSpacing: 16,
                     alignment: WrapAlignment.center,
                     children: [
-                      CTAButton(
-                        label: 'Get Started Free',
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/auth/signup');
-                        },
-                        isPrimary: true,
+                      Semantics(
+                        label: 'btn-get-started',
+                        button: true,
+                        child: CTAButton(
+                          key: const Key('btn-get-started'),
+                          label: 'Get Started Free',
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/signup');
+                          },
+                          isPrimary: true,
+                        ),
                       ),
-                      CTAButton(
-                        label: 'View Pricing',
-                        onPressed: () {
-                          // Scroll to pricing section
-                          Scrollable.ensureVisible(
-                            context,
-                            duration: const Duration(milliseconds: 800),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        isPrimary: false,
+                      Semantics(
+                        label: 'btn-view-pricing',
+                        button: true,
+                        child: CTAButton(
+                          key: const Key('btn-view-pricing'),
+                          label: 'View Pricing',
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/pricing');
+                          },
+                          isPrimary: false,
+                        ),
                       ),
                     ],
                   ),

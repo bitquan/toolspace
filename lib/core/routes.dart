@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/neo_home_screen.dart';
 import '../screens/landing/landing_page.dart';
+import '../marketing/features_screen.dart';
+import '../marketing/pricing_screen.dart';
 import '../tools/text_tools/text_tools_screen.dart';
 import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
@@ -53,6 +55,9 @@ class ToolspaceRouter {
   static const String authVerify = '/auth/verify';
   static const String account = '/account';
   static const String billing = '/billing';
+  static const String features = '/features';
+  static const String pricing = '/pricing';
+  static const String signup = '/signup';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -160,6 +165,18 @@ class ToolspaceRouter {
       case billing:
         return MaterialPageRoute(
           builder: (_) => const BillingScreen(),
+        );
+      case features:
+        return MaterialPageRoute(
+          builder: (_) => const FeaturesScreen(),
+        );
+      case pricing:
+        return MaterialPageRoute(
+          builder: (_) => const PricingScreen(),
+        );
+      case signup:
+        return MaterialPageRoute(
+          builder: (_) => const SignUpScreen(),
         );
       default:
         return MaterialPageRoute(
