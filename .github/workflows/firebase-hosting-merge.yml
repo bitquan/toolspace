@@ -26,8 +26,24 @@ jobs:
     needs: [ check_pr_ci ]
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
-      - run: flutter build web --release
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.3"
+          channel: "stable"
+
+      - name: Enable Flutter web
+        run: flutter config --enable-web
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: flutter build web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

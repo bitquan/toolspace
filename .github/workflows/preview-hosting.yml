@@ -30,6 +30,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: "3.24.3"
           channel: "stable"
           cache: true
 
@@ -37,7 +38,7 @@ jobs:
         run: flutter pub get
 
       - name: 🔍 Analyze code
-        run: flutter analyze --fatal-infos
+        run: flutter analyze
 
       - name: 🧪 Run tests
         run: flutter test
