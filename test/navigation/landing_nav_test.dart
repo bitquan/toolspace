@@ -12,9 +12,9 @@ void main() {
   group('Landing Page Navigation Tests', () {
     testWidgets('btn-get-started navigates to /signup', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
@@ -35,9 +35,9 @@ void main() {
 
     testWidgets('btn-view-pricing navigates to /pricing', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
@@ -57,9 +57,9 @@ void main() {
 
     testWidgets('nav-features navigates to /features', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
@@ -79,9 +79,9 @@ void main() {
 
     testWidgets('nav-pricing navigates to /pricing', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
@@ -101,9 +101,9 @@ void main() {
 
     testWidgets('nav-dashboard navigates to /dashboard when unauthenticated', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
@@ -124,9 +124,9 @@ void main() {
 
     testWidgets('all navigation buttons have Semantics labels', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,
-          home: const LandingPage(),
+          home: LandingPage(),
         ),
       );
 
