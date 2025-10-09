@@ -1,210 +1,210 @@
 name: Ops Cleanup
 
 on:
-  schedule:
-    # Run weekly on Sundays at 2 AM UTC
-    - cron: '0 2 * * 0'
-  workflow_dispatch:
-    inputs:
-      cleanup_type:
-        description: 'Type of cleanup to perform'
-        required: true
-        type: choice
-        options:
-          - 'merged-branches'
-          - 'old-caches'
-          - 'full-cleanup'
-        default: 'merged-branches'
-      dry_run:
-        description: 'Dry run mode (show what would be deleted)'
-        required: false
-        type: boolean
-        default: true
+    schedule:
+        # Run weekly on Sundays at 2 AM UTC
+        - cron: "0 2 * * 0"
+    workflow_dispatch:
+        inputs:
+            cleanup_type:
+                description: "Type of cleanup to perform"
+                required: true
+                type: choice
+                options:
+                    - "merged-branches"
+                    - "old-caches"
+                    - "full-cleanup"
+                default: "merged-branches"
+            dry_run:
+                description: "Dry run mode (show what would be deleted)"
+                required: false
+                type: boolean
+                default: true
 
 permissions:
-  contents: read
-  actions: write
+    contents: read
+    actions: write
 
 concurrency:
-  group: ops-cleanup
-  cancel-in-progress: false
+    group: ops-cleanup
+    cancel-in-progress: false
 
 jobs:
-  cleanup-merged-branches:
-    name: 🧹 Cleanup Merged Branches
-    runs-on: ubuntu-latest
-    if: ${{ inputs.cleanup_type == 'merged-branches' || inputs.cleanup_type == 'full-cleanup' || github.event_name == 'schedule' }}
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    cleanup-merged-branches:
+        name: 🧹 Cleanup Merged Branches
+        runs-on: ubuntu-latest
+        if: ${{ inputs.cleanup_type == 'merged-branches' || inputs.cleanup_type == 'full-cleanup' || github.event_name == 'schedule' }}
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Setup Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            - name: Setup Git
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Find merged branches
-        id: find-branches
-        run: |
-          echo "🔍 Finding merged branches..."
-          
-          # Get list of branches that match patterns and are merged
-          merged_branches=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | \
-            grep -E '^origin/(feat|fix|ops|docs|chore)/' | \
-            while read branch; do
-              local_branch=${branch#origin/}
-              # Check if branch is merged into main
-              if git merge-base --is-ancestor origin/$local_branch origin/main 2>/dev/null; then
-                echo $local_branch
-              fi
-            done)
-          
-          if [ -z "$merged_branches" ]; then
-            echo "No merged feature branches found"
-            echo "branches_found=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          echo "Found merged branches:"
-          echo "$merged_branches"
-          
-          # Save to output
-          echo "branches_found=true" >> $GITHUB_OUTPUT
-          echo "branch_count=$(echo "$merged_branches" | wc -l)" >> $GITHUB_OUTPUT
-          
-          # Save branches to file for next step
-          echo "$merged_branches" > merged_branches.txt
+            - name: Find merged branches
+              id: find-branches
+              run: |
+                  echo "🔍 Finding merged branches..."
 
-      - name: Delete merged branches (dry run)
-        if: ${{ inputs.dry_run && steps.find-branches.outputs.branches_found == 'true' }}
-        run: |
-          echo "🌊 DRY RUN: Would delete the following branches:"
-          while read -r branch; do
-            if [ -n "$branch" ]; then
-              echo "  - $branch"
-            fi
-          done < merged_branches.txt
+                  # Get list of branches that match patterns and are merged
+                  merged_branches=$(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | \
+                    grep -E '^origin/(feat|fix|ops|docs|chore)/' | \
+                    while read branch; do
+                      local_branch=${branch#origin/}
+                      # Check if branch is merged into main
+                      if git merge-base --is-ancestor origin/$local_branch origin/main 2>/dev/null; then
+                        echo $local_branch
+                      fi
+                    done)
 
-      - name: Delete merged branches (actual)
-        if: ${{ !inputs.dry_run && steps.find-branches.outputs.branches_found == 'true' }}
-        run: |
-          echo "🗑️ Deleting merged branches..."
-          deleted_count=0
-          
-          while read -r branch; do
-            if [ -n "$branch" ]; then
-              echo "Deleting branch: $branch"
-              if git push origin --delete "$branch" 2>/dev/null; then
-                echo "  ✅ Deleted $branch"
-                ((deleted_count++))
-              else
-                echo "  ❌ Failed to delete $branch"
-              fi
-            fi
-          done < merged_branches.txt
-          
-          echo "🎯 Deleted $deleted_count branches"
+                  if [ -z "$merged_branches" ]; then
+                    echo "No merged feature branches found"
+                    echo "branches_found=false" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
 
-      - name: Summary
+                  echo "Found merged branches:"
+                  echo "$merged_branches"
+
+                  # Save to output
+                  echo "branches_found=true" >> $GITHUB_OUTPUT
+                  echo "branch_count=$(echo "$merged_branches" | wc -l)" >> $GITHUB_OUTPUT
+
+                  # Save branches to file for next step
+                  echo "$merged_branches" > merged_branches.txt
+
+            - name: Delete merged branches (dry run)
+              if: ${{ inputs.dry_run && steps.find-branches.outputs.branches_found == 'true' }}
+              run: |
+                  echo "🌊 DRY RUN: Would delete the following branches:"
+                  while read -r branch; do
+                    if [ -n "$branch" ]; then
+                      echo "  - $branch"
+                    fi
+                  done < merged_branches.txt
+
+            - name: Delete merged branches (actual)
+              if: ${{ !inputs.dry_run && steps.find-branches.outputs.branches_found == 'true' }}
+              run: |
+                  echo "🗑️ Deleting merged branches..."
+                  deleted_count=0
+
+                  while read -r branch; do
+                    if [ -n "$branch" ]; then
+                      echo "Deleting branch: $branch"
+                      if git push origin --delete "$branch" 2>/dev/null; then
+                        echo "  ✅ Deleted $branch"
+                        ((deleted_count++))
+                      else
+                        echo "  ❌ Failed to delete $branch"
+                      fi
+                    fi
+                  done < merged_branches.txt
+
+                  echo "🎯 Deleted $deleted_count branches"
+
+            - name: Summary
+              if: always()
+              run: |
+                  if [ "${{ steps.find-branches.outputs.branches_found }}" = "true" ]; then
+                    branch_count="${{ steps.find-branches.outputs.branch_count }}"
+                    if [ "${{ inputs.dry_run }}" = "true" ]; then
+                      echo "📋 **Branch Cleanup Summary (Dry Run)**" >> $GITHUB_STEP_SUMMARY
+                      echo "Found $branch_count merged branches that would be deleted" >> $GITHUB_STEP_SUMMARY
+                    else
+                      echo "📋 **Branch Cleanup Summary**" >> $GITHUB_STEP_SUMMARY
+                      echo "Processed $branch_count merged branches" >> $GITHUB_STEP_SUMMARY
+                    fi
+                  else
+                    echo "📋 **Branch Cleanup Summary**" >> $GITHUB_STEP_SUMMARY
+                    echo "No merged feature branches found" >> $GITHUB_STEP_SUMMARY
+                  fi
+
+    cleanup-old-caches:
+        name: 🗂️ Cleanup Old Caches
+        runs-on: ubuntu-latest
+        if: ${{ inputs.cleanup_type == 'old-caches' || inputs.cleanup_type == 'full-cleanup' || github.event_name == 'schedule' }}
+        steps:
+            - name: Cleanup caches
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const { data: caches } = await github.rest.actions.getActionsCaches({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        per_page: 100
+                      });
+
+                      const dryRun = ${{ inputs.dry_run || false }};
+                      const cutoffDate = new Date();
+                      cutoffDate.setDate(cutoffDate.getDate() - 7); // 7 days old
+
+                      let deleteCount = 0;
+                      let totalSize = 0;
+
+                      for (const cache of caches.actions_caches) {
+                        const cacheDate = new Date(cache.created_at);
+                        if (cacheDate < cutoffDate) {
+                          totalSize += cache.size_in_bytes;
+
+                          if (dryRun) {
+                            console.log(`Would delete cache: ${cache.key} (${(cache.size_in_bytes / 1024 / 1024).toFixed(2)} MB)`);
+                          } else {
+                            try {
+                              await github.rest.actions.deleteActionsCacheById({
+                                owner: context.repo.owner,
+                                repo: context.repo.repo,
+                                cache_id: cache.id
+                              });
+                              console.log(`Deleted cache: ${cache.key}`);
+                              deleteCount++;
+                            } catch (error) {
+                              console.error(`Failed to delete cache ${cache.key}: ${error.message}`);
+                            }
+                          }
+                        }
+                      }
+
+                      const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
+
+                      if (dryRun) {
+                        console.log(`Dry run: Would delete ${caches.actions_caches.filter(c => new Date(c.created_at) < cutoffDate).length} caches (${sizeMB} MB)`);
+                      } else {
+                        console.log(`Deleted ${deleteCount} old caches (${sizeMB} MB freed)`);
+                      }
+
+    workflow-summary:
+        name: 📊 Cleanup Summary
+        runs-on: ubuntu-latest
+        needs: [cleanup-merged-branches, cleanup-old-caches]
         if: always()
-        run: |
-          if [ "${{ steps.find-branches.outputs.branches_found }}" = "true" ]; then
-            branch_count="${{ steps.find-branches.outputs.branch_count }}"
-            if [ "${{ inputs.dry_run }}" = "true" ]; then
-              echo "📋 **Branch Cleanup Summary (Dry Run)**" >> $GITHUB_STEP_SUMMARY
-              echo "Found $branch_count merged branches that would be deleted" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "📋 **Branch Cleanup Summary**" >> $GITHUB_STEP_SUMMARY
-              echo "Processed $branch_count merged branches" >> $GITHUB_STEP_SUMMARY
-            fi
-          else
-            echo "📋 **Branch Cleanup Summary**" >> $GITHUB_STEP_SUMMARY
-            echo "No merged feature branches found" >> $GITHUB_STEP_SUMMARY
-          fi
+        steps:
+            - name: Generate summary
+              run: |
+                  echo "🧹 **Weekly Operations Cleanup Complete**" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "**Cleanup Type:** ${{ inputs.cleanup_type || 'scheduled' }}" >> $GITHUB_STEP_SUMMARY
+                  echo "**Mode:** ${{ inputs.dry_run && 'Dry Run' || 'Live' }}" >> $GITHUB_STEP_SUMMARY
+                  echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
 
-  cleanup-old-caches:
-    name: 🗂️ Cleanup Old Caches
-    runs-on: ubuntu-latest
-    if: ${{ inputs.cleanup_type == 'old-caches' || inputs.cleanup_type == 'full-cleanup' || github.event_name == 'schedule' }}
-    steps:
-      - name: Cleanup caches
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: caches } = await github.rest.actions.getActionsCaches({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100
-            });
-            
-            const dryRun = ${{ inputs.dry_run || false }};
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - 7); // 7 days old
-            
-            let deleteCount = 0;
-            let totalSize = 0;
-            
-            for (const cache of caches.actions_caches) {
-              const cacheDate = new Date(cache.created_at);
-              if (cacheDate < cutoffDate) {
-                totalSize += cache.size_in_bytes;
-                
-                if (dryRun) {
-                  console.log(`Would delete cache: ${cache.key} (${(cache.size_in_bytes / 1024 / 1024).toFixed(2)} MB)`);
-                } else {
-                  try {
-                    await github.rest.actions.deleteActionsCacheById({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      cache_id: cache.id
-                    });
-                    console.log(`Deleted cache: ${cache.key}`);
-                    deleteCount++;
-                  } catch (error) {
-                    console.error(`Failed to delete cache ${cache.key}: ${error.message}`);
-                  }
-                }
-              }
-            }
-            
-            const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
-            
-            if (dryRun) {
-              console.log(`Dry run: Would delete ${caches.actions_caches.filter(c => new Date(c.created_at) < cutoffDate).length} caches (${sizeMB} MB)`);
-            } else {
-              console.log(`Deleted ${deleteCount} old caches (${sizeMB} MB freed)`);
-            }
+                  if [ "${{ needs.cleanup-merged-branches.result }}" = "success" ]; then
+                    echo "✅ Branch cleanup completed successfully" >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "❌ Branch cleanup failed or skipped" >> $GITHUB_STEP_SUMMARY
+                  fi
 
-  workflow-summary:
-    name: 📊 Cleanup Summary
-    runs-on: ubuntu-latest
-    needs: [cleanup-merged-branches, cleanup-old-caches]
-    if: always()
-    steps:
-      - name: Generate summary
-        run: |
-          echo "🧹 **Weekly Operations Cleanup Complete**" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Cleanup Type:** ${{ inputs.cleanup_type || 'scheduled' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Mode:** ${{ inputs.dry_run && 'Dry Run' || 'Live' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ "${{ needs.cleanup-merged-branches.result }}" = "success" ]; then
-            echo "✅ Branch cleanup completed successfully" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Branch cleanup failed or skipped" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ "${{ needs.cleanup-old-caches.result }}" = "success" ]; then
-            echo "✅ Cache cleanup completed successfully" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Cache cleanup failed or skipped" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Next scheduled cleanup:** $(date -d 'next sunday 2:00' '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+                  if [ "${{ needs.cleanup-old-caches.result }}" = "success" ]; then
+                    echo "✅ Cache cleanup completed successfully" >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "❌ Cache cleanup failed or skipped" >> $GITHUB_STEP_SUMMARY
+                  fi
+
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "**Next scheduled cleanup:** $(date -d 'next sunday 2:00' '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY

@@ -9,7 +9,10 @@
 
 import * as dotenv from "dotenv";
 import { setGlobalOptions } from "firebase-functions";
-import { validateProductionConfig, getConfigSummary } from "./config/validation";
+import {
+  validateProductionConfig,
+  getConfigSummary,
+} from "./config/validation";
 
 // Load environment variables from .env file
 dotenv.config();

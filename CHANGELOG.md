@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Production-Ready Single-Environment Deployment Pipeline**
+
   - Firebase Hosting + Functions deployment with dry-run capability
   - Staging preview deployments for develop branch
   - Comprehensive preflight security checks and release validation
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Weekly operations cleanup workflow (`ops-cleanup.yml`)
 
 - **Complete Production Documentation**
+
   - Step-by-step deployment guide (`DEPLOYMENT.md`)
   - Production checklist with secrets and branch protection (`PRODUCTION_CHECKLIST.md`)
   - Environment configuration guide (`docs/ENVIRONMENT.md`)
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Legal compliance documentation (`docs/compliance/legal.md`)
 
 - **Security and Quality Assurance**
+
   - Functions startup validation for placeholder detection
   - Least-privilege permissions for all workflows
   - Hard gates for production deployment (secrets + branch protection required)
