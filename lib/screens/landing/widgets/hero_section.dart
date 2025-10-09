@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+
 import 'cta_button.dart';
 
 class HeroSection extends StatefulWidget {
@@ -17,8 +18,7 @@ class HeroSection extends StatefulWidget {
   State<HeroSection> createState() => _HeroSectionState();
 }
 
-class _HeroSectionState extends State<HeroSection>
-    with SingleTickerProviderStateMixin {
+class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -100,9 +100,8 @@ class _HeroSectionState extends State<HeroSection>
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontSize: size.width < 600 ? 18 : 22,
                         height: 1.6,
-                        color: isDark
-                            ? Colors.white.withOpacity(0.8)
-                            : Colors.black.withOpacity(0.7),
+                        color:
+                            isDark ? Colors.white.withOpacity(0.8) : Colors.black.withOpacity(0.7),
                       ),
                     ),
                   ),
@@ -151,27 +150,35 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   Widget _buildFloatingIcons() {
+    // Capture size OUTSIDE AnimatedBuilder to avoid layout loops
+    final size = MediaQuery.of(context).size;
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return Stack(
-          children: [
-            _buildFloatingIcon(Icons.receipt_long, 0.1, 0.2),
-            _buildFloatingIcon(Icons.merge_type, 0.8, 0.3),
-            _buildFloatingIcon(Icons.palette, 0.15, 0.7),
-            _buildFloatingIcon(Icons.text_fields, 0.85, 0.6),
-            _buildFloatingIcon(Icons.article, 0.5, 0.1),
-          ],
+        final offset = _controller.value * 20 - 10;
+        // Wrap Stack in SizedBox to give it explicit size constraints
+        return SizedBox(
+          width: size.width,
+          height: size.height,
+          child: Stack(
+            children: [
+              _buildFloatingIcon(Icons.receipt_long, 0.1, 0.2, size, offset),
+              _buildFloatingIcon(Icons.merge_type, 0.8, 0.3, size, offset),
+              _buildFloatingIcon(Icons.palette, 0.15, 0.7, size, offset),
+              _buildFloatingIcon(Icons.text_fields, 0.85, 0.6, size, offset),
+              _buildFloatingIcon(Icons.article, 0.5, 0.1, size, offset),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildFloatingIcon(IconData icon, double left, double top) {
-    final offset = _controller.value * 20 - 10;
+  Widget _buildFloatingIcon(IconData icon, double left, double top, Size size, double offset) {
     return Positioned(
-      left: MediaQuery.of(context).size.width * left,
-      top: MediaQuery.of(context).size.height * top + offset,
+      left: size.width * left,
+      top: size.height * top + offset,
       child: Opacity(
         opacity: 0.1,
         child: Icon(
@@ -189,17 +196,14 @@ class _HeroSectionState extends State<HeroSection>
       runSpacing: 16,
       alignment: WrapAlignment.center,
       children: [
-        _buildTrustBadge(
-            'No Credit Card Required', Icons.credit_card_off, theme, isDark),
-        _buildTrustBadge(
-            'Free Plan Available', Icons.free_breakfast, theme, isDark),
+        _buildTrustBadge('No Credit Card Required', Icons.credit_card_off, theme, isDark),
+        _buildTrustBadge('Free Plan Available', Icons.free_breakfast, theme, isDark),
         _buildTrustBadge('Cancel Anytime', Icons.close, theme, isDark),
       ],
     );
   }
 
-  Widget _buildTrustBadge(
-      String label, IconData icon, ThemeData theme, bool isDark) {
+  Widget _buildTrustBadge(String label, IconData icon, ThemeData theme, bool isDark) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

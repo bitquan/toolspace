@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'auth/screens/email_verification_screen.dart';
+import 'auth/screens/signin_screen.dart';
+import 'auth/screens/signup_screen.dart';
 import 'core/services/debug_logger.dart';
 import 'core/ui/neo_playground_theme.dart';
 import 'firebase_options.dart';
@@ -69,8 +71,24 @@ class ToolspaceApp extends StatelessWidget {
       theme: NeoPlaygroundTheme.lightTheme(),
       darkTheme: NeoPlaygroundTheme.darkTheme(),
       themeMode: ThemeMode.system,
-      // Entry point is entirely driven by auth state
-      home: const AuthGate(),
+      // Use onGenerateRoute instead of home + routes to avoid conflicts
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        // Handle all route navigation
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(builder: (_) => const AuthGate());
+          case '/auth/signin':
+            return MaterialPageRoute(builder: (_) => const SignInScreen());
+          case '/auth/signup':
+            return MaterialPageRoute(builder: (_) => const SignUpScreen());
+          case '/dashboard':
+            return MaterialPageRoute(builder: (_) => const NeoHomeScreen());
+          default:
+            // Unknown route - redirect to auth gate
+            return MaterialPageRoute(builder: (_) => const AuthGate());
+        }
+      },
     );
   }
 }
@@ -84,6 +102,21 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   bool _hasCheckedAndClearedBadAuth = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Clear any cached auth on startup (debugging - remove this later)
+    _clearCachedAuth();
+  }
+
+  Future<void> _clearCachedAuth() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DebugLogger.info('🧹 Clearing cached auth session for: ${user.email ?? "anonymous"}');
+      await FirebaseAuth.instance.signOut();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,8 +138,8 @@ class _AuthGateState extends State<AuthGate> {
         }
 
         // Anonymous user or no email (old session) → sign out ONCE
-        if ((user.isAnonymous || user.email == null || user.email!.isEmpty) &&
-            !_hasCheckedAndClearedBadAuth) {
+        final hasInvalidEmail = user.email == null || user.email!.isEmpty;
+        if ((user.isAnonymous || hasInvalidEmail) && !_hasCheckedAndClearedBadAuth) {
           _hasCheckedAndClearedBadAuth = true;
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             await FirebaseAuth.instance.signOut();
