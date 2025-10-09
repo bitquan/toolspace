@@ -33,6 +33,7 @@ class DebugLogger {
       // Silently fail - VM service issues shouldn't crash the app
       if (!_suppressVMServiceErrors) {
         // Only print the error if suppression is disabled
+        // ignore: avoid_print
         print('DebugLogger error: $e');
       }
     }

@@ -4,7 +4,8 @@ import 'package:toolspace/tools/url_short/url_short_screen.dart';
 
 void main() {
   group('UrlShortScreen Widget Tests', () {
-    testWidgets('displays dev access badge in app bar', (WidgetTester tester) async {
+    testWidgets('displays dev access badge in app bar',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -102,7 +103,8 @@ void main() {
       expect(find.textContaining('Short URL created'), findsOneWidget);
     });
 
-    testWidgets('displays URL cards after creation', (WidgetTester tester) async {
+    testWidgets('displays URL cards after creation',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -121,7 +123,8 @@ void main() {
       expect(find.text('Delete'), findsOneWidget);
     });
 
-    testWidgets('copy button copies URL to clipboard', (WidgetTester tester) async {
+    testWidgets('copy button copies URL to clipboard',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -141,7 +144,8 @@ void main() {
       expect(find.text('Short URL copied to clipboard!'), findsOneWidget);
     });
 
-    testWidgets('delete button shows confirmation dialog', (WidgetTester tester) async {
+    testWidgets('delete button shows confirmation dialog',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: UrlShortScreen(),
@@ -203,12 +207,14 @@ void main() {
       await tester.enterText(find.byType(TextField), longUrl);
       await tester.pump();
 
-      expect(find.text('URL is too long (max 2048 characters)'), findsOneWidget);
+      expect(
+          find.text('URL is too long (max 2048 characters)'), findsOneWidget);
     });
   });
 
   group('UrlShortScreen Dev Access', () {
-    testWidgets('shows locked screen for non-dev users', (WidgetTester tester) async {
+    testWidgets('shows locked screen for non-dev users',
+        (WidgetTester tester) async {
       // Note: This test would need proper state management
       // to actually test non-dev access. For now, it's a placeholder.
       await tester.pumpWidget(
@@ -231,7 +237,8 @@ void main() {
       );
 
       // Create a URL
-      await tester.enterText(find.byType(TextField), 'https://example.com/test');
+      await tester.enterText(
+          find.byType(TextField), 'https://example.com/test');
       await tester.tap(find.text('Shorten URL'));
       await tester.pumpAndSettle();
 

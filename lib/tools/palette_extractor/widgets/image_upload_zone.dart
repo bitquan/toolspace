@@ -33,16 +33,18 @@ class _ImageUploadZoneState extends State<ImageUploadZone> {
           border: Border.all(
             color: _isDragOver
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
+                : theme.colorScheme.outline.withValues(alpha: 0.3),
             width: 2,
             strokeAlign: BorderSide.strokeAlignInside,
           ),
           borderRadius: BorderRadius.circular(12),
           color: _isDragOver
-              ? theme.colorScheme.primary.withOpacity(0.1)
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
               : widget.isEnabled
-                  ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.3)
-                  : theme.colorScheme.surfaceContainerHighest.withOpacity(0.1),
+                  ? theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3)
+                  : theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.1),
         ),
         child: Center(
           child: Column(
@@ -53,7 +55,7 @@ class _ImageUploadZoneState extends State<ImageUploadZone> {
                 size: widget.hasImage ? 24 : 48,
                 color: widget.isEnabled
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 12),
               Text(
@@ -65,7 +67,8 @@ class _ImageUploadZoneState extends State<ImageUploadZone> {
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: widget.isEnabled
                       ? theme.colorScheme.onSurface
-                      : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      : theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.5),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -74,7 +77,8 @@ class _ImageUploadZoneState extends State<ImageUploadZone> {
                 Text(
                   'PNG, JPG, WebP • Max 10MB',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.7),
                   ),
                 ),
               ],

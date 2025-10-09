@@ -5,12 +5,15 @@ import 'dart:ui';
 class ColorUtils {
   /// Convert Color to hex string (e.g., "#FF5733")
   static String toHex(Color color) {
-    return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+    return '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
   }
 
   /// Convert Color to RGB string (e.g., "rgb(255, 87, 51)")
   static String toRgb(Color color) {
-    return 'rgb(${color.red}, ${color.green}, ${color.blue})';
+    final r = (color.r * 255.0).round() & 0xff;
+    final g = (color.g * 255.0).round() & 0xff;
+    final b = (color.b * 255.0).round() & 0xff;
+    return 'rgb($r, $g, $b)';
   }
 
   /// Convert hex string to Color
@@ -24,16 +27,25 @@ class ColorUtils {
 
   /// Calculate Euclidean distance between two colors in RGB space
   static double colorDistance(Color a, Color b) {
-    final dr = a.red - b.red;
-    final dg = a.green - b.green;
-    final db = a.blue - b.blue;
+    final ar = (a.r * 255.0).round() & 0xff;
+    final ag = (a.g * 255.0).round() & 0xff;
+    final ab = (a.b * 255.0).round() & 0xff;
+    final br = (b.r * 255.0).round() & 0xff;
+    final bg = (b.g * 255.0).round() & 0xff;
+    final bb = (b.b * 255.0).round() & 0xff;
+    final dr = ar - br;
+    final dg = ag - bg;
+    final db = ab - bb;
     return sqrt(dr * dr + dg * dg + db * db);
   }
 
   /// Calculate perceptual brightness of a color (0-255)
   static double brightness(Color color) {
+    final r = (color.r * 255.0).round() & 0xff;
+    final g = (color.g * 255.0).round() & 0xff;
+    final b = (color.b * 255.0).round() & 0xff;
     // Using relative luminance formula
-    return 0.299 * color.red + 0.587 * color.green + 0.114 * color.blue;
+    return 0.299 * r + 0.587 * g + 0.114 * b;
   }
 
   /// Check if color is light (for contrast determination)
@@ -50,9 +62,15 @@ class ColorUtils {
 
   /// Mix two colors with given weight (0.0 to 1.0)
   static Color mix(Color a, Color b, double weight) {
-    final r = (a.red * (1 - weight) + b.red * weight).round();
-    final g = (a.green * (1 - weight) + b.green * weight).round();
-    final bl = (a.blue * (1 - weight) + b.blue * weight).round();
+    final ar = (a.r * 255.0).round() & 0xff;
+    final ag = (a.g * 255.0).round() & 0xff;
+    final ab = (a.b * 255.0).round() & 0xff;
+    final br = (b.r * 255.0).round() & 0xff;
+    final bg = (b.g * 255.0).round() & 0xff;
+    final bb = (b.b * 255.0).round() & 0xff;
+    final r = (ar * (1 - weight) + br * weight).round();
+    final g = (ag * (1 - weight) + bg * weight).round();
+    final bl = (ab * (1 - weight) + bb * weight).round();
     return Color.fromARGB(255, r, g, bl);
   }
 }

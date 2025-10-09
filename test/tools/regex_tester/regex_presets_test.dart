@@ -81,9 +81,8 @@ void main() {
       expect(results, isNotEmpty);
       expect(
         results.any((p) =>
-          p.name.toLowerCase().contains('phone') ||
-          p.description.toLowerCase().contains('phone')
-        ),
+            p.name.toLowerCase().contains('phone') ||
+            p.description.toLowerCase().contains('phone')),
         true,
       );
     });

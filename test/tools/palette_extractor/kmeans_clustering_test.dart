@@ -10,7 +10,8 @@ void main() {
       final result = await KMeansClustering.extractPalette(pixels, k: 5);
 
       expect(result.colors.length, equals(1));
-      expect(result.colors.first.red, equals(255));
+      final firstColor = result.colors.first;
+      expect((firstColor.r * 255.0).round() & 0xff, equals(255));
       expect(result.frequencies.first, equals(100));
     });
 
@@ -58,7 +59,8 @@ void main() {
 
       final result = await KMeansClustering.extractPalette(pixels, k: 5);
 
-      expect(result.frequencies.first, greaterThanOrEqualTo(result.frequencies.last));
+      expect(result.frequencies.first,
+          greaterThanOrEqualTo(result.frequencies.last));
     });
 
     test('calculates percentage correctly', () async {

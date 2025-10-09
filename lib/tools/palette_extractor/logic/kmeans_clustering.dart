@@ -241,9 +241,9 @@ class _ColorVector {
 
   factory _ColorVector.fromColor(Color color) {
     return _ColorVector(
-      color.red.toDouble(),
-      color.green.toDouble(),
-      color.blue.toDouble(),
+      ((color.r * 255.0).round() & 0xff).toDouble(),
+      ((color.g * 255.0).round() & 0xff).toDouble(),
+      ((color.b * 255.0).round() & 0xff).toDouble(),
     );
   }
 

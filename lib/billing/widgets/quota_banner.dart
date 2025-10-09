@@ -51,12 +51,12 @@ class _QuotaBannerState extends State<QuotaBanner> {
         gradient: LinearGradient(
           colors: isWarning
               ? [
-                  Colors.orange.withOpacity(0.15),
-                  Colors.deepOrange.withOpacity(0.15),
+                  Colors.orange.withValues(alpha: 0.15),
+                  Colors.deepOrange.withValues(alpha: 0.15),
                 ]
               : [
-                  Colors.blue.withOpacity(0.1),
-                  Colors.purple.withOpacity(0.1),
+                  Colors.blue.withValues(alpha: 0.1),
+                  Colors.purple.withValues(alpha: 0.1),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -64,8 +64,8 @@ class _QuotaBannerState extends State<QuotaBanner> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isWarning
-              ? Colors.orange.withOpacity(0.3)
-              : Colors.blue.withOpacity(0.3),
+              ? Colors.orange.withValues(alpha: 0.3)
+              : Colors.blue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -97,7 +97,7 @@ class _QuotaBannerState extends State<QuotaBanner> {
                   Text(
                     'Upgrade to Pro for ${_getUpgradeLimit()} operations per day',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

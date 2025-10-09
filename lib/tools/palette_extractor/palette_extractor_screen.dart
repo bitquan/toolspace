@@ -121,6 +121,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
 
     try {
       final String filename;
+      // ignore: unused_local_variable
       final dynamic content;
 
       switch (format) {
@@ -180,7 +181,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFE91E63).withOpacity(0.2),
+                color: const Color(0xFFE91E63).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -261,10 +262,11 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
               border: Border(
                 bottom: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 ),
               ),
             ),
@@ -441,7 +443,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                             'The tool will extract the most dominant colors using k-means clustering',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant
-                                  .withOpacity(0.7),
+                                  .withValues(alpha: 0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),

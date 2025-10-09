@@ -237,7 +237,8 @@ void main() {
       // No error should occur
     });
 
-    testWidgets('Custom alphabet field appears when Custom preset selected', (tester) async {
+    testWidgets('Custom alphabet field appears when Custom preset selected',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: IdGenScreen(),

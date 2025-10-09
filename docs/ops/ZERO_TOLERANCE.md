@@ -13,16 +13,19 @@ No exceptions. No warnings. No errors. Period.
 ### For All Code
 
 1. **Flutter/Dart Code**
+
    - Must pass: `flutter analyze --fatal-warnings --fatal-infos`
    - Any info, warning, or error = build fails
    - Includes: deprecation warnings, unused variables, style issues
 
 2. **TypeScript/JavaScript Code (Functions)**
+
    - Must pass: `eslint . --max-warnings=0`
    - Any ESLint warning = build fails
    - Includes: TypeScript errors, unused imports, formatting issues
 
 3. **Tests**
+
    - All tests must pass: `flutter test` and `npm test`
    - No failing tests, no skipped tests without explicit approval
    - Test coverage should not decrease
@@ -101,16 +104,19 @@ flutter test test/path/to/test_test.dart
 ### Why ZERO Tolerance?
 
 1. **Prevent Tech Debt Accumulation**
+
    - Warnings today = errors tomorrow
    - "We'll fix it later" = never fixed
    - Clean code stays clean
 
 2. **CI/Local Parity**
+
    - If it passes locally, it passes in CI
    - No surprises in PR checks
    - Faster development cycles
 
 3. **Code Quality**
+
    - Unused code = confusion
    - Deprecation warnings = future breaks
    - Type errors = runtime failures
@@ -131,12 +137,14 @@ git push --no-verify
 ```
 
 **REQUIREMENTS:**
+
 1. Open a GitHub issue immediately explaining why
 2. Tag issue with `urgent` and `tech-debt`
 3. Fix within 24 hours
 4. Never use for "I'll fix it later" situations
 
 **Abuse of `--no-verify` will result in:**
+
 - PR rejection
 - Code review escalation
 - Blocked merge rights

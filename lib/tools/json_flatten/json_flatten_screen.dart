@@ -16,7 +16,8 @@ class JsonFlattenScreen extends StatefulWidget {
   State<JsonFlattenScreen> createState() => _JsonFlattenScreenState();
 }
 
-class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProviderStateMixin {
+class _JsonFlattenScreenState extends State<JsonFlattenScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _csvController = TextEditingController();
   final BillingService _billingService = BillingService();
@@ -182,7 +183,9 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final stats = _flattenResult != null ? JsonFlattener.getStatistics(_flattenResult!) : null;
+    final stats = _flattenResult != null
+        ? JsonFlattener.getStatistics(_flattenResult!)
+        : null;
 
     // Calculate input size for paywall (large JSON exports are heavy ops)
     final inputBytes = _inputController.text.length;
@@ -203,7 +206,7 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6A1B9A).withOpacity(0.2),
+                  color: const Color(0xFF6A1B9A).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -258,10 +261,11 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  color:
+                      theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                   border: Border(
                     bottom: BorderSide(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -307,10 +311,11 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.errorContainer.withOpacity(0.3),
+                  color:
+                      theme.colorScheme.errorContainer.withValues(alpha: 0.3),
                   border: Border(
                     bottom: BorderSide(
-                      color: theme.colorScheme.error.withOpacity(0.3),
+                      color: theme.colorScheme.error.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -344,7 +349,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                       decoration: BoxDecoration(
                         border: Border(
                           right: BorderSide(
-                            color: theme.colorScheme.outline.withOpacity(0.3),
+                            color: theme.colorScheme.outline
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                       ),
@@ -376,7 +382,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                                     ),
                                   ],
                                   selected: {_notationStyle},
-                                  onSelectionChanged: (Set<NotationStyle> value) {
+                                  onSelectionChanged:
+                                      (Set<NotationStyle> value) {
                                     setState(() {
                                       _notationStyle = value.first;
                                     });
@@ -387,7 +394,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: TextField(
                                 controller: _inputController,
                                 maxLines: null,
@@ -424,7 +432,9 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                                       )
                                     : const Icon(Icons.transform),
                                 label: Text(
-                                  _isFlattening ? 'Flattening...' : 'Flatten to CSV',
+                                  _isFlattening
+                                      ? 'Flattening...'
+                                      : 'Flatten to CSV',
                                 ),
                               ),
                             ),
@@ -442,7 +452,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                         decoration: BoxDecoration(
                           border: Border(
                             right: BorderSide(
-                              color: theme.colorScheme.outline.withOpacity(0.3),
+                              color: theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
                             ),
                           ),
                         ),
@@ -455,7 +466,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                                 children: [
                                   Text(
                                     'Fields',
-                                    style: theme.textTheme.titleMedium?.copyWith(
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -470,7 +482,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
                                 children: [
                                   Expanded(
@@ -492,11 +505,13 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                             const SizedBox(height: 8),
                             Expanded(
                               child: ListView.builder(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
                                 itemCount: _flattenResult!.allKeys.length,
                                 itemBuilder: (context, index) {
                                   final key = _flattenResult!.allKeys[index];
-                                  final isSelected = _selectedKeys.contains(key);
+                                  final isSelected =
+                                      _selectedKeys.contains(key);
                                   return CheckboxListTile(
                                     value: isSelected,
                                     onChanged: (bool? value) {
@@ -510,7 +525,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                                       ),
                                     ),
                                     dense: true,
-                                    controlAffinity: ListTileControlAffinity.leading,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
                                   );
                                 },
                               ),
@@ -549,7 +565,8 @@ class _JsonFlattenScreenState extends State<JsonFlattenScreen> with TickerProvid
                                 fontSize: 14,
                               ),
                               decoration: InputDecoration(
-                                hintText: 'CSV output will appear here after flattening...',
+                                hintText:
+                                    'CSV output will appear here after flattening...',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),

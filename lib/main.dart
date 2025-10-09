@@ -42,7 +42,8 @@ void main() async {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
-      DebugLogger.info('🔧 Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001)');
+      DebugLogger.info(
+          '🔧 Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001)');
     }
 
     // Sign in anonymously for testing

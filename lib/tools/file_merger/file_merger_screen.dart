@@ -44,6 +44,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
         _quotaStatus = QuotaStatus.fromMap(result.data);
       });
     } catch (e) {
+      // ignore: avoid_print
       print('Failed to load quota status: $e');
     }
   }
@@ -113,7 +114,9 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
     }
 
     // Check quota
-    if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0) {
+    if (_quotaStatus != null &&
+        !_quotaStatus!.isPro &&
+        _quotaStatus!.mergesRemaining <= 0) {
       _showErrorSnackBar('Free quota exceeded. Please upgrade to Pro.');
       return;
     }
@@ -186,8 +189,9 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
   @override
   Widget build(BuildContext context) {
     // Calculate max file size and batch size for paywall guard
-    final maxFileBytes =
-        _files.isEmpty ? null : _files.map((f) => f.bytes.length).reduce((a, b) => a > b ? a : b);
+    final maxFileBytes = _files.isEmpty
+        ? null
+        : _files.map((f) => f.bytes.length).reduce((a, b) => a > b ? a : b);
     final batchSize = _files.length;
 
     return PaywallGuard(
@@ -206,7 +210,9 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
         body: Column(
           children: [
             // Quota banner
-            if (_quotaStatus != null && !_quotaStatus!.isPro && _quotaStatus!.mergesRemaining <= 0)
+            if (_quotaStatus != null &&
+                !_quotaStatus!.isPro &&
+                _quotaStatus!.mergesRemaining <= 0)
               QuotaBanner(quotaStatus: _quotaStatus!),
 
             Expanded(
@@ -334,7 +340,9 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
                     // Merge button
                     ElevatedButton(
                       onPressed:
-                          _files.isNotEmpty && !_isUploading && !_isMerging ? _mergeFiles : null,
+                          _files.isNotEmpty && !_isUploading && !_isMerging
+                              ? _mergeFiles
+                              : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Theme.of(context).primaryColor,
@@ -375,6 +383,7 @@ class _FileMergerScreenState extends State<FileMergerScreen> {
     // For web, we can use html.window.open
     // For mobile, use url_launcher package
     // This is a placeholder implementation
+    // ignore: avoid_print
     print('Would open URL: $url');
     _showSuccessSnackBar('Download started');
   }

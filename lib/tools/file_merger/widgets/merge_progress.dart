@@ -32,9 +32,9 @@ class MergeProgress extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -56,7 +56,7 @@ class MergeProgress extends StatelessWidget {
                 child: Text(
                   message,
                   style: TextStyle(
-                    color: color.withOpacity(0.8),
+                    color: color.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -66,7 +66,7 @@ class MergeProgress extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(color),
-            backgroundColor: color.withOpacity(0.2),
+            backgroundColor: color.withValues(alpha: 0.2),
           ),
         ],
       ),

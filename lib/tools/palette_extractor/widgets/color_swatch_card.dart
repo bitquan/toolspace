@@ -71,7 +71,6 @@ class _ColorSwatchCardState extends State<ColorSwatchCard>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final hex = ColorUtils.toHex(widget.color);
     final rgb = ColorUtils.toRgb(widget.color);
     final textColor = ColorUtils.getContrastColor(widget.color);
@@ -111,7 +110,7 @@ class _ColorSwatchCardState extends State<ColorSwatchCard>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: textColor.withOpacity(0.2),
+                            color: textColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -130,7 +129,7 @@ class _ColorSwatchCardState extends State<ColorSwatchCard>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: textColor.withOpacity(0.2),
+                              color: textColor.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -158,7 +157,7 @@ class _ColorSwatchCardState extends State<ColorSwatchCard>
                     Text(
                       rgb,
                       style: TextStyle(
-                        color: textColor.withOpacity(0.8),
+                        color: textColor.withValues(alpha: 0.8),
                         fontSize: 12,
                       ),
                     ),
@@ -214,7 +213,7 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(

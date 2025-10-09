@@ -23,8 +23,8 @@ void main() {
         expect(UuidGenerator.isValid(uuid), true);
         expect(
             uuid,
-            matches(
-                RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
+            matches(RegExp(
+                r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
       }
 
       // All should be unique
@@ -50,8 +50,8 @@ void main() {
         expect(UuidGenerator.isValid(uuid), true);
         expect(
             uuid,
-            matches(
-                RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
+            matches(RegExp(
+                r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')));
       }
 
       // All should be unique
@@ -229,7 +229,8 @@ void main() {
       // With 1000 IDs of length 10, we have 10,000 characters total
       // Default alphabet has 64 characters
       // We expect most characters to appear at least once
-      expect(charCount.length, greaterThan(50), reason: 'Should use most of the alphabet');
+      expect(charCount.length, greaterThan(50),
+          reason: 'Should use most of the alphabet');
 
       // No single character should dominate (max ~2% of total)
       for (final count in charCount.values) {

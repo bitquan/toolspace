@@ -173,7 +173,8 @@ class CodecEngine {
     }
 
     // Check for Base64 (alphanumeric + / + = padding)
-    if (RegExp(r'^[A-Za-z0-9+/]*={0,2}$').hasMatch(trimmed.replaceAll(RegExp(r'\s'), ''))) {
+    if (RegExp(r'^[A-Za-z0-9+/]*={0,2}$')
+        .hasMatch(trimmed.replaceAll(RegExp(r'\s'), ''))) {
       // Additional validation: Base64 length should be multiple of 4 (with padding)
       final cleaned = trimmed.replaceAll(RegExp(r'\s'), '');
       if (cleaned.length % 4 == 0) {
@@ -182,7 +183,8 @@ class CodecEngine {
           return CodecFormat.base64;
         } catch (_) {
           // Not valid Base64, might still be hex
-          if (RegExp(r'^[0-9A-Fa-f]+$').hasMatch(cleaned) && cleaned.length % 2 == 0) {
+          if (RegExp(r'^[0-9A-Fa-f]+$').hasMatch(cleaned) &&
+              cleaned.length % 2 == 0) {
             return CodecFormat.hex;
           }
         }

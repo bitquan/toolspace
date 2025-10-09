@@ -183,7 +183,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
             scale: _scaleAnimation.value,
             child: Card(
               elevation: _elevationAnimation.value,
-              shadowColor: widget.tool.color.withOpacity(0.3),
+              shadowColor: widget.tool.color.withValues(alpha: 0.3),
               child: InkWell(
                 onTap: widget.onTap,
                 borderRadius: BorderRadius.circular(16),
@@ -194,8 +194,8 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        widget.tool.color.withOpacity(0.1),
-                        widget.tool.color.withOpacity(0.05),
+                        widget.tool.color.withValues(alpha: 0.1),
+                        widget.tool.color.withValues(alpha: 0.05),
                       ],
                     ),
                   ),
@@ -207,7 +207,7 @@ class _PlayfulToolCardState extends State<_PlayfulToolCard>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: widget.tool.color.withOpacity(0.2),
+                          color: widget.tool.color.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(

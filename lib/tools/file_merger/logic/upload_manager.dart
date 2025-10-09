@@ -118,6 +118,7 @@ class UploadManager {
       await Future.wait(deleteFutures);
     } catch (e) {
       // Log error but don't throw - this is cleanup
+      // ignore: avoid_print
       print('Warning: Failed to delete some uploaded files: $e');
     }
   }

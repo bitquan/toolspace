@@ -34,7 +34,7 @@ class _ImageUploadZoneState extends State<ImageUploadZone> {
           ),
           borderRadius: BorderRadius.circular(8),
           color: _isDragOver
-              ? Theme.of(context).primaryColor.withOpacity(0.1)
+              ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
               : widget.isEnabled
                   ? Colors.grey.shade50
                   : Colors.grey.shade100,
