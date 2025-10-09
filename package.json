@@ -36,8 +36,8 @@
     "cleanup:help": "echo 'Workflow Cleanup Commands:' && echo '  npm run cleanup:preview     - Preview what would be cleaned' && echo '  npm run cleanup:execute     - Execute failed runs cleanup' && echo '  npm run cleanup:failed      - Clean failed/cancelled runs' && echo '  npm run cleanup:old         - Clean runs older than 7 days' && echo '  npm run cleanup:cache       - Clean cache and artifacts' && echo '  npm run cleanup:full        - ⚠️  FULL cleanup (ALL data)' && echo '  npm run cleanup:all         - 🔥 DELETE ALL WORKFLOWS' && echo '  npm run cleanup:all-preview - Preview ALL workflows deletion' && echo '  npm run cleanup:nuclear     - 🔥 NUCLEAR: Delete everything instantly'"
   },
   "dependencies": {
-    "dayjs": "^1.11.10",
-    "@octokit/rest": "^20.0.2"
+    "@octokit/rest": "^20.0.2",
+    "dayjs": "^1.11.10"
   },
   "keywords": [
     "sprint-management",
@@ -47,5 +47,9 @@
     "ops-delta"
   ],
   "author": "OPS-Delta System",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.0"
+  }
 }
