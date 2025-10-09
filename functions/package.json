@@ -2,6 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint . --max-warnings=0",
+    "test": "echo \"No tests yet - placeholder for ZERO TOLERANCE\" && exit 0",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
