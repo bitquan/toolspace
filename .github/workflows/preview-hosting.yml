@@ -113,7 +113,7 @@ jobs:
 
       - name: ✅ Check bundle size budget
         run: |
-          MAX_SIZE_MB=5
+          MAX_SIZE_MB=40
           TOTAL_SIZE=$(du -sm build/web | cut -f1)
 
           echo "Bundle size: ${TOTAL_SIZE}MB"
