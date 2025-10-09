@@ -3,12 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toolspace/core/routes.dart';
 import 'package:toolspace/screens/landing/landing_page.dart';
 
+import '../test_helpers/firebase_test_helper.dart';
+
 /// Navigation tests for landing page CTAs and navbar links
 ///
 /// Verifies that all navigation buttons route correctly:
 /// - Hero section: "Get Started Free" → /signup, "View Pricing" → /pricing
 /// - Navbar: Features → /features, Pricing → /pricing, Dashboard → /dashboard or /signup
 void main() {
+  setUpAll(() {
+    setupFirebaseAuthMocks();
+  });
+
   group('Landing Page Navigation Tests', () {
     testWidgets('btn-get-started navigates to /signup', (tester) async {
       await tester.pumpWidget(

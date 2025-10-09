@@ -4,6 +4,8 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:toolspace/screens/landing/landing_page.dart';
 import 'package:toolspace/core/routes.dart';
 
+import '../test_helpers/firebase_test_helper.dart';
+
 /// Golden visual regression tests for landing page
 ///
 /// Tests the landing page at two critical breakpoints:
@@ -15,6 +17,7 @@ import 'package:toolspace/core/routes.dart';
 /// - Verify goldens: flutter test test/golden/landing_golden_test.dart
 void main() {
   setUpAll(() async {
+    setupFirebaseAuthMocks();
     // Load app fonts for consistent text rendering across platforms
     await loadAppFonts();
   });
