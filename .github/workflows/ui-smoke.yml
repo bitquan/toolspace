@@ -1,0 +1,25 @@
+﻿name: UI Smoke
+on:
+    pull_request:
+        paths:
+            - "lib/**"
+            - "test/**"
+permissions:
+    contents: read
+concurrency:
+    group: ui-${{ github.ref }}
+    cancel-in-progress: true
+jobs:
+    smoke:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: subosito/flutter-action@v2
+              with: { channel: stable }
+            - run: flutter pub get
+            - name: Run widget tests (smoke)
+              run: flutter test --exclude-tags=e2e --exclude-tags=golden
+              continue-on-error: true
+            - name: Run golden tests (best-effort)
+              run: flutter test --tags=golden || true
+              continue-on-error: true

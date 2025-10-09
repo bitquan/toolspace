@@ -17,13 +17,6 @@
     "test-digest": "echo 'Use: gh workflow run delta-digest.yml -f dry_run=true'",
     "push:preflight": "powershell -ExecutionPolicy Bypass -File scripts/git/push-preflight.ps1",
     "push": "npm run push:preflight && git push",
-    "assign": "node scripts/assign-to-copilot.mjs",
-    "auto-assign": "node scripts/auto-assign-new-issues.mjs",
-    "test-assignment": "node scripts/assign-to-copilot.mjs 25",
-    "create-issue": "node scripts/create-and-assign-issue.mjs",
-    "create-and-assign": "node scripts/create-and-assign-issue.mjs --assign",
-    "approve-prs": "node scripts/approve-copilot-prs.mjs",
-    "approve-prs-dry": "node scripts/approve-copilot-prs.mjs --dry-run",
     "cleanup:preview": "gh workflow run workflow-cleanup.yml -f cleanup_scope=failed_runs -f dry_run=true",
     "cleanup:failed": "gh workflow run workflow-cleanup.yml -f cleanup_scope=failed_runs -f dry_run=false",
     "cleanup:old": "gh workflow run workflow-cleanup.yml -f cleanup_scope=old_runs -f days_to_keep=7 -f dry_run=false",
@@ -45,8 +38,8 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "dayjs": "^1.11.10",
-    "@octokit/rest": "^20.0.2"
+    "@octokit/rest": "^20.0.2",
+    "dayjs": "^1.11.10"
   },
   "devDependencies": {
     "husky": "^9.0.0",
@@ -64,5 +57,9 @@
     "ops-delta"
   ],
   "author": "OPS-Delta System",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.0"
+  }
 }

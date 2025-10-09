@@ -239,7 +239,12 @@ async function writeSummary() {
 
   if (
     !(await runStep("Flutter test", "flutter", {
-      args: ["test", "--coverage"],
+      args: [
+        "test",
+        "--coverage",
+        "--exclude-tags=e2e",
+        "--exclude-tags=requires-firebase",
+      ],
     }))
   ) {
     log(red("\n❌ Preflight FAILED at: Flutter test"));

@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import '../../shared/shared_data_service.dart';
 
-// ignore: avoid_web_libraries_in_flutter, deprecated_member_use
-import 'dart:html' as html;
+// Conditional import for web-only functionality
+import 'csv_cleaner_web_stub.dart' if (dart.library.html) 'csv_cleaner_web.dart'
+    as web_helper;
 
 class CsvCleanerScreen extends StatefulWidget {
   const CsvCleanerScreen({super.key});
@@ -54,25 +54,16 @@ class _CsvCleanerScreenState extends State<CsvCleanerScreen>
   }
 
   void _pickFile() async {
-    final html.FileUploadInputElement uploadInput =
-        html.FileUploadInputElement();
-    uploadInput.accept = '.csv';
-    uploadInput.click();
-
-    uploadInput.onChange.listen((e) {
-      final files = uploadInput.files;
-      if (files!.isEmpty) return;
-
-      final file = files[0];
-      _fileName = file.name;
-
-      final reader = html.FileReader();
-      reader.readAsText(file);
-
-      reader.onLoad.listen((e) {
-        _processCsvContent(reader.result as String);
+    try {
+      web_helper.pickCsvFile((content, fileName) {
+        _fileName = fileName;
+        _processCsvContent(content);
       });
-    });
+    } catch (e) {
+      setState(() {
+        _statusMessage = 'File picking not supported on this platform';
+      });
+    }
   }
 
   void _processCsvContent(String content) async {
@@ -180,18 +171,10 @@ class _CsvCleanerScreenState extends State<CsvCleanerScreen>
       final List<List<String>> exportData = [_headers, ..._csvData];
       final String csvContent = const ListToCsvConverter().convert(exportData);
 
-      // Create download
-      final bytes = utf8.encode(csvContent);
-      final blob = html.Blob([bytes]);
-      final url = html.Url.createObjectUrlFromBlob(blob);
-
-      final anchor = html.AnchorElement(href: url)
-        ..target = 'download'
-        ..download =
-            _fileName?.replaceAll('.csv', '_cleaned.csv') ?? 'cleaned_data.csv';
-      anchor.click();
-
-      html.Url.revokeObjectUrl(url);
+      // Download using platform-specific helper
+      final downloadFileName =
+          _fileName?.replaceAll('.csv', '_cleaned.csv') ?? 'cleaned_data.csv';
+      web_helper.downloadCsv(csvContent, downloadFileName);
 
       setState(() {
         _statusMessage = 'CSV exported successfully!';

@@ -1,0 +1,15 @@
+{
+  "name": "ui-smoke",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UX smoke tests for Toolspace landing page",
+  "scripts": {
+    "prepare": "playwright install --with-deps",
+    "serve": "http-server ../../build/web -p 4173 -s",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "http-server": "^14.1.1"
+  }
+}

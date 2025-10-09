@@ -9,9 +9,18 @@
 
 import * as dotenv from "dotenv";
 import { setGlobalOptions } from "firebase-functions";
+import {
+  validateProductionConfig,
+  getConfigSummary,
+} from "./config/validation";
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Validate production configuration on startup
+console.log("🔍 Validating production configuration...");
+console.log("📊 Configuration summary:", getConfigSummary());
+validateProductionConfig();
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript

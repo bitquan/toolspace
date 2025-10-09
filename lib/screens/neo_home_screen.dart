@@ -155,6 +155,33 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                 ],
                               ),
                             ),
+                            // Navigation buttons
+                            IconButton(
+                              icon: const Icon(Icons.home_outlined),
+                              tooltip: 'Landing Page',
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/'),
+                              style: IconButton.styleFrom(
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.1),
+                                foregroundColor:
+                                    isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton.icon(
+                              icon: const Icon(Icons.login, size: 18),
+                              label: const Text('Sign In'),
+                              onPressed: () => Navigator.of(context)
+                                  .pushNamed('/auth/signin'),
+                              style: TextButton.styleFrom(
+                                foregroundColor:
+                                    NeoPlaygroundTheme.primaryPurple,
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             // Billing button
                             const _BillingButton(),
                           ],

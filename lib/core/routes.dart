@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../screens/neo_home_screen.dart';
+import '../marketing/features_screen.dart';
+import '../marketing/pricing_screen.dart';
 import '../tools/text_tools/text_tools_screen.dart';
 import '../tools/file_merger/file_merger_screen.dart';
 import '../tools/json_doctor/json_doctor_screen.dart';
@@ -17,10 +20,16 @@ import '../tools/image_resizer/image_resizer_screen.dart';
 import '../tools/password_gen/password_gen_screen.dart';
 import '../tools/json_flatten/json_flatten_screen.dart';
 import '../tools/unit_converter/unit_converter_screen.dart';
+import '../auth/screens/signin_screen.dart';
+import '../auth/screens/signup_screen.dart';
+import '../auth/screens/password_reset_screen.dart';
+import '../auth/screens/email_verification_screen.dart';
+import '../auth/screens/account_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
   static const String home = '/';
+  static const String dashboard = '/dashboard';
   static const String textTools = '/tools/text-tools';
   static const String fileMerger = '/tools/file-merger';
   static const String jsonDoctor = '/tools/json-doctor';
@@ -39,13 +48,30 @@ class ToolspaceRouter {
   static const String jsonFlatten = '/tools/json-flatten';
   static const String unitConverter = '/tools/unit-converter';
   static const String auth = '/auth';
+  static const String authSignIn = '/auth/signin';
+  static const String authSignUp = '/auth/signup';
+  static const String authReset = '/auth/reset';
+  static const String authVerify = '/auth/verify';
+  static const String account = '/account';
   static const String billing = '/billing';
+  static const String features = '/features';
+  static const String pricing = '/pricing';
+  static const String signup = '/signup';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
+        // TEMPORARY: Skip landing page due to rendering issues, go straight to dashboard
         return MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const NeoHomeScreen(),
+        );
+      case dashboard:
+        // Dashboard requires authentication
+        return MaterialPageRoute(
+          builder: (context) => const _AuthGuard(
+            redirectTo: authSignUp,
+            child: NeoHomeScreen(),
+          ),
         );
       case textTools:
         return MaterialPageRoute(
@@ -119,9 +145,41 @@ class ToolspaceRouter {
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
         );
+      case authSignIn:
+        return MaterialPageRoute(
+          builder: (_) => const SignInScreen(),
+        );
+      case authSignUp:
+        return MaterialPageRoute(
+          builder: (_) => const SignUpScreen(),
+        );
+      case authReset:
+        return MaterialPageRoute(
+          builder: (_) => const PasswordResetScreen(),
+        );
+      case authVerify:
+        return MaterialPageRoute(
+          builder: (_) => const EmailVerificationScreen(),
+        );
+      case account:
+        return MaterialPageRoute(
+          builder: (_) => const AccountScreen(),
+        );
       case billing:
         return MaterialPageRoute(
           builder: (_) => const BillingScreen(),
+        );
+      case features:
+        return MaterialPageRoute(
+          builder: (_) => const FeaturesScreen(),
+        );
+      case pricing:
+        return MaterialPageRoute(
+          builder: (_) => const PricingScreen(),
+        );
+      case signup:
+        return MaterialPageRoute(
+          builder: (_) => const SignUpScreen(),
         );
       default:
         return MaterialPageRoute(
@@ -170,6 +228,52 @@ class NotFoundScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Auth guard that checks if user is authenticated
+/// Redirects to signup/signin if not authenticated
+class _AuthGuard extends StatelessWidget {
+  final Widget child;
+  final String redirectTo;
+
+  const _AuthGuard({
+    required this.child,
+    required this.redirectTo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final user = snapshot.data;
+
+        // Not authenticated - redirect to signup
+        if (user == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacementNamed(redirectTo);
+          });
+          return const Scaffold(
+            body: Center(
+              child: Text('Redirecting to sign up...'),
+            ),
+          );
+        }
+
+        // Authenticated - show the protected content
+        return child;
+      },
     );
   }
 }

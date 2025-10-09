@@ -70,6 +70,23 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Home',
+                onPressed: () => Navigator.of(context).pushNamed('/'),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Sign In'),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed('/auth/signin'),
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
 
           // Tools Grid

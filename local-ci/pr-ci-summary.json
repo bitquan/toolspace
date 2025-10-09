@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-10-09T17:32:08.717Z",
+  "summary": {
+    "success": false,
+    "passed": 2,
+    "failed": 1,
+    "total": 3,
+    "duration": 40140
+  },
+  "flags": {
+    "quick": false,
+    "noEmulators": false,
+    "fix": false
+  },
+  "results": [
+    {
+      "name": "Flutter pub get",
+      "success": true,
+      "duration": 1408,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "flutter-pub-get.log"
+    },
+    {
+      "name": "Flutter analyze (ZERO tolerance)",
+      "success": true,
+      "duration": 5735,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "flutter-analyze-zero-tolerance-.log"
+    },
+    {
+      "name": "Flutter test",
+      "success": false,
+      "duration": 30160,
+      "exitCode": 1,
+      "error": "Exit code: 1",
+      "logFile": "flutter-test.log"
+    }
+  ]
+}

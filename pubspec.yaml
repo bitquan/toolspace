@@ -27,11 +27,13 @@ dependencies:
   flutter_markdown: ^0.7.4+1
   markdown: ^7.2.2
   csv: ^6.0.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  golden_toolkit: ^0.15.0
 
 flutter:
   uses-material-design: true

@@ -52,8 +52,8 @@
         "currency": "USD",
         "interval": "month"
       },
-      "stripePriceId": "price_test_pro_monthly",
-      "stripeProductId": "prod_test_pro",
+      "stripePriceId": "price_1SG489QJjz2bfxmClomM29uG",
+      "stripeProductId": "prod_TCT3NBZa3YtVb5",
       "popular": true,
       "features": [
         "Everything in Free",
@@ -88,8 +88,8 @@
         "currency": "USD",
         "interval": "month"
       },
-      "stripePriceId": "price_test_pro_plus_monthly",
-      "stripeProductId": "prod_test_pro_plus",
+      "stripePriceId": "price_1SG48MQJjz2bfxmCtCPRhNnV",
+      "stripeProductId": "prod_TCT4agTGJjToka",
       "features": [
         "Everything in Pro",
         "2,000 heavy operations per day",

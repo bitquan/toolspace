@@ -10,7 +10,6 @@
  * - invoice.paid/payment_failed
  */
 
-import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
 import {
@@ -18,6 +17,7 @@ import {
   BillingProfile,
   StripeWebhookEventType,
 } from "../types/billing";
+import { db } from "../admin";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY ||
@@ -121,13 +121,29 @@ export const webhook = functions.https.onRequest(async (req, res) => {
  */
 async function handleCheckoutCompleted(event: Stripe.Event) {
   const session = event.data.object as Stripe.Checkout.Session;
-  const userId = session.metadata?.userId;
+
+  // Try multiple ways to get the Firebase UID for robustness
+  const userId =
+    session.metadata?.userId ||
+    session.metadata?.firebaseUid ||
+    session.client_reference_id;
+
   const planId = session.metadata?.planId;
   const customerId = session.customer as string;
 
-  if (!userId || !planId) {
-    functions.logger.error("Missing metadata in checkout session", {
+  if (!userId) {
+    functions.logger.error("No Firebase UID found in checkout session", {
       sessionId: session.id,
+      metadata: session.metadata,
+      clientReferenceId: session.client_reference_id,
+    });
+    return;
+  }
+
+  if (!planId) {
+    functions.logger.error("Missing planId in checkout session metadata", {
+      sessionId: session.id,
+      userId,
     });
     return;
   }
@@ -137,7 +153,43 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     planId,
     customerId,
     sessionId: session.id,
+    source: session.metadata?.userId
+      ? "metadata.userId"
+      : session.metadata?.firebaseUid
+      ? "metadata.firebaseUid"
+      : "client_reference_id",
   });
+
+  // Update customer metadata if not already set
+  if (customerId) {
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (
+        !customer.deleted &&
+        (!customer.metadata?.firebaseUserId || !customer.metadata?.uid)
+      ) {
+        await stripe.customers.update(customerId, {
+          metadata: {
+            ...customer.metadata,
+            firebaseUserId: userId,
+            uid: userId,
+            updated_by: "checkout_completion_webhook",
+          },
+        });
+
+        functions.logger.info("Updated customer metadata with Firebase UID", {
+          customerId,
+          userId,
+        });
+      }
+    } catch (error) {
+      functions.logger.warn("Failed to update customer metadata", {
+        customerId,
+        userId,
+        error: (error as Error).message,
+      });
+    }
+  }
 
   // Subscription will be updated via subscription.created event
   // Just log the event for audit
@@ -160,13 +212,37 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
  */
 async function handleSubscriptionUpdated(event: Stripe.Event) {
   const subscription = event.data.object as Stripe.Subscription;
-  const userId = subscription.metadata?.userId;
+
+  // Try multiple ways to get the Firebase UID for robustness
+  let userId =
+    subscription.metadata?.userId || subscription.metadata?.firebaseUid;
+
+  // If not in subscription metadata, check customer metadata
+  if (!userId && subscription.customer) {
+    try {
+      const customer = await stripe.customers.retrieve(
+        subscription.customer as string
+      );
+      if (!customer.deleted) {
+        userId = customer.metadata?.firebaseUserId || customer.metadata?.uid;
+      }
+    } catch (error) {
+      functions.logger.warn("Failed to retrieve customer for subscription", {
+        subscriptionId: subscription.id,
+        customerId: subscription.customer,
+        error: (error as Error).message,
+      });
+    }
+  }
+
   const planId = subscription.metadata?.planId;
   const customerId = subscription.customer as string;
 
   if (!userId) {
-    functions.logger.error("Missing userId in subscription metadata", {
+    functions.logger.error("No Firebase UID found for subscription", {
       subscriptionId: subscription.id,
+      customerId: subscription.customer,
+      subscriptionMetadata: subscription.metadata,
     });
     return;
   }
@@ -182,7 +258,6 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
     });
   }
 
-  const db = admin.firestore();
   const billingRef = db.doc(`users/${userId}/billing/profile`);
 
   const updatedProfile: Partial<BillingProfile> = {
@@ -205,6 +280,11 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
     planId,
     status: subscription.status,
     subscriptionId: subscription.id,
+    source: subscription.metadata?.userId
+      ? "subscription.metadata.userId"
+      : subscription.metadata?.firebaseUid
+      ? "subscription.metadata.firebaseUid"
+      : "customer.metadata",
   });
 
   await logBillingEvent({
@@ -226,17 +306,43 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
  */
 async function handleSubscriptionDeleted(event: Stripe.Event) {
   const subscription = event.data.object as Stripe.Subscription;
-  const userId = subscription.metadata?.userId;
+
+  // Try multiple ways to get the Firebase UID for robustness
+  let userId =
+    subscription.metadata?.userId || subscription.metadata?.firebaseUid;
+
+  // If not in subscription metadata, check customer metadata
+  if (!userId && subscription.customer) {
+    try {
+      const customer = await stripe.customers.retrieve(
+        subscription.customer as string
+      );
+      if (!customer.deleted) {
+        userId = customer.metadata?.firebaseUserId || customer.metadata?.uid;
+      }
+    } catch (error) {
+      functions.logger.warn(
+        "Failed to retrieve customer for subscription deletion",
+        {
+          subscriptionId: subscription.id,
+          customerId: subscription.customer,
+          error: (error as Error).message,
+        }
+      );
+    }
+  }
+
   const customerId = subscription.customer as string;
 
   if (!userId) {
-    functions.logger.error("Missing userId in subscription metadata", {
+    functions.logger.error("No Firebase UID found for subscription deletion", {
       subscriptionId: subscription.id,
+      customerId: subscription.customer,
+      subscriptionMetadata: subscription.metadata,
     });
     return;
   }
 
-  const db = admin.firestore();
   const billingRef = db.doc(`users/${userId}/billing/profile`);
 
   // Downgrade to free plan
@@ -252,6 +358,11 @@ async function handleSubscriptionDeleted(event: Stripe.Event) {
   functions.logger.info("Subscription canceled, downgraded to free", {
     userId,
     subscriptionId: subscription.id,
+    source: subscription.metadata?.userId
+      ? "subscription.metadata.userId"
+      : subscription.metadata?.firebaseUid
+      ? "subscription.metadata.firebaseUid"
+      : "customer.metadata",
   });
 
   await logBillingEvent({
@@ -367,7 +478,6 @@ function mapStripeStatus(
  * Log billing event to audit trail
  */
 async function logBillingEvent(event: BillingEvent) {
-  const db = admin.firestore();
   await db
     .collection("ops")
     .doc("billing_events")

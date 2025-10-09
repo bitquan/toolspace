@@ -402,177 +402,69 @@
       },
       "problemMatcher": [],
       "detail": "Interactive PowerShell cleanup helper with confirmation prompts"
-    }
-  ],
-  "inputs": [
-    {
-      "id": "issueNumber",
-      "description": "Enter the GitHub issue number to assign to Copilot",
-      "type": "promptString"
     },
     {
-      "label": "🧹 Flutter Clean",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["clean"],
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "Clean Flutter build artifacts"
-    },
-    {
-      "label": "📦 Flutter Pub Get",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["pub", "get"],
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "Get Flutter dependencies"
-    },
-    {
-      "label": "🔧 Flutter Clean & Get",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["clean"],
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "Clean and get Flutter dependencies",
-      "dependsOn": ["🧹 Flutter Clean"],
-      "dependsOrder": "sequence"
-    },
-    {
-      "label": "🔍 Flutter Analyze",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["analyze"],
-      "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": ["$dart-flutter"],
-      "detail": "Run Flutter static analysis"
-    },
-    {
-      "label": "🧪 Flutter Test",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["test"],
-      "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": ["$dart-flutter"],
-      "detail": "Run all Flutter tests"
-    },
-    {
-      "label": "🏃 Flutter Run (Chrome)",
+      "label": "Flutter Run (Chrome)",
       "type": "shell",
       "command": "flutter",
       "args": ["run", "-d", "chrome"],
       "isBackground": true,
-      "group": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "presentation": {
+        "echo": true,
         "reveal": "always",
-        "panel": "dedicated"
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
       },
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": [],
-      "detail": "Run Flutter app in Chrome browser"
+      "problemMatcher": {
+        "owner": "flutter",
+        "pattern": [
+          {
+            "regexp": "^(.*)$",
+            "file": 1
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^Launching",
+          "endsPattern": "Flutter run key commands\\."
+        }
+      },
+      "detail": "Run Flutter app in Chrome browser with hot reload"
     },
     {
-      "label": "🖥️ Flutter Run (macOS)",
+      "label": "Firebase Emulators",
       "type": "shell",
-      "command": "flutter",
-      "args": ["run", "-d", "macos"],
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/firebase-dev.ps1",
+        "-AutoClose"
+      ],
       "isBackground": true,
-      "group": "build",
       "presentation": {
+        "echo": true,
         "reveal": "always",
-        "panel": "dedicated"
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
       },
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": [],
-      "detail": "Run Flutter app on macOS desktop"
-    },
-    {
-      "label": "📱 Flutter Devices",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["devices"],
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "List all available Flutter devices"
-    },
-    {
-      "label": "🚀 Flutter Doctor",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["doctor", "-v"],
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "Check Flutter environment setup"
-    },
-    {
-      "label": "📊 Flutter Build Web",
-      "type": "shell",
-      "command": "flutter",
-      "args": ["build", "web"],
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": ["$dart-flutter"],
-      "detail": "Build Flutter web application"
+      "problemMatcher": []
     }
   ],
   "inputs": [
