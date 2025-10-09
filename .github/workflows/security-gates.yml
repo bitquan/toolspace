@@ -24,7 +24,7 @@ jobs:
               run: |
                   cd test/security || exit 0
                   npm ci
-                  npm run test:rules -- --config=../../jest.security.config.js
+                  npm run test:rules
 
     e2e-auth-quota:
         runs-on: ubuntu-latest
