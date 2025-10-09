@@ -23,9 +23,9 @@ void main() {
     testGoldens('landing page renders correctly at phone size', (tester) async {
       final builder = DeviceBuilder()
         ..overrideDevicesForAllScenarios(devices: [
-          Device(
+          const Device(
             name: 'phone',
-            size: const Size(360, 800),
+            size: Size(360, 800),
             devicePixelRatio: 2.0,
           ),
         ])
@@ -54,9 +54,9 @@ void main() {
         (tester) async {
       final builder = DeviceBuilder()
         ..overrideDevicesForAllScenarios(devices: [
-          Device(
+          const Device(
             name: 'desktop',
-            size: const Size(1440, 900),
+            size: Size(1440, 900),
             devicePixelRatio: 1.0,
           ),
         ])
