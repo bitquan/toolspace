@@ -16,22 +16,25 @@
 ### Pipeline Steps (prod-release.yml)
 
 1. **Preflight Checks**
+
    - Run `scripts/release-check.mjs` (validates pricing.json placeholders)
    - Execute `auth-security-ok` composite action
    - Verify all required secrets present
 
 2. **Build Phase**
+
    - Flutter web build with cache (pub dependencies)
    - Functions build + unit tests
    - Upload artifacts
 
 3. **Deploy Phase**
+
    - Deploy Hosting + Functions to `${{ secrets.FIREBASE_PROJECT_ID }}`
    - Single environment strategy (production only)
 
 4. **Post-Deploy Smoke Tests**
    - GET `/` must return 200
-   - GET `/features` must return 200  
+   - GET `/features` must return 200
    - GET `/pricing` must return 200
    - All tests must pass for successful deployment
 

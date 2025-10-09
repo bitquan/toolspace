@@ -9,7 +9,7 @@ Complete pre-deployment checklist for Toolspace production release.
 **Critical:** All secrets must be configured before production deployment.
 
 - [ ] `FIREBASE_TOKEN` - Firebase CLI authentication token
-- [ ] `FIREBASE_PROJECT_ID` - Production project ID: `your-prod-project-id`  
+- [ ] `FIREBASE_PROJECT_ID` - Production project ID: `your-prod-project-id`
 - [ ] `STRIPE_SECRET_KEY` - Live secret key: `sk_live_***`
 - [ ] `STRIPE_WEBHOOK_SECRET` - Webhook endpoint secret: `whsec_***`
 - [ ] `STRIPE_PRICE_PRO_MONTH` - Pro plan price ID: `price_XXXXXXXXXXXXXXXX`

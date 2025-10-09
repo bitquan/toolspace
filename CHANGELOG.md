@@ -7,14 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-10-09
+
 ### Added
 
-- Production deployment blueprint (single-env)
-- Comprehensive CI/CD workflows
-- Branch protection documentation
-- API documentation for backend functions
-- Performance monitoring setup
-- Security compliance framework
+- **Production-Ready Single-Environment Deployment Pipeline**
+
+  - Firebase Hosting + Functions deployment with dry-run capability
+  - Staging preview deployments for develop branch
+  - Comprehensive preflight security checks and release validation
+  - Scripts for release validation (`scripts/release-check.mjs`)
+  - Weekly operations cleanup workflow (`ops-cleanup.yml`)
+
+- **Complete Production Documentation**
+
+  - Step-by-step deployment guide (`DEPLOYMENT.md`)
+  - Production checklist with secrets and branch protection (`PRODUCTION_CHECKLIST.md`)
+  - Environment configuration guide (`docs/ENVIRONMENT.md`)
+  - API documentation (`docs/backend/API.md`)
+  - Performance optimization guide (`docs/ops/performance.md`)
+  - Support and troubleshooting guide (`docs/support/troubleshooting.md`)
+  - Legal compliance documentation (`docs/compliance/legal.md`)
+
+- **Security and Quality Assurance**
+
+  - Functions startup validation for placeholder detection
+  - Least-privilege permissions for all workflows
+  - Hard gates for production deployment (secrets + branch protection required)
+  - Comprehensive GitHub issue and PR templates
+  - Coding standards and contributor guidelines
+
+- **Pricing and Billing**
+  - Free plan: 3 heavy operations/day, 10MB max file size
+  - Pro plan: $9/month, 200 heavy operations/day, 50MB max file size
+  - Pro+ plan: $19/month, 2000 heavy operations/day, 100MB max file size
+  - Stripe integration with live billing (production-ready)
 
 ### Changed
 

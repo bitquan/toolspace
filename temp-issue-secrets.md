@@ -9,7 +9,9 @@ This issue tracks the required secrets and environment configuration for product
 Configure these in Repository Settings > Secrets and variables > Actions:
 
 ### 🔑 Firebase Secrets
-- [ ] `FIREBASE_TOKEN` - Firebase CLI authentication token  
+
+- [ ] `FIREBASE_TOKEN` - Firebase CLI authentication token
+
   ```bash
   firebase login:ci
   # Copy the token provided
@@ -20,30 +22,34 @@ Configure these in Repository Settings > Secrets and variables > Actions:
   Value: your-prod-project-id
   ```
 
-### 💳 Stripe Secrets  
+### 💳 Stripe Secrets
+
 - [ ] `STRIPE_SECRET_KEY` - Live Stripe secret key
+
   ```
   Format: sk_live_***
   Location: Stripe Dashboard > Developers > API keys
   ```
 
 - [ ] `STRIPE_WEBHOOK_SECRET` - Webhook endpoint secret
+
   ```
   Format: whsec_***
   Location: Stripe Dashboard > Developers > Webhooks > [webhook] > Signing secret
   ```
 
 - [ ] `STRIPE_PRICE_PRO_MONTH` - Pro plan price ID
+
   ```
   Format: price_XXXXXXXXXXXXXXXX
   Location: Stripe Dashboard > Products > Pro > Pricing
   Amount: $9.00 USD/month
   ```
 
-- [ ] `STRIPE_PRICE_PRO_PLUS_MONTH` - Pro+ plan price ID  
+- [ ] `STRIPE_PRICE_PRO_PLUS_MONTH` - Pro+ plan price ID
   ```
   Format: price_YYYYYYYYYYYYYYYY
-  Location: Stripe Dashboard > Products > Pro+ > Pricing  
+  Location: Stripe Dashboard > Products > Pro+ > Pricing
   Amount: $19.00 USD/month
   ```
 
@@ -54,10 +60,12 @@ Configure these in Repository Settings > Secrets and variables > Actions:
 Update these files with actual values:
 
 - [ ] `.github/workflows/prod-release.yml`
+
   - Replace `your-prod-project-id` with actual Firebase project ID
   - Replace `app.example.com` with actual domain
 
-- [ ] `.github/workflows/staging-release.yml` 
+- [ ] `.github/workflows/staging-release.yml`
+
   - Replace `your-prod-project-id` with actual Firebase project ID
 
 - [ ] `config/pricing.json`
@@ -97,6 +105,6 @@ gh workflow run prod-release.yml -f dry_run=true
 
 ---
 
-**Assigned to:** Repository administrators  
-**Due:** Before v1.0.0 production release  
+**Assigned to:** Repository administrators
+**Due:** Before v1.0.0 production release
 **Labels:** `production`, `security`, `blocking`, `configuration`
