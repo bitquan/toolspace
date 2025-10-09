@@ -22,33 +22,33 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const LandingNavBar(),
+    return const Scaffold(
+      appBar: LandingNavBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Hero Section
-            const HeroSection(),
+            HeroSection(),
 
-            const SizedBox(height: 80),
+            SizedBox(height: 80),
 
             // Features Grid
-            const FeaturesGrid(),
+            FeaturesGrid(),
 
-            const SizedBox(height: 80),
+            SizedBox(height: 80),
 
             // Pricing Section
-            const PricingSection(),
+            PricingSection(),
 
-            const SizedBox(height: 80),
+            SizedBox(height: 80),
 
             // Social Proof Section
-            const SocialProofSection(),
+            SocialProofSection(),
 
-            const SizedBox(height: 80),
+            SizedBox(height: 80),
 
             // Footer
-            const LandingFooter(),
+            LandingFooter(),
           ],
         ),
       ),

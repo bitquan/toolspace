@@ -74,7 +74,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify we navigated to features page
-      expect(find.text('Everything you need to build better, faster'), findsOneWidget);
+      expect(find.text('Everything you need to build better, faster'),
+          findsOneWidget);
     });
 
     testWidgets('nav-pricing navigates to /pricing', (tester) async {
@@ -99,7 +100,8 @@ void main() {
       expect(find.text('Choose your plan'), findsOneWidget);
     });
 
-    testWidgets('nav-dashboard navigates to /dashboard when unauthenticated', (tester) async {
+    testWidgets('nav-dashboard navigates to /dashboard when unauthenticated',
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           onGenerateRoute: ToolspaceRouter.generateRoute,

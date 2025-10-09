@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/neo_home_screen.dart';
-import '../screens/landing/landing_page.dart';
 import '../marketing/features_screen.dart';
 import '../marketing/pricing_screen.dart';
 import '../tools/text_tools/text_tools_screen.dart';
@@ -67,8 +66,12 @@ class ToolspaceRouter {
           builder: (_) => const NeoHomeScreen(),
         );
       case dashboard:
+        // Dashboard requires authentication
         return MaterialPageRoute(
-          builder: (_) => const NeoHomeScreen(),
+          builder: (context) => const _AuthGuard(
+            redirectTo: authSignUp,
+            child: NeoHomeScreen(),
+          ),
         );
       case textTools:
         return MaterialPageRoute(
@@ -225,6 +228,52 @@ class NotFoundScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Auth guard that checks if user is authenticated
+/// Redirects to signup/signin if not authenticated
+class _AuthGuard extends StatelessWidget {
+  final Widget child;
+  final String redirectTo;
+
+  const _AuthGuard({
+    required this.child,
+    required this.redirectTo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final user = snapshot.data;
+
+        // Not authenticated - redirect to signup
+        if (user == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacementNamed(redirectTo);
+          });
+          return const Scaffold(
+            body: Center(
+              child: Text('Redirecting to sign up...'),
+            ),
+          );
+        }
+
+        // Authenticated - show the protected content
+        return child;
+      },
     );
   }
 }

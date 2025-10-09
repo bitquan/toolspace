@@ -45,7 +45,8 @@ class FeaturesScreen extends StatelessWidget {
                   Text(
                     'Everything you need to boost productivity, all in one place',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                      color:
+                          colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -58,9 +59,12 @@ class FeaturesScreen extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final crossAxisCount = constraints.maxWidth > 900 ? 3 : 
-                                       constraints.maxWidth > 600 ? 2 : 1;
-                  
+                  final crossAxisCount = constraints.maxWidth > 900
+                      ? 3
+                      : constraints.maxWidth > 600
+                          ? 2
+                          : 1;
+
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -72,47 +76,56 @@ class FeaturesScreen extends StatelessWidget {
                       _FeatureCard(
                         icon: Icons.code,
                         title: 'Developer Tools',
-                        description: 'JSON formatting, regex testing, UUID generation, and more',
+                        description:
+                            'JSON formatting, regex testing, UUID generation, and more',
                       ),
                       _FeatureCard(
                         icon: Icons.merge_type,
                         title: 'File Operations',
-                        description: 'Merge PDFs, convert formats, resize images effortlessly',
+                        description:
+                            'Merge PDFs, convert formats, resize images effortlessly',
                       ),
                       _FeatureCard(
                         icon: Icons.security,
                         title: 'Secure & Private',
-                        description: 'All processing happens in your browser. Your data never leaves',
+                        description:
+                            'All processing happens in your browser. Your data never leaves',
                       ),
                       _FeatureCard(
                         icon: Icons.speed,
                         title: 'Lightning Fast',
-                        description: 'Instant results with optimized performance',
+                        description:
+                            'Instant results with optimized performance',
                       ),
                       _FeatureCard(
                         icon: Icons.palette,
                         title: 'Design Tools',
-                        description: 'Color palette extraction, QR codes, and visual utilities',
+                        description:
+                            'Color palette extraction, QR codes, and visual utilities',
                       ),
                       _FeatureCard(
                         icon: Icons.cloud_off,
                         title: 'Works Offline',
-                        description: 'Progressive Web App works without internet connection',
+                        description:
+                            'Progressive Web App works without internet connection',
                       ),
                       _FeatureCard(
                         icon: Icons.dashboard_customize,
                         title: 'Clean Interface',
-                        description: 'Modern Material Design 3 with intuitive navigation',
+                        description:
+                            'Modern Material Design 3 with intuitive navigation',
                       ),
                       _FeatureCard(
                         icon: Icons.update,
                         title: 'Always Fresh',
-                        description: 'Regular updates with new tools and improvements',
+                        description:
+                            'Regular updates with new tools and improvements',
                       ),
                       _FeatureCard(
                         icon: Icons.workspace_premium,
                         title: 'Pro Features',
-                        description: 'Unlock advanced capabilities with premium plans',
+                        description:
+                            'Unlock advanced capabilities with premium plans',
                       ),
                     ],
                   );

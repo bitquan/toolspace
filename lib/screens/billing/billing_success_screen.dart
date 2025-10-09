@@ -96,7 +96,7 @@ class _BillingSuccessScreenState extends State<BillingSuccessScreen>
                     child: Column(
                       children: [
                         Text(
-                          'Welcome to Pro!',
+                          'Welcome to Your New Plan!',
                           style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

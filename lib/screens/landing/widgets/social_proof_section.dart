@@ -43,7 +43,7 @@ class SocialProofSection extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 48),
-        Wrap(
+        const Wrap(
           spacing: 48,
           runSpacing: 32,
           alignment: WrapAlignment.center,
@@ -89,11 +89,11 @@ class SocialProofSection extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 48),
-        Wrap(
+        const Wrap(
           spacing: 24,
           runSpacing: 24,
           alignment: WrapAlignment.center,
-          children: const [
+          children: [
             _TestimonialCard(
               quote:
                   'Toolspace has saved me hours every week. The palette extractor alone is worth it!',
@@ -132,7 +132,7 @@ class SocialProofSection extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),
-        Wrap(
+        const Wrap(
           spacing: 32,
           runSpacing: 24,
           alignment: WrapAlignment.center,

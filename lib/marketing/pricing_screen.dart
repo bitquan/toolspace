@@ -48,7 +48,7 @@ class PricingScreen extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 900;
-                  
+
                   if (isWide) {
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +65,8 @@ class PricingScreen extends StatelessWidget {
                               'No credit card required',
                               'Community support',
                             ],
-                            onSelect: () => Navigator.pushNamed(context, '/signup'),
+                            onSelect: () =>
+                                Navigator.pushNamed(context, '/signup'),
                             buttonText: 'Get Started',
                           ),
                         ),
@@ -85,28 +86,29 @@ class PricingScreen extends StatelessWidget {
                               'Priority email support',
                               'No watermarks',
                             ],
-                            onSelect: () => Navigator.pushNamed(context, '/signup'),
-                            buttonText: 'Start Free Trial',
+                            onSelect: () =>
+                                Navigator.pushNamed(context, '/signup'),
+                            buttonText: 'Upgrade to Pro',
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: _PricingCard(
-                            key: const Key('pricing-enterprise'),
-                            title: 'Enterprise',
-                            price: 'Custom',
-                            period: 'contact sales',
+                            key: const Key('pricing-pro-plus'),
+                            title: 'Pro+',
+                            price: '\$19',
+                            period: 'per month',
                             features: const [
                               'Everything in Pro',
-                              'Custom integrations',
-                              'Dedicated support',
-                              'SLA guarantees',
-                              'Volume discounts',
-                              'On-premise deployment',
+                              '2,000 heavy operations/day',
+                              '100MB max file size',
+                              'Batch processing (up to 100)',
+                              'Priority queue processing',
+                              'Priority email support',
                             ],
-                            onSelect: () => Navigator.pushNamed(context, '/signup'),
-                            buttonText: 'Contact Sales',
-                            outlined: true,
+                            onSelect: () =>
+                                Navigator.pushNamed(context, '/signup'),
+                            buttonText: 'Upgrade to Pro+',
                           ),
                         ),
                       ],
@@ -125,7 +127,8 @@ class PricingScreen extends StatelessWidget {
                             'No credit card required',
                             'Community support',
                           ],
-                          onSelect: () => Navigator.pushNamed(context, '/signup'),
+                          onSelect: () =>
+                              Navigator.pushNamed(context, '/signup'),
                           buttonText: 'Get Started',
                         ),
                         const SizedBox(height: 16),
@@ -143,26 +146,27 @@ class PricingScreen extends StatelessWidget {
                             'Priority email support',
                             'No watermarks',
                           ],
-                          onSelect: () => Navigator.pushNamed(context, '/signup'),
-                          buttonText: 'Start Free Trial',
+                          onSelect: () =>
+                              Navigator.pushNamed(context, '/signup'),
+                          buttonText: 'Upgrade to Pro',
                         ),
                         const SizedBox(height: 16),
                         _PricingCard(
-                          key: const Key('pricing-enterprise'),
-                          title: 'Enterprise',
-                          price: 'Custom',
-                          period: 'contact sales',
+                          key: const Key('pricing-pro-plus'),
+                          title: 'Pro+',
+                          price: '\$19',
+                          period: 'per month',
                           features: const [
                             'Everything in Pro',
-                            'Custom integrations',
-                            'Dedicated support',
-                            'SLA guarantees',
-                            'Volume discounts',
-                            'On-premise deployment',
+                            '2,000 heavy operations/day',
+                            '100MB max file size',
+                            'Batch processing (up to 100)',
+                            'Priority queue processing',
+                            'Priority email support',
                           ],
-                          onSelect: () => Navigator.pushNamed(context, '/signup'),
-                          buttonText: 'Contact Sales',
-                          outlined: true,
+                          onSelect: () =>
+                              Navigator.pushNamed(context, '/signup'),
+                          buttonText: 'Upgrade to Pro+',
                         ),
                       ],
                     );
@@ -210,7 +214,6 @@ class _PricingCard extends StatelessWidget {
   final VoidCallback onSelect;
   final String buttonText;
   final bool isPopular;
-  final bool outlined;
 
   const _PricingCard({
     super.key,
@@ -221,7 +224,6 @@ class _PricingCard extends StatelessWidget {
     required this.onSelect,
     required this.buttonText,
     this.isPopular = false,
-    this.outlined = false,
   });
 
   @override
@@ -295,42 +297,34 @@ class _PricingCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 ...features.map((feature) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 20,
-                        color: colorScheme.primary,
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
+                            size: 20,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              feature,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          feature,
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
+                    )),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  child: outlined
-                      ? OutlinedButton(
-                          onPressed: onSelect,
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: Text(buttonText),
-                        )
-                      : FilledButton(
-                          onPressed: onSelect,
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: Text(buttonText),
-                        ),
+                  child: FilledButton(
+                    onPressed: onSelect,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(buttonText),
+                  ),
                 ),
               ],
             ),

@@ -179,7 +179,7 @@ class _AccountScreenState extends State<AccountScreen> {
       case PlanId.pro:
         return 'Pro Plan';
       case PlanId.proPlus:
-        return 'Pro Plus Plan';
+        return 'Pro+ Plan';
     }
   }
 
