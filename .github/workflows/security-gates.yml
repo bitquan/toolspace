@@ -28,20 +28,15 @@ jobs:
               run: cd test/security && npm ci
             - name: Setup emulators and run rules tests
               run: |
-                  # Create minimal firebase.json without hosting for CI
-                  cat > firebase-ci.json << 'EOF'
-                  {
-                    "emulators": {
-                      "auth": {"port": 9099},
-                      "firestore": {"port": 8080},
-                      "storage": {"port": 9199}
-                    }
-                  }
-                  EOF
-                  export FIREBASE_CONFIG=firebase-ci.json
+                  # Temporarily rename firebase.json to avoid webframeworks experiment requirement
+                  mv firebase.json firebase.json.bak
+                  # Start emulators in background
                   (firebase emulators:start --only auth,firestore,storage --project demo-toolspace &)
                   sleep 10
+                  # Run tests
                   cd test/security && npm run test:rules
+                  # Restore firebase.json
+                  mv ../firebase.json.bak ../firebase.json || true
 
     e2e-auth-quota:
         runs-on: ubuntu-latest
