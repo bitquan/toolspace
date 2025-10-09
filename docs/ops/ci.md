@@ -1,6 +1,6 @@
 # CI/CD Pipeline Documentation
 
-**Last Updated:** 2025-10-08  
+**Last Updated:** 2025-10-08
 **Status:** ✅ Refactored to Lean PR + Heavy Nightly
 
 ---
@@ -18,20 +18,20 @@ This approach balances **fast PR feedback** with **comprehensive testing** witho
 
 ## PR CI Pipeline (Lean & Fast)
 
-**Workflow:** `.github/workflows/pr-ci.yml`  
-**Triggers:** Pull requests, pushes to main/develop, manual dispatch  
-**Target Runtime:** <10 minutes  
+**Workflow:** `.github/workflows/pr-ci.yml`
+**Triggers:** Pull requests, pushes to main/develop, manual dispatch
+**Target Runtime:** <10 minutes
 **Status:** ✅ Blocking (required for merge)
 
 ### Jobs
 
-| Job | Description | Timeout |
-|-----|-------------|---------|
-| `flutter_build` | Flutter pub get, analyze, build web release | 10 min |
-| `functions_build` | npm ci, lint, TypeScript type-check | 8 min |
-| `tests_flutter` | Flutter unit tests with coverage | 8 min |
-| `tests_functions` | Functions unit tests (no E2E) | 8 min |
-| `security_smoke` | Security rules smoke tests (@smoke tagged) | 10 min |
+| Job               | Description                                 | Timeout |
+| ----------------- | ------------------------------------------- | ------- |
+| `flutter_build`   | Flutter pub get, analyze, build web release | 10 min  |
+| `functions_build` | npm ci, lint, TypeScript type-check         | 8 min   |
+| `tests_flutter`   | Flutter unit tests with coverage            | 8 min   |
+| `tests_functions` | Functions unit tests (no E2E)               | 8 min   |
+| `security_smoke`  | Security rules smoke tests (@smoke tagged)  | 10 min  |
 
 ### What Gets Checked
 
@@ -59,20 +59,20 @@ cd test/security && npm run test:smoke
 
 ## Nightly CI Pipeline (Heavy Scans)
 
-**Workflow:** `.github/workflows/nightly-ci.yml`  
-**Triggers:** Daily at 00:30 UTC, manual dispatch  
-**Target Runtime:** ~30-60 minutes  
+**Workflow:** `.github/workflows/nightly-ci.yml`
+**Triggers:** Daily at 00:30 UTC, manual dispatch
+**Target Runtime:** ~30-60 minutes
 **Status:** ℹ️ Informational (does NOT block PRs)
 
 ### Jobs
 
-| Job | Description | Artifacts |
-|-----|-------------|-----------|
-| `e2e_full` | Full Playwright E2E test suite | Videos, screenshots, JUnit reports |
-| `deep_scan` | CodeQL, Trivy, npm audit, outdated deps | SARIF reports, audit JSON |
-| `coverage_trend` | Coverage analysis with trend tracking | Codecov uploads |
-| `deps_health` | Dependency health report | Creates/updates maintenance issue |
-| `weekly_digest` | Velocity, insights, sprint reports | Commits to docs/reports |
+| Job              | Description                             | Artifacts                          |
+| ---------------- | --------------------------------------- | ---------------------------------- |
+| `e2e_full`       | Full Playwright E2E test suite          | Videos, screenshots, JUnit reports |
+| `deep_scan`      | CodeQL, Trivy, npm audit, outdated deps | SARIF reports, audit JSON          |
+| `coverage_trend` | Coverage analysis with trend tracking   | Codecov uploads                    |
+| `deps_health`    | Dependency health report                | Creates/updates maintenance issue  |
+| `weekly_digest`  | Velocity, insights, sprint reports      | Commits to docs/reports            |
 
 ### What Gets Checked
 
@@ -108,8 +108,8 @@ flutter test --coverage
 
 ## Deployment Pipeline
 
-**Workflow:** `.github/workflows/firebase-hosting-merge.yml`  
-**Triggers:** Push to main, after PR CI completes  
+**Workflow:** `.github/workflows/firebase-hosting-merge.yml`
+**Triggers:** Push to main, after PR CI completes
 **Depends On:** `pr-ci.yml` must pass
 
 ### Deployment Flow
@@ -132,6 +132,7 @@ flutter test --coverage
 The following workflows have been **disabled** (`.disabled` extension):
 
 ### Removed Automation
+
 - ❌ `issue-to-branch.yml` - Auto-create branches from issues
 - ❌ `auto-pr.yml` - Auto-create pull requests
 - ❌ `pr-merge.yml` - Auto-merge approved PRs
@@ -141,6 +142,7 @@ The following workflows have been **disabled** (`.disabled` extension):
 - ❌ `auto-approve-copilot.yml` - Duplicate auto-approve
 
 ### Removed Duplicate Pipelines
+
 - ❌ `test-runner.yml` - Duplicate test execution
 - ❌ `branch-ci.yml` - Duplicate branch checks
 - ❌ `policy-checks.yml` - Duplicate policy enforcement
@@ -149,6 +151,7 @@ The following workflows have been **disabled** (`.disabled` extension):
 ### Why Removed?
 
 **VS Code Copilot handles these tasks better:**
+
 - Issue creation and assignment → Manual in VS Code
 - Branch creation → Manual with Copilot suggestions
 - PR creation → Manual with Copilot-generated descriptions
@@ -163,14 +166,17 @@ The following workflows have been **disabled** (`.disabled` extension):
 These workflows remain **active** for essential automation:
 
 ### Post-Merge Cleanup
+
 - ✅ `dev-log-updater.yml` - Updates dev logs after merges
 - ✅ Branch deletion after merge (if configured)
 
 ### Reporting & Monitoring
+
 - ✅ `delta-*.yml` - OPS-Delta sprint management and reporting
 - ✅ `zeta-*.yml` - OPS-Zeta automated improvements
 
 ### Manual Operations
+
 - ✅ `workflow-cleanup.yml` - Manual workflow cleanup
 - ✅ `nuclear-cleanup.yml` - Emergency cleanup
 - ✅ `release.yml` - Release management
@@ -183,13 +189,14 @@ These workflows remain **active** for essential automation:
 
 ```
 pr-ci / flutter_build
-pr-ci / functions_build  
+pr-ci / functions_build
 pr-ci / tests_flutter
 pr-ci / tests_functions
 pr-ci / security_smoke
 ```
 
 **Settings:**
+
 - ✅ Require status checks to pass before merging
 - ✅ Require branches to be up to date before merging
 - ✅ Require conversation resolution before merging
@@ -214,23 +221,23 @@ gh api repos/bitquan/toolspace/branches/main/protection \
 
 ### Before Refactor
 
-| Metric | Value |
-|--------|-------|
-| **Active Workflows** | 35 |
-| **PR Checks** | 12-15 |
-| **Avg PR Runtime** | 25-35 minutes |
-| **Duplicate Jobs** | 5-7 |
+| Metric               | Value         |
+| -------------------- | ------------- |
+| **Active Workflows** | 35            |
+| **PR Checks**        | 12-15         |
+| **Avg PR Runtime**   | 25-35 minutes |
+| **Duplicate Jobs**   | 5-7           |
 
 ### After Refactor
 
-| Metric | Value |
-|--------|-------|
-| **Active Workflows** | 15 |
-| **PR Checks** | 5 |
-| **Avg PR Runtime** | <10 minutes ⚡ |
-| **Duplicate Jobs** | 0 |
+| Metric               | Value          |
+| -------------------- | -------------- |
+| **Active Workflows** | 15             |
+| **PR Checks**        | 5              |
+| **Avg PR Runtime**   | <10 minutes ⚡ |
+| **Duplicate Jobs**   | 0              |
 
-**Time Saved:** ~20-25 minutes per PR  
+**Time Saved:** ~20-25 minutes per PR
 **Complexity Reduced:** 57% fewer active workflows
 
 ---
@@ -293,7 +300,7 @@ gh pr create --fill
 For security tests to run in PR CI, tag them with `@smoke`:
 
 ```typescript
-test('@smoke should deny unauthenticated access', async () => {
+test("@smoke should deny unauthenticated access", async () => {
   // Critical security test
 });
 ```
@@ -315,11 +322,13 @@ Run smoke tests: `cd test/security && npm run test:smoke`
 ## Support
 
 **Questions?** Check:
+
 - GitHub Actions tab for live runs
 - `Makefile` for local commands
 - `dev-log/operations/` for historical context
 
 **Issues?** Open issue with:
+
 - Workflow name
 - Run ID/link
 - Error logs

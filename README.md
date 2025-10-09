@@ -168,6 +168,7 @@ Runs on every pull request in <10 minutes:
 - ✅ **Security Smoke** - Critical security rules (@smoke tagged)
 
 **Run locally before pushing:**
+
 ```bash
 make pr-ci
 ```
