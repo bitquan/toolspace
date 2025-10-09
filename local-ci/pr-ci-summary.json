@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-10-09T17:32:08.717Z",
+  "timestamp": "2025-10-09T19:57:28.504Z",
   "summary": {
-    "success": false,
-    "passed": 2,
-    "failed": 1,
-    "total": 3,
-    "duration": 40140
+    "success": true,
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "duration": 106686
   },
   "flags": {
     "quick": false,
@@ -16,7 +16,7 @@
     {
       "name": "Flutter pub get",
       "success": true,
-      "duration": 1408,
+      "duration": 1449,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-pub-get.log"
@@ -24,18 +24,58 @@
     {
       "name": "Flutter analyze (ZERO tolerance)",
       "success": true,
-      "duration": 5735,
+      "duration": 4640,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-analyze-zero-tolerance-.log"
     },
     {
       "name": "Flutter test",
-      "success": false,
-      "duration": 30160,
-      "exitCode": 1,
-      "error": "Exit code: 1",
+      "success": true,
+      "duration": 9807,
+      "exitCode": 0,
+      "error": null,
       "logFile": "flutter-test.log"
+    },
+    {
+      "name": "Flutter build web",
+      "success": true,
+      "duration": 6769,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "flutter-build-web.log"
+    },
+    {
+      "name": "Functions npm ci",
+      "success": true,
+      "duration": 75674,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "functions-npm-ci.log"
+    },
+    {
+      "name": "Functions lint (ZERO warnings)",
+      "success": true,
+      "duration": 2508,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "functions-lint-zero-warnings-.log"
+    },
+    {
+      "name": "Functions test",
+      "success": true,
+      "duration": 1340,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "functions-test.log"
+    },
+    {
+      "name": "E2E with emulators",
+      "success": true,
+      "duration": 1616,
+      "exitCode": 0,
+      "error": null,
+      "logFile": "e2e-with-emulators.log"
     }
   ]
 }
