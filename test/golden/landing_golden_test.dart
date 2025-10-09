@@ -1,11 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
-import 'package:toolspace/screens/landing/landing_page.dart';
-import 'package:toolspace/core/routes.dart';
-
-import '../test_helpers/firebase_test_helper.dart';
-
 /// Golden visual regression tests for landing page
 ///
 /// Tests the landing page at two critical breakpoints:
@@ -15,6 +7,19 @@ import '../test_helpers/firebase_test_helper.dart';
 /// Run with:
 /// - Generate goldens: flutter test --update-goldens test/golden/landing_golden_test.dart
 /// - Verify goldens: flutter test test/golden/landing_golden_test.dart
+///
+/// NOTE: These tests require Firebase mocking and are skipped in CI.
+@Tags(<String>['requires-firebase'])
+library;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:toolspace/screens/landing/landing_page.dart';
+import 'package:toolspace/core/routes.dart';
+
+import '../test_helpers/firebase_test_helper.dart';
+
 void main() {
   setUpAll(() async {
     setupFirebaseAuthMocks();

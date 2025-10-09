@@ -1,3 +1,14 @@
+/// Navigation tests for landing page CTAs and navbar links
+///
+/// Verifies that all navigation buttons route correctly:
+/// - Hero section: "Get Started Free" → /signup, "View Pricing" → /pricing
+/// - Navbar: Features → /features, Pricing → /pricing, Dashboard → /dashboard or /signup
+///
+/// NOTE: These tests require Firebase mocking and are skipped in CI.
+/// Run locally with: flutter test test/navigation/landing_nav_test.dart
+@Tags(<String>['requires-firebase'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toolspace/core/routes.dart';
@@ -5,11 +16,6 @@ import 'package:toolspace/screens/landing/landing_page.dart';
 
 import '../test_helpers/firebase_test_helper.dart';
 
-/// Navigation tests for landing page CTAs and navbar links
-///
-/// Verifies that all navigation buttons route correctly:
-/// - Hero section: "Get Started Free" → /signup, "View Pricing" → /pricing
-/// - Navbar: Features → /features, Pricing → /pricing, Dashboard → /dashboard or /signup
 void main() {
   setUpAll(() {
     setupFirebaseAuthMocks();
