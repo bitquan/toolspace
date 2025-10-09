@@ -4,9 +4,9 @@
   "description": "Security rules tests for Toolspace",
   "private": true,
   "scripts": {
-    "test:rules": "jest --config=../../jest.security.config.cjs",
-    "test:rules:watch": "jest --watch --config=../../jest.security.config.cjs",
-    "test:smoke": "jest --config=../../jest.security.config.cjs --testNamePattern='@smoke'"
+    "test:rules": "jest --config=jest.security.config.cjs",
+    "test:rules:watch": "jest --watch --config=jest.security.config.cjs",
+    "test:smoke": "jest --config=jest.security.config.cjs --testNamePattern='@smoke'"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",
