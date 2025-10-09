@@ -1,0 +1,26 @@
+﻿name: UI Smoke
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'test/**'
+permissions:
+  contents: read
+concurrency:
+  group: ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable }
+      - run: flutter pub get
+      - name: Run widget smoke tests
+        run: flutter test --tags 'smoke'
+      - name: Run golden tests (best-effort)
+        run: |
+          if grep -R "golden_toolkit" pubspec.yaml >/dev/null; then
+            flutter test --tags 'golden' || true
+          fi
