@@ -73,19 +73,13 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          'https://developers.google.com/identity/images/g-logo.png',
-                        ),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                  // Google logo icon (avoiding CORS issues with external image)
+                  Icon(
+                    Icons.g_mobiledata,
+                    size: 28,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Text(
                     _isLoading ? 'Signing in...' : 'Continue with Google',
                     style: TextStyle(
