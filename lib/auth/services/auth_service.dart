@@ -167,9 +167,17 @@ class AuthService {
     }
 
     try {
+      // Force reload from Firebase servers
       await user.reload();
-      // Trigger state update
-      _onAuthStateChanged(_auth.currentUser);
+
+      // Get fresh user instance after reload
+      final freshUser = _auth.currentUser;
+
+      // Trigger state update with fresh user
+      _onAuthStateChanged(freshUser);
+
+      debugPrint(
+          '[AuthService] User reloaded - emailVerified: ${freshUser?.emailVerified}');
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthException(e);
     } catch (e) {

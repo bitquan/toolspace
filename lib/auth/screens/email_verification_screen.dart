@@ -282,6 +282,46 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         ),
                         const SizedBox(height: 16),
 
+                        // Manual check button
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            onPressed: _isLoading
+                                ? null
+                                : () async {
+                                    final messenger =
+                                        ScaffoldMessenger.of(context);
+                                    setState(() => _isLoading = true);
+                                    try {
+                                      await _checkEmailVerified();
+                                      if (!_isVerified) {
+                                        messenger.showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Not verified yet. Please click the link in your email first.'),
+                                            backgroundColor: Colors.orange,
+                                          ),
+                                        );
+                                      }
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() => _isLoading = false);
+                                      }
+                                    }
+                                  },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('I\'ve Verified My Email'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
                         // Help text
                         Text(
                           'Didn\'t receive the email? Check your spam folder or try resending.',
