@@ -10,9 +10,9 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 
 > **⚠️ PRODUCTION DEPLOYMENT BLOCKED**
 >
-> Security CI gates must pass before deployment is allowed. The `auth-security-ok` workflow validates authentication, security rules, billing integration, and paywall enforcement.
+> All pull requests must pass the **PR CI pipeline** before deployment. The pipeline validates builds, tests, security, and code quality in <10 minutes.
 >
-> **Status:** [View CI Results](../../actions/workflows/auth-security-ok.yml) > **Epic:** [AUTH-01 - Production Auth & Security](docs/epics/AUTH-01.md)
+> **Status:** [![PR CI](https://github.com/bitquan/toolspace/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/pr-ci.yml)
 
 ---
 
@@ -149,9 +149,42 @@ Server-assisted file merging and processing for multiple file formats.
 ### Infrastructure
 
 - **Hosting**: Firebase Hosting
-- **CI/CD**: GitHub Actions
+- **CI/CD**: Two-tier GitHub Actions (Lean PR + Heavy Nightly)
 - **Monitoring**: Firebase console + custom logging
 - **Security**: Firestore security rules + input validation
+
+## 🔄 CI/CD Pipeline
+
+Toolspace uses a **two-tier CI strategy** for fast feedback and comprehensive validation:
+
+### PR CI (Lean & Fast) - Required for Merge
+
+Runs on every pull request in <10 minutes:
+
+- ✅ **Flutter Build** - Dependencies, static analysis, web build
+- ✅ **Functions Build** - Dependencies, linting, TypeScript type-check
+- ✅ **Flutter Tests** - Unit tests with coverage
+- ✅ **Functions Tests** - Unit tests (excluding E2E)
+- ✅ **Security Smoke** - Critical security rules (@smoke tagged)
+
+**Run locally before pushing:**
+```bash
+make pr-ci
+```
+
+### Nightly CI (Heavy & Comprehensive) - Informational
+
+Runs overnight at 00:30 UTC for deep validation:
+
+- 🔍 **Full E2E Suite** - Playwright tests with artifacts
+- 🛡️ **Deep Security Scans** - CodeQL, Trivy, npm audit
+- 📊 **Coverage Trends** - Track test coverage over time
+- 📦 **Dependency Health** - Outdated packages, security advisories
+- 📈 **Weekly Digest** - Velocity reports and insights
+
+Nightly failures create GitHub issues but **don't block PRs**.
+
+**Documentation:** See [docs/ops/ci.md](docs/ops/ci.md) for full details.
 
 ## 📚 Documentation
 
@@ -204,11 +237,15 @@ toolspace/
 
 ### Quality Standards
 
-- ✅ Backend: `npm run qa` must pass
-- ✅ Frontend: `flutter analyze` must be clean
-- ✅ All tests must pass
-- ✅ Security scans must pass
-- ✅ Documentation must be updated
+All PRs must pass these 5 checks:
+
+- ✅ **flutter_build** - Code analysis and web build
+- ✅ **functions_build** - Linting and TypeScript compilation
+- ✅ **tests_flutter** - Unit tests with coverage
+- ✅ **tests_functions** - Backend unit tests
+- ✅ **security_smoke** - Critical security rules
+
+Additional validation runs nightly (informational only).
 
 ## 🔒 Security
 
