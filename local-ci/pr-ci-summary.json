@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-10-09T16:51:09.764Z",
+  "timestamp": "2025-10-09T17:09:49.050Z",
   "summary": {
     "success": false,
     "passed": 2,
     "failed": 1,
     "total": 3,
-    "duration": 11905
+    "duration": 39544
   },
   "flags": {
     "quick": false,
@@ -16,7 +16,7 @@
     {
       "name": "Flutter pub get",
       "success": true,
-      "duration": 1470,
+      "duration": 1450,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-pub-get.log"
@@ -24,7 +24,7 @@
     {
       "name": "Flutter analyze (ZERO tolerance)",
       "success": true,
-      "duration": 5783,
+      "duration": 5739,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-analyze-zero-tolerance-.log"
@@ -32,9 +32,9 @@
     {
       "name": "Flutter test",
       "success": false,
-      "duration": 1731,
+      "duration": 29469,
       "exitCode": 1,
-      "error": "Flutter failed to check for directory existence at \"build\\unit_test_assets\". The flutter tool cannot access the file or directory.\nPlease ensure that the SDK and/or project is installed in a location that has read/write permissions for the current user.",
+      "error": "Exit code: 1",
       "logFile": "flutter-test.log"
     }
   ]
