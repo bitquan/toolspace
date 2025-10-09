@@ -18,9 +18,17 @@ jobs:
           flutter-version: "3.24.3"
           channel: "stable"
 
-      - run: flutter pub get
-      - run: npm ci
-      - run: flutter build web --release
+      - name: Enable Flutter web
+        run: flutter config --enable-web
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: flutter build web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
