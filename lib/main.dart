@@ -97,6 +97,15 @@ class AuthGate extends StatelessWidget {
           return const LandingPage();
         }
 
+        // Anonymous user or no email (old session) → sign out and show landing
+        if (user.isAnonymous || user.email == null || user.email!.isEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await FirebaseAuth.instance.signOut();
+            DebugLogger.info('🚪 Signed out anonymous/incomplete user');
+          });
+          return const LandingPage();
+        }
+
         // Signed in but needs email verification
         if (!user.emailVerified) {
           return const EmailVerificationScreen();
