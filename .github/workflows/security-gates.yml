@@ -28,9 +28,7 @@ jobs:
               run: cd test/security && npm ci
             - name: Setup emulators and run rules tests
               run: |
-                  (firebase emulators:start --only auth,firestore,storage --project demo-toolspace &)
-                  sleep 8
-                  cd test/security && npm run test:rules
+                  firebase emulators:exec --only auth,firestore,storage --project demo-toolspace "cd test/security && npm run test:rules"
 
     e2e-auth-quota:
         runs-on: ubuntu-latest
