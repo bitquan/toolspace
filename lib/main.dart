@@ -75,8 +75,15 @@ class ToolspaceApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  bool _hasCheckedAndClearedBadAuth = false;
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +104,15 @@ class AuthGate extends StatelessWidget {
           return const LandingPage();
         }
 
-        // Anonymous user or no email (old session) → force sign out
-        if (user.isAnonymous || user.email == null || user.email!.isEmpty) {
-          // Force sign out and show landing page
-          FirebaseAuth.instance.signOut();
+        // Anonymous user or no email (old session) → sign out ONCE
+        if ((user.isAnonymous || user.email == null || user.email!.isEmpty) &&
+            !_hasCheckedAndClearedBadAuth) {
+          _hasCheckedAndClearedBadAuth = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await FirebaseAuth.instance.signOut();
+            DebugLogger.info('🚪 Signed out anonymous/incomplete user');
+          });
+          // Show landing page immediately while signing out
           return const LandingPage();
         }
 
@@ -109,7 +121,7 @@ class AuthGate extends StatelessWidget {
           return const EmailVerificationScreen();
         }
 
-        // Fully authenticated → go to app home (your main nav/routes)
+        // Fully authenticated → go to app home
         return const NeoHomeScreen();
       },
     );
