@@ -1,0 +1,191 @@
+name: 🧹 Weekly Repo Cleanup
+
+on:
+    schedule:
+        - cron: "0 3 * * 0" # Sundays at 3:00 AM UTC
+    workflow_dispatch:
+
+concurrency:
+    group: ops-cleanup
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    actions: write
+
+jobs:
+    cleanup:
+        name: Cleanup Old Branches & Artifacts
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: 🔧 Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: 📦 Install dependencies
+              run: npm ci
+
+            - name: 🧹 Cleanup merged branches
+              run: |
+                  echo "🧹 Cleaning up merged branches..."
+
+                  # Get list of branches that have been merged to main
+                  MERGED_BRANCHES=$(git branch -r --merged origin/main | \
+                    grep -v 'origin/main' | \
+                    grep -v 'HEAD' | \
+                    sed 's/origin\///' | \
+                    tr -d ' ')
+
+                  if [ -z "$MERGED_BRANCHES" ]; then
+                    echo "✓ No merged branches to clean up"
+                    exit 0
+                  fi
+
+                  echo "Found merged branches:"
+                  echo "$MERGED_BRANCHES"
+
+                  # Count branches
+                  COUNT=$(echo "$MERGED_BRANCHES" | wc -l)
+                  echo "Total: $COUNT branches"
+
+                  # Delete merged branches (except protected ones)
+                  for branch in $MERGED_BRANCHES; do
+                    # Skip protected branches
+                    if [[ "$branch" =~ ^(main|develop|staging|production)$ ]]; then
+                      echo "⏭️  Skipping protected branch: $branch"
+                      continue
+                    fi
+
+                    echo "🗑️  Deleting branch: $branch"
+                    git push origin --delete "$branch" || echo "⚠️  Failed to delete $branch"
+                  done
+
+                  echo "✅ Cleanup complete!"
+
+            - name: 📊 Cleanup summary
+              if: always()
+              run: |
+                  echo "## 🧹 Weekly Cleanup Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "**Date:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+
+                  # Count remaining branches
+                  TOTAL_BRANCHES=$(git branch -r | grep -v 'HEAD' | wc -l)
+                  echo "**Total remote branches:** $TOTAL_BRANCHES" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+
+                  # List active branches
+                  echo "### Active Branches" >> $GITHUB_STEP_SUMMARY
+                  echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+                  git branch -r | grep -v 'HEAD' | head -20 >> $GITHUB_STEP_SUMMARY
+                  echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+    cleanup-artifacts:
+        name: Cleanup Old Artifacts
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 🧹 Delete old artifacts
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+
+                      // Get artifacts older than 7 days
+                      const cutoffDate = new Date();
+                      cutoffDate.setDate(cutoffDate.getDate() - 7);
+
+                      console.log(`Deleting artifacts older than ${cutoffDate.toISOString()}`);
+
+                      const artifacts = await github.rest.actions.listArtifactsForRepo({
+                        owner,
+                        repo,
+                        per_page: 100
+                      });
+
+                      let deleted = 0;
+                      for (const artifact of artifacts.data.artifacts) {
+                        const createdAt = new Date(artifact.created_at);
+
+                        if (createdAt < cutoffDate) {
+                          console.log(`Deleting artifact: ${artifact.name} (created ${createdAt.toISOString()})`);
+
+                          try {
+                            await github.rest.actions.deleteArtifact({
+                              owner,
+                              repo,
+                              artifact_id: artifact.id
+                            });
+                            deleted++;
+                          } catch (error) {
+                            console.error(`Failed to delete artifact ${artifact.id}: ${error.message}`);
+                          }
+                        }
+                      }
+
+                      console.log(`✅ Deleted ${deleted} old artifacts`);
+
+                      core.summary
+                        .addHeading('🧹 Artifacts Cleanup Summary')
+                        .addRaw(`Deleted **${deleted}** artifacts older than 7 days`)
+                        .write();
+
+    cleanup-caches:
+        name: Cleanup Old Caches
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 🧹 Delete old caches
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const owner = context.repo.owner;
+                      const repo = context.repo.repo;
+
+                      // Get caches older than 7 days
+                      const cutoffDate = new Date();
+                      cutoffDate.setDate(cutoffDate.getDate() - 7);
+
+                      console.log(`Deleting caches older than ${cutoffDate.toISOString()}`);
+
+                      const caches = await github.rest.actions.getActionsCacheList({
+                        owner,
+                        repo,
+                        per_page: 100
+                      });
+
+                      let deleted = 0;
+                      for (const cache of caches.data.actions_caches) {
+                        const createdAt = new Date(cache.created_at);
+
+                        if (createdAt < cutoffDate) {
+                          console.log(`Deleting cache: ${cache.key} (created ${createdAt.toISOString()})`);
+
+                          try {
+                            await github.rest.actions.deleteActionsCacheById({
+                              owner,
+                              repo,
+                              cache_id: cache.id
+                            });
+                            deleted++;
+                          } catch (error) {
+                            console.error(`Failed to delete cache ${cache.id}: ${error.message}`);
+                          }
+                        }
+                      }
+
+                      console.log(`✅ Deleted ${deleted} old caches`);
+
+                      core.summary
+                        .addHeading('🧹 Cache Cleanup Summary')
+                        .addRaw(`Deleted **${deleted}** caches older than 7 days`)
+                        .write();

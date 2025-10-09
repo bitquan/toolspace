@@ -39,6 +39,8 @@
     "repo:safe-cleanup": "node scripts/safe-workflow-cleanup.mjs",
     "preflight": "node scripts/preflight.mjs",
     "preflight:quick": "node scripts/preflight.mjs --quick",
+    "postflight": "node scripts/postflight.mjs",
+    "cleanup": "gh workflow run ops-cleanup.yml",
     "setup:hooks": "husky install",
     "prepare": "husky"
   },

@@ -34,11 +34,14 @@ const FLAGS = {
 // Setup logging
 const LOG_DIR = join(ROOT, "local-ci", "logs");
 const SUMMARY_PATH = join(ROOT, "local-ci", "summary.md");
+const JSON_SUMMARY_PATH = join(ROOT, "local-ci", "pr-ci-summary.json");
+const SIM_LOG_PATH = join(ROOT, "local-ci", "pr-ci-sim.log");
 
 await mkdir(LOG_DIR, { recursive: true });
 
 let globalLogs = "";
 let results = [];
+let startTime = Date.now();
 
 function log(message) {
   console.log(message);
@@ -121,7 +124,10 @@ async function writeSummary() {
   const passed = results.filter((r) => r.success).length;
   const failed = results.filter((r) => !r.success).length;
   const total = results.length;
+  const success = failed === 0;
+  const totalDuration = Date.now() - startTime;
 
+  // Markdown summary
   let md = `# Local CI - Preflight Summary\n\n`;
   md += `**Generated:** ${new Date().toISOString()}\n\n`;
   md += `**Flags:** ${JSON.stringify(FLAGS)}\n\n`;
@@ -145,6 +151,36 @@ async function writeSummary() {
   }
 
   await writeFile(SUMMARY_PATH, md, "utf-8");
+
+  // JSON summary (matches CI format)
+  const jsonSummary = {
+    timestamp: new Date().toISOString(),
+    summary: {
+      success,
+      passed,
+      failed,
+      total,
+      duration: totalDuration,
+    },
+    flags: FLAGS,
+    results: results.map((r) => ({
+      name: r.name,
+      success: r.success,
+      duration: r.duration,
+      exitCode: r.success ? 0 : 1,
+      error: r.error || null,
+      logFile: r.logFile,
+    })),
+  };
+
+  await writeFile(
+    JSON_SUMMARY_PATH,
+    JSON.stringify(jsonSummary, null, 2),
+    "utf-8"
+  );
+
+  // Write simulation log (all output)
+  await writeFile(SIM_LOG_PATH, globalLogs, "utf-8");
 }
 
 // Main execution
@@ -298,7 +334,8 @@ async function writeSummary() {
     // Quick mode: just security rules
     log(dim("⏩ Quick mode: running security rules tests only"));
 
-    if (existsSync(securityDir)) {
+    const securityPkgJson = join(securityDir, "package.json");
+    if (existsSync(securityPkgJson)) {
       if (
         !(await runStep("Security rules test", "npm", {
           args: ["run", "test:rules"],
@@ -310,7 +347,7 @@ async function writeSummary() {
         process.exit(1);
       }
     } else {
-      log(yellow("⚠ test/security not found, skipping"));
+      log(yellow("⚠ test/security not configured, skipping"));
     }
   }
 

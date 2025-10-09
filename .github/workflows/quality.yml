@@ -9,17 +9,28 @@ on:
       - main
 
 concurrency:
-  group: quality-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test_and_lint:
     name: Tests & Linting
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
 
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
+
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
@@ -44,7 +55,17 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: 🔧 Setup Node.js
+      - name: � Cache Node dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            functions/node_modules
+          key: node-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-${{ runner.os }}-
+
+      - name: �🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -66,10 +87,21 @@ jobs:
   bundle_size_check:
     name: Bundle Size Check
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request_target'
 
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
+
+      - name: 💾 Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build
+          key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            flutter-${{ runner.os }}-
 
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
