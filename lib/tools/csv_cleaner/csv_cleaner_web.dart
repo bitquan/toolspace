@@ -5,8 +5,7 @@ import 'dart:convert';
 
 /// Pick a CSV file using HTML file input
 void pickCsvFile(Function(String content, String fileName) onFileLoaded) {
-  final html.FileUploadInputElement uploadInput =
-      html.FileUploadInputElement();
+  final html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
   uploadInput.accept = '.csv';
   uploadInput.click();
 

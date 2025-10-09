@@ -3,8 +3,8 @@ import 'package:csv/csv.dart';
 import '../../shared/shared_data_service.dart';
 
 // Conditional import for web-only functionality
-import 'csv_cleaner_web_stub.dart'
-    if (dart.library.html) 'csv_cleaner_web.dart' as web_helper;
+import 'csv_cleaner_web_stub.dart' if (dart.library.html) 'csv_cleaner_web.dart'
+    as web_helper;
 
 class CsvCleanerScreen extends StatefulWidget {
   const CsvCleanerScreen({super.key});
