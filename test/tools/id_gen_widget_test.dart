@@ -252,8 +252,12 @@ void main() {
       // Custom alphabet field not visible yet
       expect(find.text('Custom Alphabet'), findsNothing);
 
+      // Scroll to make Custom preset visible
+      await tester.ensureVisible(find.text('Custom'));
+      await tester.pumpAndSettle();
+
       // Select Custom preset
-      await tester.tap(find.text('Custom'));
+      await tester.tap(find.text('Custom'), warnIfMissed: false);
       await tester.pumpAndSettle();
 
       // Custom alphabet field should appear

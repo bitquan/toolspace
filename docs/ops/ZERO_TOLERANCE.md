@@ -24,11 +24,14 @@ No exceptions. No warnings. No errors. Period.
    - Any ESLint warning = build fails
    - Includes: TypeScript errors, unused imports, formatting issues
 
-3. **Tests**
+3. **Tests: 100% PASS RATE - NO EXCEPTIONS**
 
-   - All tests must pass: `flutter test` and `npm test`
-   - No failing tests, no skipped tests without explicit approval
+   - **Every single test must pass**: `flutter test` and `npm test`
+   - **NO failing tests** - Fix or delete unreliable tests
+   - **NO skipped tests** - Either fix them or remove them
+   - **NO flaky tests** - If it fails sometimes, it's broken
    - Test coverage should not decrease
+   - If a test can't be made reliable, remove it and file an issue
 
 4. **Build**
    - Production builds must succeed without warnings
@@ -58,16 +61,28 @@ All GitHub Actions workflows enforce the same standards:
 
 ### Flutter Warnings/Errors
 
-```bash
+````bash
 # Check what's wrong
 flutter analyze --fatal-warnings
 
 # Common fixes:
 # 1. Unused imports: Remove them
 # 2. Deprecated APIs: Update to new APIs (e.g., withOpacity → withValues)
+
+### Test Failures
+
+```bash
+# Run tests and see failures
+flutter test
+
+# Common fixes:
+# 1. Flaky UI tests: Add ensureVisible(), increase pump times
+# 2. Off-screen widgets: Use warnIfMissed: false and ensureVisible()
+# 3. Async issues: Add proper await and pumpAndSettle()
+# 4. Unreliable tests: Fix the root cause or delete the test
 # 3. Missing const: Add const where suggested
 # 4. Unused variables: Remove or use them
-```
+````
 
 ### ESLint Warnings
 
