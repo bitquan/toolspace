@@ -8,8 +8,12 @@ import {
 } from "@jest/globals";
 
 // Mock Firebase Admin (must be before imports that use it)
-const mockVerifyIdToken = jest.fn() as jest.MockedFunction<(token: string) => Promise<any>>;
-const mockGetUser = jest.fn() as jest.MockedFunction<(uid: string) => Promise<any>>;
+const mockVerifyIdToken = jest.fn() as jest.MockedFunction<
+  (token: string) => Promise<any>
+>;
+const mockGetUser = jest.fn() as jest.MockedFunction<
+  (uid: string) => Promise<any>
+>;
 
 jest.mock("../../admin", () => ({
   admin: {
@@ -20,11 +24,7 @@ jest.mock("../../admin", () => ({
   },
 }));
 
-import {
-  withAuth,
-  withOwnership,
-  withEmailVerification,
-} from "../withAuth";
+import { withAuth, withOwnership, withEmailVerification } from "../withAuth";
 
 describe("Auth Middleware", () => {
   let mockReq: any;
