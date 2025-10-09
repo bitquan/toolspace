@@ -32,18 +32,18 @@ class AuthFormField extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: isDark
             ? Colors.white.withValues(alpha: 0.05)
-            : Colors.white.withOpacity(0.8),
+            : Colors.white.withValues(alpha: 0.8),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.grey.withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.black.withValues(alpha: 0.2)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

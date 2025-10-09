@@ -107,7 +107,7 @@ class _AnimatedPricingCardState extends State<_AnimatedPricingCard> {
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
                     color: isPopular
-                        ? Colors.blue.withOpacity(0.5)
+                        ? Colors.blue.withValues(alpha: 0.5)
                         : Colors.transparent,
                     width: 2,
                   ),
@@ -120,8 +120,8 @@ class _AnimatedPricingCardState extends State<_AnimatedPricingCard> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.blue.withOpacity(0.05),
-                              Colors.purple.withOpacity(0.05),
+                              Colors.blue.withValues(alpha: 0.05),
+                              Colors.purple.withValues(alpha: 0.05),
                             ],
                           )
                         : null,
@@ -245,7 +245,7 @@ class _AnimatedPricingCardState extends State<_AnimatedPricingCard> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.3),
+                            color: Colors.blue.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

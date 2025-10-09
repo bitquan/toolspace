@@ -183,16 +183,16 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
-                        : Colors.white.withOpacity(0.1),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.white.withValues(alpha: 0.1),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.1),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.1),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -206,7 +206,7 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.orange.withOpacity(0.1),
+                          color: Colors.orange.withValues(alpha: 0.1),
                         ),
                         child: const Icon(
                           Icons.mark_email_unread,
@@ -284,8 +284,8 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.3)
-                                  : Colors.black.withOpacity(0.3),
+                                  ? Colors.white.withValues(alpha: 0.3)
+                                  : Colors.black.withValues(alpha: 0.3),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -307,7 +307,8 @@ class _EmailVerificationPromptState extends State<EmailVerificationPrompt> {
                       TextButton(
                         onPressed: () async {
                           await AuthService().signOut();
-                          if (mounted) {
+                          if (context.mounted) {
+                            if (!context.mounted) return;
                             Navigator.of(context)
                                 .pushReplacementNamed('/auth/signin');
                           }

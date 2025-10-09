@@ -430,7 +430,7 @@ interface VendorAssessment {
 
 ### Legal and Compliance
 
-- **Legal Counsel**: legal@toolspace.app
-- **Privacy Officer**: privacy@toolspace.app
-- **Compliance Team**: compliance@toolspace.app
-- **Security Team**: security@toolspace.app
+- **Legal Counsel**: <legal@toolspace.app>
+- **Privacy Officer**: <privacy@toolspace.app>
+- **Compliance Team**: <compliance@toolspace.app>
+- **Security Team**: <security@toolspace.app>

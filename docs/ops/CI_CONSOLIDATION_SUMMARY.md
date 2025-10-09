@@ -1,8 +1,8 @@
 # CI Workflow Consolidation Complete
 
-**Date**: October 9, 2025  
-**Branch**: `ops/prod-ready`  
-**PR**: #107 - <https://github.com/bitquan/toolspace/pull/107>  
+**Date**: October 9, 2025
+**Branch**: `ops/prod-ready`
+**PR**: #107 - <https://github.com/bitquan/toolspace/pull/107>
 **Commit**: `588b40c` - ci: consolidate to 5 lean workflows; remove redundant pipelines
 
 ## ✅ Mission Accomplished

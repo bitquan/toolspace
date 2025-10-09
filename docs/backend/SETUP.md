@@ -11,7 +11,7 @@ Complete guide for setting up the Firebase Functions backend locally.
 
 ## Project Structure
 
-```
+```text
 functions/
 ├── src/
 │   ├── index.ts              # Main function exports
@@ -90,9 +90,9 @@ firebase emulators:start --only functions,firestore
 
 **Emulator URLs:**
 
-- Functions: http://localhost:5001
-- Firestore: http://localhost:8080
-- Auth: http://localhost:9099
+- Functions: <http://localhost:5001>
+- Firestore: <http://localhost:8080>
+- Auth: <http://localhost:9099>
 
 ### 2. Build and Watch
 
@@ -329,7 +329,7 @@ export const scalableFunction = functions
 
 ### Local Monitoring
 
-- Firebase Emulator UI: http://localhost:4000
+- Firebase Emulator UI: <http://localhost:4000>
 - Function execution logs in terminal
 - Firestore data viewer in emulator
 

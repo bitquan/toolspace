@@ -4,7 +4,7 @@
 
 ### Support Channels
 
-- 📧 **Email Support**: support@toolspace.app
+- 📧 **Email Support**: <support@toolspace.app>
 - 💬 **Community Forum**: [GitHub Discussions](https://github.com/bitquan/toolspace/discussions)
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/bitquan/toolspace/issues)
 - 📖 **Documentation**: [docs.toolspace.app](https://docs.toolspace.app)
@@ -75,9 +75,9 @@ if (window.self !== window.top) {
 
 #### Quick Invoice
 
-**Issue: PDF generation fails**
+##### Issue: PDF generation fails
 
-```
+```text
 Error: Failed to generate PDF
 ```
 
@@ -90,9 +90,9 @@ Error: Failed to generate PDF
 
 #### Text Tools
 
-**Issue: Large text processing timeout**
+##### Issue: Large text processing timeout
 
-```
+```text
 Error: Request timeout
 ```
 
@@ -245,7 +245,7 @@ const exportData = await fetch("/api/tools/export", {
 
 ### Level 3: Direct Support
 
-1. Email support@toolspace.app
+1. Email <support@toolspace.app>
 2. Include account email
 3. Provide detailed error description
 4. Attach screenshots if relevant
@@ -254,7 +254,7 @@ const exportData = await fetch("/api/tools/export", {
 
 For critical issues affecting business operations:
 
-1. Email support@toolspace.app with "URGENT" prefix
+1. Email <support@toolspace.app> with "URGENT" prefix
 2. Include business impact description
 3. Provide phone number for callback
 4. Expected response within 4 hours
@@ -311,7 +311,7 @@ Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.yml):
 
 For GDPR, CCPA, or other data requests:
 
-1. Email privacy@toolspace.app
+1. Email <privacy@toolspace.app>
 2. Provide identity verification
 3. Specify request type (access, deletion, portability)
 4. Allow 30 days for processing
@@ -320,14 +320,14 @@ For GDPR, CCPA, or other data requests:
 
 For security vulnerabilities:
 
-1. Email security@toolspace.app
+1. Email <security@toolspace.app>
 2. Include detailed vulnerability description
 3. Provide proof-of-concept if safe
 4. Allow coordinated disclosure timeline
 
 ### Terms Violations
 
-Report violations to abuse@toolspace.app:
+Report violations to <abuse@toolspace.app>:
 
 - Account information
 - Description of violation

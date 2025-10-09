@@ -21,11 +21,11 @@ class LandingNavBar extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.black.withOpacity(0.8)
-            : Colors.white.withOpacity(0.9),
+            ? Colors.black.withValues(alpha: 0.8)
+            : Colors.white.withValues(alpha: 0.9),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

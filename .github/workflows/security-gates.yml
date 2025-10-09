@@ -1,41 +1,41 @@
 ﻿name: Security Gates (full)
 on:
-  pull_request:
-    paths:
-      - 'firestore.rules'
-      - 'storage.rules'
-      - 'functions/**'
-      - 'test/security/**'
-    types: [opened, synchronize, labeled, reopened]
-  schedule:
-    - cron: '0 3 * * *'
-  workflow_dispatch:
+    pull_request:
+        paths:
+            - "firestore.rules"
+            - "storage.rules"
+            - "functions/**"
+            - "test/security/**"
+        types: [opened, synchronize, labeled, reopened]
+    schedule:
+        - cron: "0 3 * * *"
+    workflow_dispatch:
 permissions:
-  contents: read
+    contents: read
 concurrency:
-  group: sec-${{ github.ref }}
-  cancel-in-progress: true
+    group: sec-${{ github.ref }}
+    cancel-in-progress: true
 jobs:
-  rules-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Firestore/Storage rules tests
-        run: |
-          cd test/security || exit 0
-          npm ci
-          npm run test:rules
+    rules-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Run Firestore/Storage rules tests
+              run: |
+                  cd test/security || exit 0
+                  npm ci
+                  npm run test:rules
 
-  e2e-auth-quota:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: |
-          cd test/security || exit 0
-          npm ci
-          npx playwright install --with-deps chromium
-          (firebase emulators:start --only auth,firestore,storage --project demo-toolspace &)
-          sleep 8
-          npx playwright test || npx playwright test --reporter=line
+    e2e-auth-quota:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with: { node-version: 20 }
+            - run: |
+                  cd test/security || exit 0
+                  npm ci
+                  npx playwright install --with-deps chromium
+                  (firebase emulators:start --only auth,firestore,storage --project demo-toolspace &)
+                  sleep 8
+                  npx playwright test || npx playwright test --reporter=line

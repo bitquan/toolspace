@@ -138,7 +138,7 @@ class _AnimatedFeatureCardState extends State<_AnimatedFeatureCard> {
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
               color: _isHovered
-                  ? widget.color.withOpacity(0.5)
+                  ? widget.color.withValues(alpha: 0.5)
                   : Colors.transparent,
               width: 2,
             ),
@@ -155,7 +155,8 @@ class _AnimatedFeatureCardState extends State<_AnimatedFeatureCard> {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: widget.color.withOpacity(_isHovered ? 0.2 : 0.1),
+                      color: widget.color
+                          .withValues(alpha: _isHovered ? 0.2 : 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -189,7 +190,7 @@ class _AnimatedFeatureCardState extends State<_AnimatedFeatureCard> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: widget.color.withOpacity(0.1),
+                        color: widget.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: widget.color, width: 1),
                       ),

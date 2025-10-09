@@ -1,55 +1,55 @@
 ﻿name: Deploy
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+    push:
+        branches: [main]
+    workflow_dispatch:
 permissions:
-  contents: read
-  deployments: write
-  id-token: write
+    contents: read
+    deployments: write
+    id-token: write
 concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+    group: deploy-${{ github.ref }}
+    cancel-in-progress: true
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    outputs:
-      web: ${{ steps.art.outputs.path }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with: { channel: stable }
-      - run: flutter pub get
-      - run: flutter build web --release
-      - id: art
-        run: echo "path=build/web" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
-        with: { name: web-dist, path: build/web }
+    build:
+        runs-on: ubuntu-latest
+        outputs:
+            web: ${{ steps.art.outputs.path }}
+        steps:
+            - uses: actions/checkout@v4
+            - uses: subosito/flutter-action@v2
+              with: { channel: stable }
+            - run: flutter pub get
+            - run: flutter build web --release
+            - id: art
+              run: echo "path=build/web" >> "$GITHUB_OUTPUT"
+            - uses: actions/upload-artifact@v4
+              with: { name: web-dist, path: build/web }
 
-  deploy-staging:
-    needs: build
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with: { name: web-dist, path: build/web }
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-          channelId: live
+    deploy-staging:
+        needs: build
+        if: github.event_name == 'push'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/download-artifact@v4
+              with: { name: web-dist, path: build/web }
+            - uses: FirebaseExtended/action-hosting-deploy@v0
+              with:
+                  repoToken: ${{ secrets.GITHUB_TOKEN }}
+                  firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+                  projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+                  channelId: live
 
-  deploy-prod:
-    needs: build
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with: { name: web-dist, path: build/web }
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-          channelId: live
+    deploy-prod:
+        needs: build
+        if: github.event_name == 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/download-artifact@v4
+              with: { name: web-dist, path: build/web }
+            - uses: FirebaseExtended/action-hosting-deploy@v0
+              with:
+                  repoToken: ${{ secrets.GITHUB_TOKEN }}
+                  firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+                  projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+                  channelId: live

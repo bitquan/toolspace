@@ -130,7 +130,7 @@ Creates a Stripe customer portal link for billing management.
 }
 ```
 
-**No authentication required**
+#### No authentication required
 
 ### Stripe Webhook
 

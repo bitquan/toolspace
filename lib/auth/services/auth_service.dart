@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 /// Comprehensive authentication service providing reactive streams
 /// and methods for managing user authentication state
@@ -56,7 +57,7 @@ class AuthService {
       await _auth.setPersistence(Persistence.LOCAL);
     } catch (e) {
       // Persistence might fail in some environments, log but continue
-      print('Warning: Could not set auth persistence: $e');
+      debugPrint('Warning: Could not set auth persistence: $e');
     }
 
     // Listen to auth state changes

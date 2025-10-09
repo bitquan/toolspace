@@ -222,8 +222,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 8,
-                            shadowColor:
-                                theme.colorScheme.primary.withValues(alpha: 0.3),
+                            shadowColor: theme.colorScheme.primary
+                                .withValues(alpha: 0.3),
                           ),
                           child: _isLoading
                               ? const SizedBox(

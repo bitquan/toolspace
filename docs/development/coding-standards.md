@@ -167,7 +167,7 @@ class Failure<T> extends Result<T> {
 
 ## TypeScript Standards
 
-### Code Formatting
+### TypeScript Code Formatting
 
 ```bash
 # Format and lint
@@ -183,7 +183,7 @@ npm run lint -- --fix
 - Prettier integration
 - Strict TypeScript mode enabled
 
-### Naming Conventions
+### TypeScript Naming Conventions
 
 ```typescript
 // Interfaces: PascalCase with 'I' prefix (optional)
@@ -248,7 +248,7 @@ export async function createCheckoutSession(
 }
 ```
 
-### Error Handling
+### TypeScript Error Handling
 
 ```typescript
 // Custom error classes
@@ -300,7 +300,7 @@ export const createCheckoutSession = functions.https.onCall(
 
 ### Folder Organization
 
-```
+```text
 lib/
 ├── auth/                 # Authentication features
 │   ├── services/        # Auth business logic

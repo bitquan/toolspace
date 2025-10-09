@@ -156,7 +156,8 @@ class _EmailVerificationDialogState extends State<EmailVerificationDialog>
               end: Alignment.bottomRight,
               colors: [
                 theme.colorScheme.surface.withValues(alpha: 0.9),
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+                theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.8),
               ],
             ),
             borderRadius: BorderRadius.circular(24),

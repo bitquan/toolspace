@@ -2,7 +2,7 @@
 on:
   pull_request:
   push:
-    branches: [ "feat/**" ]
+    branches: ["feat/**"]
 permissions:
   contents: read
 concurrency:

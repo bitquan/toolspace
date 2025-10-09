@@ -1,3 +1,5 @@
+# Pull Request
+
 ## Description
 
 Brief description of the changes made.
@@ -92,14 +94,14 @@ Any additional information that reviewers should know.
 - Closes #issue_number
 - Related to #issue_number
 
-## Breaking Changes
+## Breaking Changes List
 
 <!-- List any breaking changes -->
 
 - [ ] No breaking changes
 - [ ] Breaking changes (describe below)
 
-## Checklist
+## PR Checklist
 
 <!-- Check all applicable boxes -->
 
@@ -110,7 +112,7 @@ Any additional information that reviewers should know.
 - [ ] Code is well-commented, particularly in hard-to-understand areas
 - [ ] No obvious code smells or technical debt introduced
 
-### Testing
+### Testing Status
 
 - [ ] **Backend**: `functions`: `npm run qa` passes
 - [ ] **Frontend**: `flutter analyze` clean
@@ -136,6 +138,6 @@ Any additional information that reviewers should know.
 - [ ] Reviewers assigned
 - [ ] PR is ready for review
 
-## Additional Notes
+## Additional Context
 
 <!-- Any additional information that reviewers should know -->

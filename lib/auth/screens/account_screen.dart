@@ -74,7 +74,9 @@ class _AccountScreenState extends State<AccountScreen> {
               await _authService.signOut();
 
               if (mounted) {
+                if (!context.mounted) return;
                 Navigator.of(context).pushReplacementNamed('/auth/signin');
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Signed out successfully'),

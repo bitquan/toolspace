@@ -1,6 +1,6 @@
 # Toolspace
 
-**Micro-tools platform for productivity and business needs**
+## Micro-tools platform for productivity and business needs
 
 Toolspace is a collection of focused, web-based micro-tools designed to help small businesses, freelancers, and individuals accomplish common tasks quickly and efficiently.
 
@@ -177,7 +177,7 @@ Server-assisted file merging and processing for multiple file formats.
 
 ### Project Structure
 
-```
+```text
 toolspace/
 ├── lib/                    # Flutter app
 ├── core/                   # Shared components

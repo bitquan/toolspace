@@ -1,27 +1,27 @@
 ﻿name: Repo Maintenance
 on:
-  schedule:
-    - cron: '0 3 * * 0'
-  workflow_dispatch:
+    schedule:
+        - cron: "0 3 * * 0"
+    workflow_dispatch:
 permissions:
-  contents: write
-  actions: write
-  issues: write
+    contents: write
+    actions: write
+    issues: write
 concurrency:
-  group: maint-${{ github.ref }}
-  cancel-in-progress: true
+    group: maint-${{ github.ref }}
+    cancel-in-progress: true
 jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Delete merged branches
-        run: |
-          git fetch --prune
-          for b in $(git branch -r --merged origin/main | sed 's/origin\///'); do
-            case "$b" in main|develop) ;; *) echo "Deleting $b"; gh api -X DELETE repos/${{ github.repository }}/git/refs/heads/$b || true;; esac
-          done
-      - name: Prune actions caches (best effort)
-        uses: MyAlbum/purge-cache@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+    cleanup:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Delete merged branches
+              run: |
+                  git fetch --prune
+                  for b in $(git branch -r --merged origin/main | sed 's/origin\///'); do
+                    case "$b" in main|develop) ;; *) echo "Deleting $b"; gh api -X DELETE repos/${{ github.repository }}/git/refs/heads/$b || true;; esac
+                  done
+            - name: Prune actions caches (best effort)
+              uses: MyAlbum/purge-cache@v2
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}

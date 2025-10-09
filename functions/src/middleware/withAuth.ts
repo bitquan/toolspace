@@ -1,6 +1,6 @@
-import { admin } from "../admin.js";
-import { AuthError } from "../util/errors.js";
-import { extractBearerToken, assertOwner } from "../util/guards.js";
+import { admin } from "../admin";
+import { AuthError } from "../util/errors";
+import { extractBearerToken, assertOwner } from "../util/guards";
 
 /**
  * Middleware to verify Firebase ID tokens and attach user info to request

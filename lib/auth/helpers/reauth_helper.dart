@@ -17,6 +17,9 @@ class ReauthHelper {
       return true;
     }
 
+    // Check if widget is still mounted before showing dialog
+    if (!context.mounted) return false;
+
     // Show reauthentication dialog
     final result = await showDialog<bool>(
       context: context,

@@ -102,8 +102,8 @@ class _HeroSectionState extends State<HeroSection>
                         fontSize: size.width < 600 ? 18 : 22,
                         height: 1.6,
                         color: isDark
-                            ? Colors.white.withOpacity(0.8)
-                            : Colors.black.withOpacity(0.7),
+                            ? Colors.white.withValues(alpha: 0.8)
+                            : Colors.black.withValues(alpha: 0.7),
                       ),
                     ),
                   ),

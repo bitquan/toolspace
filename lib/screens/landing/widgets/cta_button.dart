@@ -60,7 +60,7 @@ class _CTAButtonState extends State<CTAButton> {
                     ),
             ),
             elevation: widget.isPrimary ? 4 : 0,
-            shadowColor: theme.colorScheme.primary.withOpacity(0.4),
+            shadowColor: theme.colorScheme.primary.withValues(alpha: 0.4),
           ),
           child: Text(
             widget.label,

@@ -313,7 +313,7 @@ function check_secret_expiration() {
 
 ### Common Environment Issues
 
-**Invalid Project ID**
+#### Invalid Project ID
 
 ```bash
 # Verify current project
@@ -324,7 +324,7 @@ firebase projects:list
 firebase use your-prod-project-id
 ```
 
-**Wrong Stripe Keys**
+#### Wrong Stripe Keys
 
 ```bash
 # Check key format
@@ -334,7 +334,7 @@ echo $STRIPE_SECRET_KEY | grep -E "^sk_(live|test)_"
 stripe customers list --limit 1
 ```
 
-**Function Configuration Mismatch**
+#### Function Configuration Mismatch
 
 ```bash
 # Check current configuration
@@ -347,7 +347,7 @@ firebase functions:config:set stripe.secret_key="sk_live_***"
 
 ### Environment Recovery
 
-**Complete Environment Reset**
+#### Complete Environment Reset
 
 ```bash
 # 1. Backup current configuration
