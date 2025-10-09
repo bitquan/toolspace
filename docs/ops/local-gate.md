@@ -1,5 +1,13 @@
 # OPS-LocalGate: Pre-Push Validation System
 
+## 🚨 ZERO TOLERANCE POLICY
+
+**NEW RULE: This project must have ZERO errors and ZERO warnings at all times!**
+
+OPS-LocalGate enforces local testing before allowing any git push. This ensures that **local development parity with CI** and prevents pushing broken code.
+
+**No exceptions. No warnings. No errors. Period.**
+
 ## Overview
 
 OPS-LocalGate enforces local testing before allowing any git push. This ensures that **local development parity with CI** and prevents pushing broken code.
@@ -9,6 +17,7 @@ OPS-LocalGate enforces local testing before allowing any git push. This ensures 
 The preflight system runs the following checks:
 
 ### 1. Tooling Verification
+
 - Flutter SDK
 - Dart SDK
 - Node.js
@@ -18,17 +27,20 @@ The preflight system runs the following checks:
 All tools must be available and their versions are logged.
 
 ### 2. Flutter App Checks
+
 - `flutter pub get` - Install dependencies
-- `flutter analyze --no-fatal-infos --no-fatal-warnings` - Static analysis (errors fail)
+- `flutter analyze --fatal-warnings --fatal-infos` - **ZERO TOLERANCE: Any warning or error fails the build**
 - `flutter test --coverage` - Run all unit tests with coverage
 - `flutter build web --release` - Production build (skipped in `--quick` mode)
 
 ### 3. Functions Checks (in `functions/`)
+
 - `npm ci` - Clean install dependencies
-- `npm run lint` - ESLint validation (auto-fix with `--fix` flag)
+- `npm run lint -- --max-warnings=0` - **ZERO TOLERANCE: Any ESLint warning fails the build**
 - `npm test --silent` - Run Jest unit tests
 
 ### 4. Security Rules & E2E
+
 - **Full mode**: Firebase emulators + Firestore rules + Playwright smoke tests
 - **Quick mode**: Firestore rules tests only (skip Playwright)
 
@@ -72,11 +84,11 @@ Run via: `Ctrl+Shift+P` → "Tasks: Run Task"
 
 ## Expected Runtime
 
-| Mode | Duration | What's Included |
-|------|----------|----------------|
-| **Full** | ~3-5 min | All checks + web build + E2E |
-| **Quick** | ~1-2 min | Core checks, no build/E2E |
-| **Fix** | Variable | Runs linting with auto-fix |
+| Mode      | Duration | What's Included              |
+| --------- | -------- | ---------------------------- |
+| **Full**  | ~3-5 min | All checks + web build + E2E |
+| **Quick** | ~1-2 min | Core checks, no build/E2E    |
+| **Fix**   | Variable | Runs linting with auto-fix   |
 
 ## Pre-Push Hook
 
@@ -93,6 +105,7 @@ git push --no-verify
 ```
 
 **If you bypass:**
+
 1. Open a follow-up issue immediately
 2. Fix the failing checks ASAP
 3. Never bypass for convenience
@@ -142,19 +155,25 @@ This ensures **local == CI**. If it passes locally, it should pass in CI.
 ## Troubleshooting
 
 ### "Missing required tools"
+
 Install Flutter, Dart, Node.js, npm, Firebase CLI and ensure they're in PATH.
 
 ### "Flutter analyze failed"
+
 Run `flutter analyze` locally to see errors. Fix or suppress warnings in `analysis_options.yaml`.
 
 ### "Functions lint failed"
+
 Run `cd functions && npm run lint` to see issues. Try `npm run lint -- --fix` for auto-fixes.
 
 ### "Functions test failed"
+
 Run `cd functions && npm test` to debug failing tests.
 
 ### "E2E/Security rules failed"
+
 Check `local-ci/logs/e2e-with-emulators.log` or run:
+
 ```bash
 cd test/security
 npm run test:rules

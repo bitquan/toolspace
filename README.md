@@ -42,6 +42,7 @@ npm run build                # Build TypeScript
 ### Cross-Tool Data Sharing
 
 Share data seamlessly between tools without manual copy-paste:
+
 - 🔄 Share text, JSON, URLs, and more between tools
 - 📋 One-click import from other tools
 - 📜 History tracking for recent shares
@@ -166,16 +167,20 @@ toolspace/
 
 ### Contributing
 
+**🚨 ZERO TOLERANCE POLICY: This project must have ZERO errors and ZERO warnings at all times!**
+
 **All pushes are blocked by the Local Gate. Run `npm run preflight` until green.**
 
 1. Fork the repository
 2. Create a feature branch
 3. Run `npm run setup:hooks` (one-time setup)
 4. Make changes with tests
-5. Run `npm run preflight` - must pass before push
+5. Run `npm run preflight` - **must pass with ZERO errors/warnings before push**
 6. Submit pull request
 
 See [docs/ops/local-gate.md](docs/ops/local-gate.md) for details on the Local Gate system.
+
+**No exceptions. No warnings. No errors. Period.**
 
 ### Quality Standards
 

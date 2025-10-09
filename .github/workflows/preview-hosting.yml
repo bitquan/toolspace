@@ -36,8 +36,8 @@ jobs:
       - name: 📦 Get dependencies
         run: flutter pub get
 
-      - name: 🔍 Analyze code
-        run: flutter analyze
+      - name: 🔍 Analyze code (ZERO tolerance)
+        run: flutter analyze --fatal-warnings --fatal-infos
 
       - name: 🧪 Run tests
         run: flutter test

@@ -1,7 +1,7 @@
 # OPS-LocalGate Implementation
 
-**Date:** 2025-10-08  
-**Type:** Operations / Quality Gate  
+**Date:** 2025-10-08
+**Type:** Operations / Quality Gate
 **Status:** ✅ Implemented
 
 ## Summary
@@ -20,6 +20,7 @@ Created a comprehensive Node.js ESM script that runs:
 - **Security & E2E**: Firestore rules + optional Playwright smoke tests
 
 **Features:**
+
 - Fail-fast with clear error messages
 - Logging to `local-ci/logs/*.log`
 - Markdown summary at `local-ci/summary.md`
@@ -35,6 +36,7 @@ Created a comprehensive Node.js ESM script that runs:
 ### 3. Package.json Updates
 
 Added scripts:
+
 ```json
 {
   "preflight": "node scripts/preflight.mjs",
@@ -44,6 +46,7 @@ Added scripts:
 ```
 
 Added devDependencies:
+
 - `husky@9` - Git hooks
 - `zx@7` - Shell scripting helpers
 - `colorette@2` - Terminal colors
@@ -54,12 +57,14 @@ Added devDependencies:
 ### 4. VS Code Integration
 
 Added two tasks to `.vscode/tasks.json`:
+
 - "Preflight: All checks (local == CI)" - Full suite
 - "Preflight (quick)" - Fast validation
 
 ### 5. Documentation
 
 Created:
+
 - `docs/ops/local-gate.md` - Complete usage guide
 - Updated `README.md` Contributing section
 - This dev-log entry
@@ -68,20 +73,22 @@ Updated `.gitignore` to exclude `local-ci/` directory.
 
 ## Expected Runtime
 
-| Mode | Duration | What Runs |
-|------|----------|-----------|
-| **Full** | ~3-5 min | All checks + web build + E2E |
-| **Quick** | ~1-2 min | Core checks only |
+| Mode      | Duration | What Runs                    |
+| --------- | -------- | ---------------------------- |
+| **Full**  | ~3-5 min | All checks + web build + E2E |
+| **Quick** | ~1-2 min | Core checks only             |
 
 ## Usage
 
 ### First Time Setup
+
 ```bash
 npm install        # Install devDeps (husky, zx, etc.)
 npm run setup:hooks # Install Husky hooks
 ```
 
 ### Regular Workflow
+
 ```bash
 # Make changes...
 npm run preflight  # or preflight:quick
@@ -91,6 +98,7 @@ git push  # Pre-push hook runs preflight
 ```
 
 ### Flags
+
 ```bash
 npm run preflight         # Full suite
 npm run preflight:quick   # Skip web build + Playwright
@@ -100,16 +108,18 @@ node scripts/preflight.mjs --fix  # Auto-fix linting
 ## Impact
 
 ### Benefits
-✅ **No broken pushes**: All code is validated locally before push  
-✅ **Local == CI**: Same checks run locally and in CI  
-✅ **Clear feedback**: Detailed logs show exactly what failed  
-✅ **Fast feedback**: Quick mode runs in ~1-2 minutes  
-✅ **Developer confidence**: Know your code is good before pushing  
+
+✅ **No broken pushes**: All code is validated locally before push
+✅ **Local == CI**: Same checks run locally and in CI
+✅ **Clear feedback**: Detailed logs show exactly what failed
+✅ **Fast feedback**: Quick mode runs in ~1-2 minutes
+✅ **Developer confidence**: Know your code is good before pushing
 
 ### Tradeoffs
-⚠️ **Slower pushes**: Must wait for checks (use `--quick` for speed)  
-⚠️ **Initial setup**: Requires `npm install` + `setup:hooks`  
-⚠️ **Can be bypassed**: `--no-verify` exists but should only be for emergencies  
+
+⚠️ **Slower pushes**: Must wait for checks (use `--quick` for speed)
+⚠️ **Initial setup**: Requires `npm install` + `setup:hooks`
+⚠️ **Can be bypassed**: `--no-verify` exists but should only be for emergencies
 
 ## CI Alignment
 
