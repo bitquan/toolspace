@@ -98,17 +98,8 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-    // Clear any cached auth on startup (debugging - remove this later)
-    _clearCachedAuth();
-  }
-
-  Future<void> _clearCachedAuth() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DebugLogger.info(
-          '🧹 Clearing cached auth session for: ${user.email ?? "anonymous"}');
-      await FirebaseAuth.instance.signOut();
-    }
+    // NOTE: Removed _clearCachedAuth() - it was signing out users on every app load
+    // This was causing the "sign in but stay on landing page" bug in production
   }
 
   @override
