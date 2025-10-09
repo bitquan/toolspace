@@ -1,0 +1,164 @@
+name: 🧹 Cleanup Workflows
+on:
+    workflow_dispatch:
+        inputs:
+            cleanup_type:
+                description: "What to delete?"
+                required: true
+                type: choice
+                options:
+                    - failed
+                    - skipped
+                    - cancelled
+                    - success
+                    - all
+                default: "failed"
+            workflow_name:
+                description: "Workflow name (leave empty for all workflows)"
+                required: false
+                type: string
+            days_older_than:
+                description: "Delete runs older than X days (0 = all)"
+                required: false
+                type: number
+                default: 0
+            dry_run:
+                description: "Dry run (preview only, no deletion)"
+                required: true
+                type: boolean
+                default: true
+
+permissions:
+    actions: write
+    contents: read
+
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🧹 Cleanup Workflow Runs
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const cleanupType = '${{ inputs.cleanup_type }}';
+                      const workflowName = '${{ inputs.workflow_name }}';
+                      const daysOlderThan = parseInt('${{ inputs.days_older_than }}') || 0;
+                      const dryRun = '${{ inputs.dry_run }}' === 'true';
+
+                      console.log('🧹 Workflow Cleanup Tool');
+                      console.log('========================');
+                      console.log(`Cleanup Type: ${cleanupType}`);
+                      console.log(`Workflow Filter: ${workflowName || 'ALL'}`);
+                      console.log(`Days Older Than: ${daysOlderThan || 'ANY'}`);
+                      console.log(`Dry Run: ${dryRun ? '✅ YES (preview only)' : '❌ NO (will delete!)'}`);
+                      console.log('');
+
+                      // Calculate cutoff date
+                      const cutoffDate = daysOlderThan > 0
+                          ? new Date(Date.now() - daysOlderThan * 24 * 60 * 60 * 1000)
+                          : null;
+
+                      // Get all workflows
+                      const workflows = await github.paginate(
+                          github.rest.actions.listRepoWorkflows,
+                          {
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              per_page: 100
+                          }
+                      );
+
+                      let totalDeleted = 0;
+                      let totalSkipped = 0;
+
+                      // Process each workflow
+                      for (const workflow of workflows) {
+                          // Filter by workflow name if specified
+                          if (workflowName && !workflow.name.toLowerCase().includes(workflowName.toLowerCase())) {
+                              continue;
+                          }
+
+                          console.log(`\n📋 Processing: ${workflow.name}`);
+
+                          let page = 1;
+                          let hasMore = true;
+
+                          while (hasMore) {
+                              const runs = await github.rest.actions.listWorkflowRuns({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  workflow_id: workflow.id,
+                                  per_page: 100,
+                                  page: page
+                              });
+
+                              if (runs.data.workflow_runs.length === 0) {
+                                  hasMore = false;
+                                  break;
+                              }
+
+                              for (const run of runs.data.workflow_runs) {
+                                  // Check if run matches cleanup criteria
+                                  let shouldDelete = false;
+
+                                  if (cleanupType === 'all') {
+                                      shouldDelete = true;
+                                  } else if (cleanupType === 'failed' && run.conclusion === 'failure') {
+                                      shouldDelete = true;
+                                  } else if (cleanupType === 'skipped' && run.conclusion === 'skipped') {
+                                      shouldDelete = true;
+                                  } else if (cleanupType === 'cancelled' && run.conclusion === 'cancelled') {
+                                      shouldDelete = true;
+                                  } else if (cleanupType === 'success' && run.conclusion === 'success') {
+                                      shouldDelete = true;
+                                  }
+
+                                  // Check age filter
+                                  if (shouldDelete && cutoffDate) {
+                                      const runDate = new Date(run.created_at);
+                                      if (runDate > cutoffDate) {
+                                          shouldDelete = false;
+                                      }
+                                  }
+
+                                  if (shouldDelete) {
+                                      const runAge = Math.floor((Date.now() - new Date(run.created_at)) / (24 * 60 * 60 * 1000));
+
+                                      if (dryRun) {
+                                          console.log(`   [DRY RUN] Would delete: #${run.run_number} - ${run.conclusion} (${runAge}d old)`);
+                                      } else {
+                                          try {
+                                              await github.rest.actions.deleteWorkflowRun({
+                                                  owner: context.repo.owner,
+                                                  repo: context.repo.repo,
+                                                  run_id: run.id
+                                              });
+                                              console.log(`   ✅ Deleted: #${run.run_number} - ${run.conclusion} (${runAge}d old)`);
+                                              totalDeleted++;
+                                          } catch (error) {
+                                              console.log(`   ❌ Failed to delete #${run.run_number}: ${error.message}`);
+                                          }
+                                      }
+                                  } else {
+                                      totalSkipped++;
+                                  }
+                              }
+
+                              page++;
+                          }
+                      }
+
+                      console.log('\n');
+                      console.log('========================');
+                      console.log('📊 Summary');
+                      console.log('========================');
+                      if (dryRun) {
+                          console.log(`Would delete: ${totalDeleted} runs`);
+                          console.log(`Would keep: ${totalSkipped} runs`);
+                          console.log('');
+                          console.log('⚠️  This was a DRY RUN - nothing was deleted');
+                          console.log('💡 Set "Dry run" to FALSE to actually delete');
+                      } else {
+                          console.log(`✅ Deleted: ${totalDeleted} runs`);
+                          console.log(`⏭️  Skipped: ${totalSkipped} runs`);
+                      }
