@@ -6,10 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'auth/screens/email_verification_screen.dart';
-import 'auth/screens/signin_screen.dart';
-import 'auth/screens/signup_screen.dart';
 import 'core/services/debug_logger.dart';
 import 'core/ui/neo_playground_theme.dart';
+import 'core/routes.dart';
 import 'firebase_options.dart';
 import 'screens/landing/landing_page.dart';
 import 'screens/neo_home_screen.dart';
@@ -47,7 +46,8 @@ Future<void> main() async {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
-      DebugLogger.info('🔧 Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001)');
+      DebugLogger.info(
+          '🔧 Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001)');
     }
 
     // 🚫 DO NOT sign in anonymously here (removed)
@@ -71,23 +71,15 @@ class ToolspaceApp extends StatelessWidget {
       theme: NeoPlaygroundTheme.lightTheme(),
       darkTheme: NeoPlaygroundTheme.darkTheme(),
       themeMode: ThemeMode.system,
-      // Use onGenerateRoute instead of home + routes to avoid conflicts
+      // Use the centralized router for all navigation
       initialRoute: '/',
       onGenerateRoute: (settings) {
-        // Handle all route navigation
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(builder: (_) => const AuthGate());
-          case '/auth/signin':
-            return MaterialPageRoute(builder: (_) => const SignInScreen());
-          case '/auth/signup':
-            return MaterialPageRoute(builder: (_) => const SignUpScreen());
-          case '/dashboard':
-            return MaterialPageRoute(builder: (_) => const NeoHomeScreen());
-          default:
-            // Unknown route - redirect to auth gate
-            return MaterialPageRoute(builder: (_) => const AuthGate());
+        // Special case: root route goes to AuthGate
+        if (settings.name == '/') {
+          return MaterialPageRoute(builder: (_) => const AuthGate());
         }
+        // All other routes handled by ToolspaceRouter
+        return ToolspaceRouter.generateRoute(settings);
       },
     );
   }
@@ -113,7 +105,8 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _clearCachedAuth() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      DebugLogger.info('🧹 Clearing cached auth session for: ${user.email ?? "anonymous"}');
+      DebugLogger.info(
+          '🧹 Clearing cached auth session for: ${user.email ?? "anonymous"}');
       await FirebaseAuth.instance.signOut();
     }
   }
@@ -139,7 +132,8 @@ class _AuthGateState extends State<AuthGate> {
 
         // Anonymous user or no email (old session) → sign out ONCE
         final hasInvalidEmail = user.email == null || user.email!.isEmpty;
-        if ((user.isAnonymous || hasInvalidEmail) && !_hasCheckedAndClearedBadAuth) {
+        if ((user.isAnonymous || hasInvalidEmail) &&
+            !_hasCheckedAndClearedBadAuth) {
           _hasCheckedAndClearedBadAuth = true;
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             await FirebaseAuth.instance.signOut();
