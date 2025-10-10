@@ -42,7 +42,7 @@
           "audio_converter",
           "file_compressor"
         ],
-        "requiresUpgrade": true
+         "requiresUpgrade": true
       }
     },
     "pro": {
@@ -148,6 +148,36 @@
       "category": "heavy",
       "minPlan": "pro",
       "description": "Convert JSON to CSV with flattening"
+    },
+    "invoice_lite": {
+      "name": "Invoice Lite",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Generate professional invoices and payment links"
+    },
+    "audio_converter": {
+      "name": "Audio Converter",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Convert and process audio files"
+    },
+    "file_compressor": {
+      "name": "File Compressor",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Compress files and folders into ZIP archives"
+    },
+    "md_to_pdf": {
+      "name": "Markdown to PDF",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Convert markdown documents to PDF with themes and formatting"
+    },
+    "json_flatten": {
+      "name": "JSON Flatten",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Flatten nested JSON structures for easier analysis"
     },
     "text_tools": {
       "name": "Text Tools",

@@ -2,7 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint . --max-warnings=0",
-    "test": "echo \"No tests yet - placeholder for ZERO TOLERANCE\" && exit 0",
+    "test": "jest",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
@@ -10,7 +10,6 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "jest",
     "test:rules": "jest test/rules.spec.js --config jest.config.rules.js",
     "test:watch": "jest --watch"
   },
@@ -22,7 +21,8 @@
     "dotenv": "^17.2.3",
     "firebase-admin": "^12.6.0",
     "firebase-functions": "^6.0.1",
-    "stripe": "^19.1.0"
+    "stripe": "^19.1.0",
+    "zx": "^8.8.4"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.0",

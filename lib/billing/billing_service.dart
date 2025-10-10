@@ -147,17 +147,22 @@ class BillingService {
   Future<BillingProfile> getBillingProfile() async {
     final user = _auth.currentUser;
     if (user == null) {
-      return BillingProfile.free();
+      throw Exception('User not authenticated');
     }
 
-    final snapshot =
-        await _firestore.doc('users/${user.uid}/billing/profile').get();
+    final docRef = _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('billing')
+        .doc('profile');
 
-    if (snapshot.exists) {
-      return BillingProfile.fromJson(snapshot.data()!);
+    final snapshot = await docRef.get();
+    if (!snapshot.exists) {
+      throw Exception('Billing profile not found');
     }
 
-    return BillingProfile.free();
+    final profile = BillingProfile.fromJson(snapshot.data()!);
+    return profile;
   }
 
   /// Get today's usage (one-time read)

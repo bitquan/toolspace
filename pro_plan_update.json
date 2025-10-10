@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "plan": { "stringValue": "pro" },
+    "planDisplayName": { "stringValue": "Pro Plan" },
+    "status": { "stringValue": "active" },
+    "updatedAt": { "timestampValue": "2025-10-10T01:45:00.000Z" },
+    "subscriptionId": { "stringValue": "manual_update_20251010" },
+    "priceId": { "stringValue": "price_1Q8QFNKH9qhDPyF8xTlgONJW" }
+  }
+}
