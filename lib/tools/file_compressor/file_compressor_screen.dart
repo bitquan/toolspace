@@ -340,7 +340,7 @@ class _FileCompressorScreenState extends State<FileCompressorScreen> {
             onPressed: _files.isEmpty ? null : _pickFiles,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              side: BorderSide(color: NeoPlaygroundTheme.primaryPurple),
+              side: const BorderSide(color: NeoPlaygroundTheme.primaryPurple),
             ),
             child: const Text('Add More Files'),
           ),
@@ -410,8 +410,9 @@ class _FileCompressorScreenState extends State<FileCompressorScreen> {
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 

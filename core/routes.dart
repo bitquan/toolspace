@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../lib/tools/invoice_lite/invoice_lite_screen.dart';
-import '../lib/tools/file_compressor/file_compressor_screen.dart';
-import '../lib/tools/audio_converter/audio_converter_screen.dart';
+import 'package:toolspace/tools/invoice_lite/invoice_lite_screen.dart';
+import 'package:toolspace/tools/file_compressor/file_compressor_screen.dart';
+import 'package:toolspace/tools/audio_converter/audio_converter_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {

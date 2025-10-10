@@ -9,7 +9,6 @@
 /// - Neo-Playground theme with glassmorphism
 library;
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -853,7 +852,7 @@ class _InvoiceLiteScreenState extends State<InvoiceLiteScreen>
 
           // Currency selector
           DropdownButtonFormField<String>(
-            value: _selectedCurrency,
+            initialValue: _selectedCurrency,
             decoration: const InputDecoration(
               labelText: 'Currency',
               border: OutlineInputBorder(),

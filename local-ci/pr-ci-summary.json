@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-10-10T00:43:58.175Z",
+  "timestamp": "2025-10-10T00:58:06.718Z",
   "summary": {
     "success": false,
     "passed": 1,
     "failed": 1,
     "total": 2,
-    "duration": 11586
+    "duration": 11260
   },
   "flags": {
     "quick": false,
@@ -16,7 +16,7 @@
     {
       "name": "Flutter pub get",
       "success": true,
-      "duration": 1564,
+      "duration": 1566,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-pub-get.log"
@@ -24,9 +24,9 @@
     {
       "name": "Flutter analyze (ZERO tolerance)",
       "success": false,
-      "duration": 6987,
+      "duration": 6708,
       "exitCode": 1,
-      "error": "20 issues found. (ran in 5.1s)",
+      "error": "20 issues found. (ran in 4.9s)",
       "logFile": "flutter-analyze-zero-tolerance-.log"
     }
   ]

@@ -197,7 +197,7 @@ class _AudioConverterScreenState extends State<AudioConverterScreen> {
                       items: [22050, 44100, 48000, 96000].map((rate) {
                         return DropdownMenuItem(
                           value: rate,
-                          child: Text('${rate} Hz'),
+                          child: Text('$rate Hz'),
                         );
                       }).toList(),
                     ),
@@ -326,7 +326,7 @@ class _AudioConverterScreenState extends State<AudioConverterScreen> {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.audiotrack,
             color: NeoPlaygroundTheme.accentPink,
             size: 24,
@@ -408,7 +408,7 @@ class _AudioConverterScreenState extends State<AudioConverterScreen> {
             onPressed: _files.isEmpty ? null : _pickFiles,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              side: BorderSide(color: NeoPlaygroundTheme.accentPink),
+              side: const BorderSide(color: NeoPlaygroundTheme.accentPink),
             ),
             child: const Text('Add More Files'),
           ),
@@ -448,8 +448,9 @@ class _AudioConverterScreenState extends State<AudioConverterScreen> {
   String _formatFileSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024) {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
