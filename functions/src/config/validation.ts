@@ -12,6 +12,7 @@ import { loadPricingConfig } from "../billing/entitlements";
  */
 export function validateProductionConfig(): void {
   const errors: string[] = [];
+  const isProduction = isProductionEnvironment();
 
   // Validate Stripe configuration
   const stripeKey =
@@ -22,7 +23,7 @@ export function validateProductionConfig(): void {
 
   if (!stripeKey) {
     errors.push("STRIPE_SECRET_KEY is not configured");
-  } else if (stripeKey.startsWith("sk_test_")) {
+  } else if (stripeKey.startsWith("sk_test_") && isProduction) {
     errors.push("STRIPE_SECRET_KEY is using test key in production");
   } else if (stripeKey === "sk_live_***") {
     errors.push("STRIPE_SECRET_KEY contains placeholder value 'sk_live_***'");
@@ -112,7 +113,7 @@ export function validateProductionConfig(): void {
     console.error("🔧 Fix these issues before production deployment!");
 
     // In production, we might want to prevent startup
-    if (process.env.NODE_ENV === "production") {
+    if (isProductionEnvironment()) {
       console.error(
         "💥 BLOCKING PRODUCTION STARTUP DUE TO CONFIGURATION ERRORS"
       );
@@ -130,6 +131,11 @@ export function isProductionEnvironment(): boolean {
   const nodeEnv = process.env.NODE_ENV;
   const projectId =
     process.env.GCLOUD_PROJECT || process.env.FIREBASE_PROJECT_ID;
+
+  // Special case: toolspace-beta is our beta environment, allow test keys
+  if (projectId === "toolspace-beta") {
+    return false;
+  }
 
   return (
     nodeEnv === "production" ||
