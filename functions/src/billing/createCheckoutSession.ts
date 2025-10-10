@@ -23,7 +23,7 @@ const stripe = new Stripe(
     functions.config().stripe?.secret ||
     "",
   {
-    apiVersion: "2025-09-30.clover",
+    apiVersion: "2024-09-30.acacia",
   }
 );
 
@@ -32,16 +32,22 @@ export const createCheckoutSession = functions.https.onCall(
     data: CreateCheckoutSessionRequest,
     context
   ): Promise<CreateCheckoutSessionResponse> => {
+    console.log("DEBUG: createCheckoutSession called with data:", data);
+
     // Require authentication
     if (!context.auth) {
+      console.log("DEBUG: Authentication failed");
       throw new functions.https.HttpsError(
         "unauthenticated",
         "Must be logged in"
       );
     }
 
+    console.log("DEBUG: User authenticated:", context.auth.uid);
+
     // Require email verification before checkout
     if (!context.auth.token.email_verified) {
+      console.log("DEBUG: Email not verified");
       throw new functions.https.HttpsError(
         "failed-precondition",
         "Email verification required. Please verify your email address before purchasing a subscription."
@@ -51,8 +57,16 @@ export const createCheckoutSession = functions.https.onCall(
     const userId = context.auth.uid;
     const { planId, successUrl, cancelUrl } = data;
 
+    console.log("DEBUG: Processing checkout for:", {
+      userId,
+      planId,
+      successUrl,
+      cancelUrl,
+    });
+
     // Validate plan
     if (!planId || !["pro", "pro_plus"].includes(planId)) {
+      console.log("DEBUG: Invalid plan ID:", planId);
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Invalid plan ID"
@@ -61,6 +75,7 @@ export const createCheckoutSession = functions.https.onCall(
 
     // Validate URLs
     if (!successUrl || !cancelUrl) {
+      console.log("DEBUG: Missing URLs:", { successUrl, cancelUrl });
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Missing success or cancel URL"
@@ -68,8 +83,12 @@ export const createCheckoutSession = functions.https.onCall(
     }
 
     try {
+      console.log("DEBUG: Loading pricing config...");
       const config = loadPricingConfig();
+      console.log("DEBUG: Pricing config loaded successfully");
       const plan = config.plans[planId as keyof typeof config.plans];
+
+      console.log("DEBUG: Plan found:", plan);
 
       if (!plan || !plan.stripePriceId) {
         throw new functions.https.HttpsError(
@@ -130,7 +149,6 @@ export const createCheckoutSession = functions.https.onCall(
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         client_reference_id: userId, // Link to Firebase UID for cross-device access
-        customer_email: context.auth?.token.email, // Ensure email consistency
         payment_method_types: ["card"],
         line_items: [
           {
