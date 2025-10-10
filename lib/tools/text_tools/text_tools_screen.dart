@@ -6,6 +6,8 @@ import 'logic/slugify.dart';
 import 'logic/counters.dart';
 import 'logic/uuid_gen.dart';
 import '../../core/ui/clipboard_btn.dart';
+import '../../cross/widgets/share_toolbar.dart';
+import '../../shared/cross_tool/share_envelope.dart';
 
 class TextToolsScreen extends StatefulWidget {
   const TextToolsScreen({super.key});
@@ -24,6 +26,46 @@ class _TextToolsScreenState extends State<TextToolsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
+    
+    // Listen for share intents
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleShareIntent();
+    });
+  }
+
+  void _handleShareIntent() {
+    // Handle share intents from URL parameters or ShareBus
+    // This would be called when navigating to text tools with data
+  }
+
+  Map<ShareKind, dynamic> _getExportData() {
+    final input = _inputController.text;
+    final output = _outputController.text;
+    
+    return {
+      ShareKind.text: output.isNotEmpty ? output : input,
+      if (output.isNotEmpty && input.isNotEmpty)
+        ShareKind.json: {
+          'input': input,
+          'output': output,
+          'operation': 'text_processing',
+        },
+    };
+  }
+
+  void _onImport(ShareEnvelope envelope, String sourceTool) {
+    setState(() {
+      if (envelope.kind == ShareKind.text) {
+        _inputController.text = envelope.value as String;
+      } else if (envelope.kind == ShareKind.json) {
+        final data = envelope.value as Map<String, dynamic>;
+        if (data.containsKey('text')) {
+          _inputController.text = data['text'] as String;
+        } else if (data.containsKey('input')) {
+          _inputController.text = data['input'] as String;
+        }
+      }
+    });
   }
 
   @override
@@ -456,6 +498,14 @@ class _TextToolsScreenState extends State<TextToolsScreen>
                 ],
               ),
             ),
+          ),
+          // Add ShareToolbar for cross-tool integration
+          ShareToolbar(
+            toolId: 'text_tools',
+            acceptedTypes: const [ShareKind.text, ShareKind.json],
+            exportData: _getExportData,
+            onImport: _onImport,
+            compact: true,
           ),
         ],
       ),

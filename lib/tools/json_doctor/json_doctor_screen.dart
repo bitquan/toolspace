@@ -6,6 +6,8 @@ import 'logic/jsonpath_query.dart';
 import '../../core/services/shared_data_service.dart';
 import '../../core/ui/import_data_button.dart';
 import '../../core/ui/share_data_button.dart';
+import '../../cross/widgets/share_toolbar.dart';
+import '../../shared/cross_tool/share_envelope.dart';
 
 /// JSON Doctor - Validate, format, and repair JSON with instant feedback
 class JsonDoctorScreen extends StatefulWidget {
@@ -59,6 +61,41 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
     _tabController.dispose();
     _pulseController.dispose();
     super.dispose();
+  }
+
+  Map<ShareKind, dynamic> _getExportData() {
+    final input = _inputController.text.trim();
+    final output = _outputController.text.trim();
+    
+    Map<ShareKind, dynamic> exportData = {};
+    
+    // Always export text
+    exportData[ShareKind.text] = output.isNotEmpty ? output : input;
+    
+    // Export as JSON if valid
+    try {
+      final dynamic jsonData = jsonDecode(output.isNotEmpty ? output : input);
+      exportData[ShareKind.json] = jsonData;
+    } catch (e) {
+      // If invalid JSON, just export as text
+    }
+    
+    return exportData;
+  }
+
+  void _onImport(ShareEnvelope envelope, String sourceTool) {
+    setState(() {
+      if (envelope.kind == ShareKind.text) {
+        _inputController.text = envelope.value as String;
+      } else if (envelope.kind == ShareKind.json) {
+        try {
+          final jsonStr = const JsonEncoder.withIndent('  ').convert(envelope.value);
+          _inputController.text = jsonStr;
+        } catch (e) {
+          _inputController.text = envelope.value.toString();
+        }
+      }
+    });
   }
 
   void _validateJson() {
