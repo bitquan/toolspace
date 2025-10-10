@@ -25,7 +25,7 @@ export function loadPricingConfig(): PricingConfig {
     return cachedPricingConfig;
   }
 
-  const configPath = path.resolve(__dirname, "../../../config/pricing.json");
+  const configPath = path.resolve(__dirname, "../config/pricing.json");
   const configData = fs.readFileSync(configPath, "utf8");
   cachedPricingConfig = JSON.parse(configData) as PricingConfig;
   return cachedPricingConfig;

@@ -112,22 +112,31 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
       final successUrl = widget.successUrl ?? '$baseUrl#/billing/success';
       final cancelUrl = widget.cancelUrl ?? '$baseUrl#/billing/cancel';
 
+      print('DEBUG: Calling createCheckoutSession with planId: ${planId.id}');
+      print('DEBUG: successUrl: $successUrl');
+      print('DEBUG: cancelUrl: $cancelUrl');
+
       final result = await widget.billingService.createCheckoutSession(
         planId: planId,
         successUrl: successUrl,
         cancelUrl: cancelUrl,
       );
 
+      print('DEBUG: Got result: $result');
       final checkoutUrl = result['url'] as String;
+      print('DEBUG: checkoutUrl: $checkoutUrl');
       final uri = Uri.parse(checkoutUrl);
 
       if (await canLaunchUrl(uri)) {
+        print('DEBUG: Launching URL: $uri');
         await launchUrl(uri, mode: LaunchMode.externalApplication);
         if (mounted) Navigator.of(context).pop();
       } else {
+        print('DEBUG: Cannot launch URL: $uri');
         if (mounted) _showError('Could not open checkout page');
       }
     } catch (e) {
+      print('DEBUG: Error in _proceedToCheckout: $e');
       if (mounted) {
         // Handle email verification error specifically
         if (e.toString().contains('Email verification required')) {

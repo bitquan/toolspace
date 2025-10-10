@@ -352,12 +352,19 @@ class BillingService {
     required String successUrl,
     required String cancelUrl,
   }) async {
+    print('DEBUG: BillingService.createCheckoutSession called');
+    print('DEBUG: planId: ${planId.id}, successUrl: $successUrl, cancelUrl: $cancelUrl');
+    
     final callable = _functions.httpsCallable('createCheckoutSession');
+    print('DEBUG: Calling Firebase function: createCheckoutSession');
+    
     final result = await callable.call({
       'planId': planId.id,
       'successUrl': successUrl,
       'cancelUrl': cancelUrl,
     });
+    
+    print('DEBUG: Firebase function result: ${result.data}');
     return result.data as Map<String, dynamic>;
   }
 

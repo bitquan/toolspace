@@ -1,0 +1,245 @@
+{
+  "$schema": "./pricing.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-06",
+  "plans": {
+    "free": {
+      "id": "free",
+      "name": "Free",
+      "displayName": "Free",
+      "description": "Perfect for trying out Toolspace",
+      "price": {
+        "amount": 0,
+        "currency": "USD",
+        "interval": null
+      },
+      "stripePriceId": null,
+      "stripeProductId": null,
+      "features": [
+        "Access to all 17 tools",
+        "3 heavy operations per day",
+        "10MB max file size",
+        "Community support"
+      ],
+      "entitlements": {
+        "heavyOpsPerDay": 3,
+        "lightOpsPerDay": 1000,
+        "maxFileSize": 10485760,
+        "maxBatchSize": 1,
+        "priorityQueue": false,
+        "supportLevel": "community",
+        "canExportBatch": false,
+        "advancedFeatures": false
+      },
+      "restrictions": {
+        "heavyTools": [
+          "file_merger",
+          "image_resizer",
+          "markdown_to_pdf",
+          "qr_maker_batch",
+          "json_to_csv",
+          "invoice_lite",
+          "audio_converter",
+          "file_compressor"
+        ],
+        "requiresUpgrade": true
+      }
+    },
+    "pro": {
+      "id": "pro",
+      "name": "Pro",
+      "displayName": "Pro",
+      "description": "For power users and professionals",
+      "price": {
+        "amount": 900,
+        "currency": "USD",
+        "interval": "month"
+      },
+      "stripePriceId": "price_1SG489QJjz2bfxmClomM29uG",
+      "stripeProductId": "prod_TCT3NBZa3YtVb5",
+      "popular": true,
+      "features": [
+        "Everything in Free",
+        "200 heavy operations per day",
+        "50MB max file size",
+        "Batch processing (up to 20)",
+        "Export batch results",
+        "Email support"
+      ],
+      "entitlements": {
+        "heavyOpsPerDay": 200,
+        "lightOpsPerDay": 10000,
+        "maxFileSize": 52428800,
+        "maxBatchSize": 20,
+        "priorityQueue": false,
+        "supportLevel": "email",
+        "canExportBatch": true,
+        "advancedFeatures": true
+      },
+      "restrictions": {
+        "heavyTools": [],
+        "requiresUpgrade": false
+      }
+    },
+    "pro_plus": {
+      "id": "pro_plus",
+      "name": "Pro+",
+      "displayName": "Pro+",
+      "description": "Maximum power for teams and high-volume use",
+      "price": {
+        "amount": 1900,
+        "currency": "USD",
+        "interval": "month"
+      },
+      "stripePriceId": "price_1SG48MQJjz2bfxmCtCPRhNnV",
+      "stripeProductId": "prod_TCT4agTGJjToka",
+      "features": [
+        "Everything in Pro",
+        "2,000 heavy operations per day",
+        "100MB max file size",
+        "Batch processing (up to 100)",
+        "Priority queue (faster processing)",
+        "Priority email support",
+        "Advanced API access (coming soon)"
+      ],
+      "entitlements": {
+        "heavyOpsPerDay": 2000,
+        "lightOpsPerDay": 100000,
+        "maxFileSize": 104857600,
+        "maxBatchSize": 100,
+        "priorityQueue": true,
+        "supportLevel": "priority",
+        "canExportBatch": true,
+        "advancedFeatures": true
+      },
+      "restrictions": {
+        "heavyTools": [],
+        "requiresUpgrade": false
+      }
+    }
+  },
+  "tools": {
+    "file_merger": {
+      "name": "File Merger",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Merge multiple files with advanced options"
+    },
+    "image_resizer": {
+      "name": "Image Resizer",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Batch resize and optimize images"
+    },
+    "markdown_to_pdf": {
+      "name": "Markdown to PDF",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Convert markdown documents to PDF"
+    },
+    "qr_maker_batch": {
+      "name": "Batch QR Generator",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Generate QR codes in batch"
+    },
+    "json_to_csv": {
+      "name": "JSON to CSV",
+      "category": "heavy",
+      "minPlan": "pro",
+      "description": "Convert JSON to CSV with flattening"
+    },
+    "text_tools": {
+      "name": "Text Tools",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Text manipulation utilities"
+    },
+    "json_doctor": {
+      "name": "JSON Doctor",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Format and validate JSON"
+    },
+    "text_diff": {
+      "name": "Text Diff",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Compare text differences"
+    },
+    "qr_maker": {
+      "name": "QR Maker",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Generate single QR codes"
+    },
+    "url_shortener": {
+      "name": "URL Shortener",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Shorten URLs"
+    },
+    "codec_lab": {
+      "name": "Codec Lab",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Encode and decode text"
+    },
+    "time_converter": {
+      "name": "Time Converter",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Convert between time zones"
+    },
+    "regex_tester": {
+      "name": "Regex Tester",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Test regular expressions"
+    },
+    "id_generator": {
+      "name": "ID Generator",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Generate UUIDs and IDs"
+    },
+    "palette_extractor": {
+      "name": "Palette Extractor",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Extract colors from images"
+    },
+    "csv_cleaner": {
+      "name": "CSV Cleaner",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Clean and format CSV data"
+    },
+    "password_generator": {
+      "name": "Password Generator",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Generate secure passwords"
+    },
+    "json_flattener": {
+      "name": "JSON Flattener",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Flatten nested JSON"
+    },
+    "unit_converter": {
+      "name": "Unit Converter",
+      "category": "light",
+      "minPlan": "free",
+      "description": "Convert between units"
+    }
+  },
+  "metadata": {
+    "trialDays": 0,
+    "gracePeriodDays": 3,
+    "defaultPlan": "free",
+    "currencySymbol": "$",
+    "billingPortalUrl": "https://billing.stripe.com/p/login/test_",
+    "supportEmail": "support@toolspace.dev"
+  }
+}
