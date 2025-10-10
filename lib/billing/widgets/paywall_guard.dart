@@ -203,6 +203,7 @@ class _PaywallGuardState extends State<PaywallGuard> {
 
     // Show quota banner if approaching limits
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (_shouldShowQuotaBanner())
           QuotaBanner(
@@ -211,7 +212,7 @@ class _PaywallGuardState extends State<PaywallGuard> {
             currentPlan: _profile!.planId,
             onUpgrade: _showUpgradeSheet,
           ),
-        Expanded(child: widget.child),
+        Flexible(child: widget.child),
       ],
     );
   }

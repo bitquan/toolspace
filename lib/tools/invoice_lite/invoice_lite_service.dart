@@ -60,7 +60,7 @@ class InvoiceLiteService {
   /// Add an item to the invoice
   InvoiceLite addItem(InvoiceLite invoice, InvoiceItem item) {
     _validateItem(item);
-    
+
     final newItems = List<InvoiceItem>.from(invoice.items)..add(item);
     return invoice.copyWith(items: newItems);
   }
@@ -158,10 +158,10 @@ class InvoiceLiteService {
 
     try {
       final pdfUrl = await _backend.generatePdf(invoice);
-      
+
       // Track usage
       await _billing.trackHeavyOp();
-      
+
       return pdfUrl;
     } catch (e) {
       throw InvoiceValidationError('Failed to generate PDF: $e');
@@ -189,10 +189,10 @@ class InvoiceLiteService {
 
     try {
       final payLink = await _backend.createPaymentLink(invoice);
-      
+
       // Track usage
       await _billing.trackHeavyOp();
-      
+
       return payLink;
     } catch (e) {
       throw InvoiceValidationError('Failed to create payment link: $e');
@@ -213,8 +213,9 @@ class InvoiceLiteService {
       case ShareKind.text:
         // Import as client info
         final text = envelope.value as String;
-        final lines = text.split('\n').where((l) => l.trim().isNotEmpty).toList();
-        
+        final lines =
+            text.split('\n').where((l) => l.trim().isNotEmpty).toList();
+
         if (lines.isEmpty) return draft;
 
         // Try to parse email from first line
@@ -235,7 +236,7 @@ class InvoiceLiteService {
         // Import full or partial invoice data
         try {
           final data = envelope.value as Map<String, dynamic>;
-          
+
           // If it's a full invoice, parse it
           if (data.containsKey('id') && data.containsKey('invoiceNumber')) {
             return InvoiceLite.fromJson(data);
@@ -245,7 +246,8 @@ class InvoiceLiteService {
           return draft.copyWith(
             clientName: data['clientName'] as String? ?? draft.clientName,
             clientEmail: data['clientEmail'] as String? ?? draft.clientEmail,
-            clientAddress: data['clientAddress'] as String? ?? draft.clientAddress,
+            clientAddress:
+                data['clientAddress'] as String? ?? draft.clientAddress,
             notes: data['notes'] as String? ?? draft.notes,
           );
         } catch (e) {
@@ -408,7 +410,7 @@ Total: $total
 
   Future<void> _checkToolAccess() async {
     final result = await _billing.canAccessTool('invoice_lite');
-    
+
     if (!result.allowed) {
       throw PaywallRequiredError(
         result.reason ?? 'Invoice Lite requires a paid plan',
@@ -420,7 +422,7 @@ Total: $total
 
   Future<void> _checkHeavyOpQuota() async {
     final result = await _billing.canPerformHeavyOp();
-    
+
     if (!result.allowed) {
       throw PaywallRequiredError(
         result.reason ?? 'Daily operation limit reached',

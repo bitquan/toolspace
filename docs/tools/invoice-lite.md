@@ -1,8 +1,7 @@
 # Invoice Lite Tool
 
-> **Status**: Service Layer Complete (Phase-3, Iteration 1)  
-> **Tool ID**: `invoice_lite`  
-> **Min Plan**: Pro  
+> **Status**: Service Layer Complete (Phase-3, Iteration 1)
+> **Tool ID**: `invoice_lite` > **Min Plan**: Pro
 > **Quota**: Heavy Ops (PDF generation, payment links)
 
 ## Overview
@@ -10,6 +9,7 @@
 Invoice Lite is a professional invoicing tool that enables users to create, customize, and share invoices with clients. It provides PDF export, Stripe payment link generation, and cross-tool data sharing capabilities.
 
 **Key Features:**
+
 - ✨ Create professional invoices with business and client info
 - 📄 Generate PDF invoices (requires Pro plan)
 - 💳 Create Stripe payment links (requires Pro plan)
@@ -28,18 +28,18 @@ Complete invoice with business info, client info, line items, and calculations.
 class InvoiceLite {
   final String id;                    // Unique ID (nanoid)
   final DateTime createdAt;           // Creation timestamp
-  
+
   // Business info
   final String businessName;
   final String businessEmail;
   final String? businessAddress;
   final String? businessPhone;
-  
+
   // Client info
   final String clientName;
   final String clientEmail;
   final String? clientAddress;
-  
+
   // Invoice details
   final String invoiceNumber;         // e.g., "INV-A1B2C3D4"
   final DateTime invoiceDate;
@@ -51,7 +51,7 @@ class InvoiceLite {
   final double discountPercent;       // Percentage discount
   final String? notes;
   final String? paymentTerms;
-  
+
   // Computed getters
   double get subtotal;                // Sum of all items
   double get totalDiscount;           // Fixed + percentage discount
@@ -71,7 +71,7 @@ class InvoiceItem {
   final double quantity;
   final double unitPrice;
   final String? notes;
-  
+
   double get total => quantity * unitPrice;
 }
 ```
@@ -117,6 +117,7 @@ final service = InvoiceLiteService(
 #### Core CRUD Operations
 
 **Create a draft invoice:**
+
 ```dart
 final invoice = service.draft(
   business: BusinessInfo(
@@ -132,6 +133,7 @@ final invoice = service.draft(
 ```
 
 **Add items:**
+
 ```dart
 invoice = service.addItem(
   invoice,
@@ -144,11 +146,13 @@ invoice = service.addItem(
 ```
 
 **Update an item:**
+
 ```dart
 invoice = service.updateItem(invoice, 0, updatedItem);
 ```
 
 **Remove an item:**
+
 ```dart
 invoice = service.removeItem(invoice, 0);
 ```
@@ -156,21 +160,25 @@ invoice = service.removeItem(invoice, 0);
 #### Tax & Discount
 
 **Apply tax:**
+
 ```dart
 invoice = service.applyTax(invoice, percent: 10); // 10% tax
 ```
 
 **Apply fixed discount:**
+
 ```dart
 invoice = service.applyDiscount(invoice, fixed: 50.0);
 ```
 
 **Apply percentage discount:**
+
 ```dart
 invoice = service.applyDiscount(invoice, percent: 15); // 15% off
 ```
 
 **Calculate totals:**
+
 ```dart
 invoice = service.calculateTotals(invoice); // Validates and returns
 ```
@@ -178,6 +186,7 @@ invoice = service.calculateTotals(invoice); // Validates and returns
 #### Backend Operations (Heavy Ops)
 
 **Generate PDF:**
+
 ```dart
 try {
   final pdfUrl = await service.getInvoicePdfUrl(invoice);
@@ -192,6 +201,7 @@ try {
 ```
 
 **Create payment link:**
+
 ```dart
 try {
   final payLink = await service.createPayLink(invoice);
@@ -204,6 +214,7 @@ try {
 #### Cross-Tool Integration
 
 **Export as JSON:**
+
 ```dart
 final envelope = service.exportAsJson(invoice);
 // Share with other tools (e.g., JSON Doctor)
@@ -211,6 +222,7 @@ shareBus.publish(envelope);
 ```
 
 **Export payment link:**
+
 ```dart
 final payLink = Uri.parse('https://checkout.stripe.com/...');
 final envelope = service.exportPayLink(payLink, invoice);
@@ -218,12 +230,14 @@ final envelope = service.exportPayLink(payLink, invoice);
 ```
 
 **Export PDF URL:**
+
 ```dart
 final pdfUrl = Uri.parse('https://storage.com/invoice.pdf');
 final envelope = service.exportPdfUrl(pdfUrl, invoice);
 ```
 
 **Import from text:**
+
 ```dart
 final clientEnvelope = ShareEnvelope(
   kind: ShareKind.text,
@@ -234,6 +248,7 @@ invoice = service.importFromEnvelope(invoice, clientEnvelope);
 ```
 
 **Import from JSON:**
+
 ```dart
 final dataEnvelope = ShareEnvelope(
   kind: ShareKind.json,
@@ -250,6 +265,7 @@ invoice = service.importFromEnvelope(invoice, dataEnvelope);
 #### Formatting
 
 **Format money:**
+
 ```dart
 service.formatMoney(1234.56, 'USD'); // "$1,234.56"
 service.formatMoney(1234.56, 'EUR'); // "€1,234.56"
@@ -257,6 +273,7 @@ service.formatMoney(1234, 'JPY');    // "¥1,234"
 ```
 
 **Get invoice summary:**
+
 ```dart
 final summary = service.getInvoiceSummary(invoice);
 print(summary);
@@ -264,7 +281,7 @@ print(summary);
 // Invoice INV-A1B2C3D4
 // From: Acme Corp
 // To: Client Co
-// 
+//
 // Items: 3
 // Subtotal: $1,500.00
 // Tax: $135.00
@@ -304,6 +321,7 @@ try {
 ```
 
 **Common validation failures:**
+
 - Empty description, business name, or client email
 - Negative quantity or price
 - Invalid currency code (must be 3-letter ISO-4217)
@@ -325,6 +343,7 @@ try {
 ```
 
 **Paywall triggers:**
+
 - Tool access (`canAccessTool('invoice_lite')` fails)
 - Heavy operation quota (`canPerformHeavyOp()` fails)
 
@@ -362,15 +381,18 @@ final adapter = FunctionsInvoiceBackendAdapter();
 ### Heavy Operations
 
 **What counts as heavy op:**
+
 - PDF generation (`getInvoicePdfUrl`)
 - Payment link creation (`createPayLink`)
 
 **Quota limits:**
+
 - **Free**: 0/day (tool access blocked)
 - **Pro**: 10/day
 - **Pro+**: 50/day
 
 **Tracking:**
+
 ```dart
 await billingService.trackHeavyOp();
 ```
@@ -385,27 +407,27 @@ import 'package:toolspace/tools/invoice_lite/models/models.dart';
 
 void main() async {
   final service = InvoiceLiteService(billing: billingService);
-  
+
   // Create draft
   var invoice = service.draft(
     business: BusinessInfo(name: 'My Business', email: 'me@biz.com'),
     client: ClientInfo(name: 'Client Inc', email: 'client@inc.com'),
   );
-  
+
   // Add items
   invoice = service.addItem(invoice, InvoiceItem(
     description: 'Consulting',
     quantity: 5,
     unitPrice: 200,
   ));
-  
+
   // Apply tax and discount
   invoice = service.applyTax(invoice, percent: 8);
   invoice = service.applyDiscount(invoice, percent: 10);
-  
+
   print('Total: ${service.formatMoney(invoice.total, invoice.currency)}');
   // Total: $972.00
-  
+
   // Generate PDF
   final pdfUrl = await service.getInvoicePdfUrl(invoice);
   print('Download: $pdfUrl');
@@ -443,14 +465,14 @@ class MockBillingService {
       planId: PlanId.pro,
     );
   }
-  
+
   Future<EntitlementCheckResult> canPerformHeavyOp() async {
     return EntitlementCheckResult(
       allowed: _allowHeavyOp,
       planId: PlanId.pro,
     );
   }
-  
+
   Future<void> trackHeavyOp() async {}
 }
 ```
@@ -458,6 +480,7 @@ class MockBillingService {
 ## Roadmap
 
 ### Phase 3A (Current - Service Layer) ✅
+
 - [x] Complete data models
 - [x] Service API implementation
 - [x] Mock backend adapter
@@ -467,6 +490,7 @@ class MockBillingService {
 - [x] Comprehensive unit tests (44 tests, 100% pass)
 
 ### Phase 3B (Next - UI & Backend)
+
 - [ ] Invoice Lite screen (UI)
 - [ ] Firebase Functions for PDF generation
 - [ ] Firebase Functions for Stripe payment links
@@ -475,6 +499,7 @@ class MockBillingService {
 - [ ] Integration with routes and home grid
 
 ### Phase 3C (Future - Enhancements)
+
 - [ ] Invoice templates
 - [ ] Recurring invoices
 - [ ] Payment tracking
@@ -492,5 +517,6 @@ class MockBillingService {
 ## Support
 
 For issues or questions:
+
 - GitHub Issues: [toolspace#109](https://github.com/bitquan/toolspace/issues/109)
 - Dev Log: `dev-log/phase-3-*.md`

@@ -26,7 +26,7 @@ class _TextToolsScreenState extends State<TextToolsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
-    
+
     // Listen for share intents
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleShareIntent();
@@ -41,7 +41,7 @@ class _TextToolsScreenState extends State<TextToolsScreen>
   Map<ShareKind, dynamic> _getExportData() {
     final input = _inputController.text;
     final output = _outputController.text;
-    
+
     return {
       ShareKind.text: output.isNotEmpty ? output : input,
       if (output.isNotEmpty && input.isNotEmpty)

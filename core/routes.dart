@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import '../lib/tools/invoice_lite/invoice_lite_screen.dart';
+import '../lib/tools/file_compressor/file_compressor_screen.dart';
+import '../lib/tools/audio_converter/audio_converter_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
   static const String home = '/';
   static const String quickInvoice = '/tools/quick-invoice';
+  static const String invoiceLite = '/tools/invoice-lite';
+  static const String fileCompressor = '/tools/file-compressor';
+  static const String audioConverter = '/tools/audio-converter';
   static const String textTools = '/tools/text-tools';
   static const String fileMerger = '/tools/file-merger';
   static const String auth = '/auth';
@@ -18,6 +24,18 @@ class ToolspaceRouter {
       case quickInvoice:
         return MaterialPageRoute(
           builder: (_) => const QuickInvoiceScreen(),
+        );
+      case invoiceLite:
+        return MaterialPageRoute(
+          builder: (_) => const InvoiceLiteScreen(),
+        );
+      case fileCompressor:
+        return MaterialPageRoute(
+          builder: (_) => const FileCompressorScreen(),
+        );
+      case audioConverter:
+        return MaterialPageRoute(
+          builder: (_) => const AudioConverterScreen(),
         );
       case textTools:
         return MaterialPageRoute(

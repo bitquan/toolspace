@@ -424,20 +424,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": {
-        "owner": "flutter",
-        "pattern": [
-          {
-            "regexp": "^(.*)$",
-            "file": 1
-          }
-        ],
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^Launching",
-          "endsPattern": "Flutter run key commands\\."
-        }
-      },
+      "problemMatcher": [],
       "detail": "Run Flutter app in Chrome browser with hot reload"
     },
     {

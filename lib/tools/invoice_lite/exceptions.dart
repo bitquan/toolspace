@@ -11,9 +11,8 @@ class InvoiceValidationError implements Exception {
   @override
   String toString() {
     if (fieldErrors != null && fieldErrors!.isNotEmpty) {
-      final errors = fieldErrors!.entries
-          .map((e) => '${e.key}: ${e.value}')
-          .join(', ');
+      final errors =
+          fieldErrors!.entries.map((e) => '${e.key}: ${e.value}').join(', ');
       return 'InvoiceValidationError: $message ($errors)';
     }
     return 'InvoiceValidationError: $message';

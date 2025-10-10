@@ -20,11 +20,17 @@ import '../tools/image_resizer/image_resizer_screen.dart';
 import '../tools/password_gen/password_gen_screen.dart';
 import '../tools/json_flatten/json_flatten_screen.dart';
 import '../tools/unit_converter/unit_converter_screen.dart';
+import '../tools/invoice_lite/invoice_lite_screen.dart';
+import '../tools/audio_converter/audio_converter_screen.dart';
+import '../tools/file_compressor/file_compressor_screen.dart';
 import '../auth/screens/signin_screen.dart';
 import '../auth/screens/signup_screen.dart';
 import '../auth/screens/password_reset_screen.dart';
 import '../auth/screens/email_verification_screen.dart';
 import '../auth/screens/account_screen.dart';
+import '../screens/billing/billing_success_screen.dart';
+import '../screens/billing/billing_cancel_screen.dart';
+import '../dev/e2e_playground.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
@@ -47,6 +53,11 @@ class ToolspaceRouter {
   static const String passwordGen = '/tools/password-gen';
   static const String jsonFlatten = '/tools/json-flatten';
   static const String unitConverter = '/tools/unit-converter';
+  // Phase 3 tools
+  static const String invoiceLite = '/tools/invoice-lite';
+  static const String audioConverter = '/tools/audio-converter';
+  static const String fileCompressor = '/tools/file-compressor';
+  // Auth and billing
   static const String auth = '/auth';
   static const String authSignIn = '/auth/signin';
   static const String authSignUp = '/auth/signup';
@@ -54,9 +65,13 @@ class ToolspaceRouter {
   static const String authVerify = '/auth/verify';
   static const String account = '/account';
   static const String billing = '/billing';
+  static const String billingSuccess = '/billing/success';
+  static const String billingCancel = '/billing/cancel';
   static const String features = '/features';
   static const String pricing = '/pricing';
   static const String signup = '/signup';
+  // Dev tools
+  static const String e2ePlayground = '/dev/e2e-playground';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -141,6 +156,19 @@ class ToolspaceRouter {
         return MaterialPageRoute(
           builder: (_) => const UnitConverterScreen(),
         );
+      // Phase 3 tools (PaywallGuard wrapped)
+      case invoiceLite:
+        return MaterialPageRoute(
+          builder: (_) => const InvoiceLiteScreen(),
+        );
+      case audioConverter:
+        return MaterialPageRoute(
+          builder: (_) => const AudioConverterScreen(),
+        );
+      case fileCompressor:
+        return MaterialPageRoute(
+          builder: (_) => const FileCompressorScreen(),
+        );
       case auth:
         return MaterialPageRoute(
           builder: (_) => const AuthScreen(),
@@ -169,6 +197,14 @@ class ToolspaceRouter {
         return MaterialPageRoute(
           builder: (_) => const BillingScreen(),
         );
+      case billingSuccess:
+        return MaterialPageRoute(
+          builder: (_) => const BillingSuccessScreen(),
+        );
+      case billingCancel:
+        return MaterialPageRoute(
+          builder: (_) => const BillingCancelScreen(),
+        );
       case features:
         return MaterialPageRoute(
           builder: (_) => const FeaturesScreen(),
@@ -180,6 +216,11 @@ class ToolspaceRouter {
       case signup:
         return MaterialPageRoute(
           builder: (_) => const SignUpScreen(),
+        );
+      // Dev tools
+      case e2ePlayground:
+        return MaterialPageRoute(
+          builder: (_) => const E2EPlaygroundScreen(),
         );
       default:
         return MaterialPageRoute(

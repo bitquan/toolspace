@@ -28,7 +28,7 @@ class ShareToolbar extends StatefulWidget {
 class _ShareToolbarState extends State<ShareToolbar> {
   final ShareBus _shareBus = ShareBus.instance;
   final HandoffStore _handoffStore = HandoffStore.instance;
-  
+
   List<ShareEnvelope> _availableEnvelopes = [];
   List<ShareEnvelope> _recentHandoffs = [];
 
@@ -116,8 +116,9 @@ class _ShareToolbarState extends State<ShareToolbar> {
   }
 
   Widget _buildImportButton() {
-    final hasData = _availableEnvelopes.isNotEmpty || _recentHandoffs.isNotEmpty;
-    
+    final hasData =
+        _availableEnvelopes.isNotEmpty || _recentHandoffs.isNotEmpty;
+
     return PopupMenuButton<ShareEnvelope>(
       enabled: hasData,
       onSelected: _onImportSelected,
@@ -190,17 +191,19 @@ class _ShareToolbarState extends State<ShareToolbar> {
       onSelected: _onExportSelected,
       itemBuilder: (context) {
         final exportData = widget.exportData();
-        return exportData.keys.map((kind) => PopupMenuItem<ShareKind>(
-              value: kind,
-              child: ListTile(
-                dense: true,
-                leading: Icon(_getKindIcon(kind), size: 16),
-                title: Text(
-                  'Export as ${_getKindLabel(kind)}',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            )).toList();
+        return exportData.keys
+            .map((kind) => PopupMenuItem<ShareKind>(
+                  value: kind,
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(_getKindIcon(kind), size: 16),
+                    title: Text(
+                      'Export as ${_getKindLabel(kind)}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ))
+            .toList();
       },
       child: OutlinedButton.icon(
         onPressed: null,
@@ -213,17 +216,19 @@ class _ShareToolbarState extends State<ShareToolbar> {
   Widget _buildSendToButton() {
     return PopupMenuButton<String>(
       onSelected: _onSendToSelected,
-      itemBuilder: (context) => _getTargetTools().map((tool) => PopupMenuItem<String>(
-            value: tool['id'] as String,
-            child: ListTile(
-              dense: true,
-              leading: Icon(tool['icon'] as IconData, size: 16),
-              title: Text(
-                'Send to ${tool['name']}',
-                style: const TextStyle(fontSize: 12),
-              ),
-            ),
-          )).toList(),
+      itemBuilder: (context) => _getTargetTools()
+          .map((tool) => PopupMenuItem<String>(
+                value: tool['id'] as String,
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(tool['icon'] as IconData, size: 16),
+                  title: Text(
+                    'Send to ${tool['name']}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ))
+          .toList(),
       child: OutlinedButton.icon(
         onPressed: null,
         icon: const Icon(Icons.send_outlined, size: 16),
@@ -234,15 +239,15 @@ class _ShareToolbarState extends State<ShareToolbar> {
 
   void _onImportSelected(ShareEnvelope envelope) {
     final sourceTool = envelope.meta['sourceTool'] as String? ?? 'Unknown';
-    
+
     // Consume from ShareBus if it's a recent share
     if (_availableEnvelopes.contains(envelope)) {
       _shareBus.consumeEnvelope(envelope);
     }
-    
+
     // Call the import callback
     widget.onImport?.call(envelope, sourceTool);
-    
+
     // Show success feedback
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -263,9 +268,9 @@ class _ShareToolbarState extends State<ShareToolbar> {
   void _onExportSelected(ShareKind kind) async {
     final exportData = widget.exportData();
     final data = exportData[kind];
-    
+
     if (data == null) return;
-    
+
     final envelope = ShareEnvelope(
       kind: kind,
       value: data,
@@ -274,17 +279,17 @@ class _ShareToolbarState extends State<ShareToolbar> {
         'timestamp': DateTime.now().toIso8601String(),
       },
     );
-    
+
     // Publish to ShareBus
     _shareBus.publish(envelope);
-    
+
     // Save to HandoffStore for persistence
     try {
       await _handoffStore.save(envelope);
     } catch (e) {
       // Handle auth errors silently
     }
-    
+
     // Show success feedback
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -297,11 +302,11 @@ class _ShareToolbarState extends State<ShareToolbar> {
 
   void _onSendToSelected(String targetToolId) async {
     final exportData = widget.exportData();
-    
+
     // Find the best export format for the target tool
     ShareKind? bestKind;
     dynamic bestData;
-    
+
     final targetPreferences = _getToolPreferences(targetToolId);
     for (final preferredKind in targetPreferences) {
       if (exportData.containsKey(preferredKind)) {
@@ -310,7 +315,7 @@ class _ShareToolbarState extends State<ShareToolbar> {
         break;
       }
     }
-    
+
     if (bestKind == null || bestData == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -321,7 +326,7 @@ class _ShareToolbarState extends State<ShareToolbar> {
       }
       return;
     }
-    
+
     final envelope = ShareEnvelope(
       kind: bestKind,
       value: bestData,
@@ -330,23 +335,24 @@ class _ShareToolbarState extends State<ShareToolbar> {
         'timestamp': DateTime.now().toIso8601String(),
       },
     );
-    
+
     // Create share intent and navigate
     final intent = ShareIntent(
       targetTool: targetToolId,
       envelope: envelope,
     );
-    
+
     // Publish to share bus first
     _shareBus.publish(envelope);
-    
+
     // Navigate with intent
     if (mounted) {
       Navigator.of(context).pushNamed(intent.toUrl());
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sent ${_getKindLabel(bestKind)} to ${_getToolName(targetToolId)}'),
+          content: Text(
+              'Sent ${_getKindLabel(bestKind)} to ${_getToolName(targetToolId)}'),
         ),
       );
     }
@@ -406,10 +412,18 @@ class _ShareToolbarState extends State<ShareToolbar> {
       {'id': 'url_short', 'name': 'URL Shortener', 'icon': Icons.link},
       {'id': 'codec_lab', 'name': 'Codec Lab', 'icon': Icons.transform},
       {'id': 'file_merger', 'name': 'File Merger', 'icon': Icons.merge},
-      {'id': 'image_resizer', 'name': 'Image Resizer', 'icon': Icons.photo_size_select_large},
+      {
+        'id': 'image_resizer',
+        'name': 'Image Resizer',
+        'icon': Icons.photo_size_select_large
+      },
       {'id': 'md_to_pdf', 'name': 'Markdown→PDF', 'icon': Icons.picture_as_pdf},
       {'id': 'json_flatten', 'name': 'JSON Flatten', 'icon': Icons.unfold_more},
-      {'id': 'invoice_lite', 'name': 'Invoice Lite', 'icon': Icons.receipt_long},
+      {
+        'id': 'invoice_lite',
+        'name': 'Invoice Lite',
+        'icon': Icons.receipt_long
+      },
     ];
   }
 

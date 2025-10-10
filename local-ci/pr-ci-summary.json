@@ -1,14 +1,14 @@
 {
-  "timestamp": "2025-10-09T17:32:08.717Z",
+  "timestamp": "2025-10-10T00:36:07.039Z",
   "summary": {
     "success": false,
-    "passed": 2,
+    "passed": 1,
     "failed": 1,
-    "total": 3,
-    "duration": 40140
+    "total": 2,
+    "duration": 11809
   },
   "flags": {
-    "quick": false,
+    "quick": true,
     "noEmulators": false,
     "fix": false
   },
@@ -16,26 +16,18 @@
     {
       "name": "Flutter pub get",
       "success": true,
-      "duration": 1408,
+      "duration": 1633,
       "exitCode": 0,
       "error": null,
       "logFile": "flutter-pub-get.log"
     },
     {
       "name": "Flutter analyze (ZERO tolerance)",
-      "success": true,
-      "duration": 5735,
-      "exitCode": 0,
-      "error": null,
-      "logFile": "flutter-analyze-zero-tolerance-.log"
-    },
-    {
-      "name": "Flutter test",
       "success": false,
-      "duration": 30160,
+      "duration": 7026,
       "exitCode": 1,
-      "error": "Exit code: 1",
-      "logFile": "flutter-test.log"
+      "error": "21 issues found. (ran in 5.1s)",
+      "logFile": "flutter-analyze-zero-tolerance-.log"
     }
   ]
 }

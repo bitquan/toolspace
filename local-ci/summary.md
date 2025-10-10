@@ -1,21 +1,20 @@
 # Local CI - Preflight Summary
 
-**Generated:** 2025-10-09T17:32:08.715Z
+**Generated:** 2025-10-10T00:36:07.036Z
 
-**Flags:** {"quick":false,"noEmulators":false,"fix":false}
+**Flags:** {"quick":true,"noEmulators":false,"fix":false}
 
-## Results: 2/3 passed
+## Results: 1/2 passed
 
 | Step | Status | Duration | Log |
 |------|--------|----------|-----|
-| Flutter pub get | ✅ PASS | 1408ms | [flutter-pub-get.log](logs/flutter-pub-get.log) |
-| Flutter analyze (ZERO tolerance) | ✅ PASS | 5735ms | [flutter-analyze-zero-tolerance-.log](logs/flutter-analyze-zero-tolerance-.log) |
-| Flutter test | ❌ FAIL | 30160ms | [flutter-test.log](logs/flutter-test.log) |
+| Flutter pub get | ✅ PASS | 1633ms | [flutter-pub-get.log](logs/flutter-pub-get.log) |
+| Flutter analyze (ZERO tolerance) | ❌ FAIL | 7026ms | [flutter-analyze-zero-tolerance-.log](logs/flutter-analyze-zero-tolerance-.log) |
 
 ## Failures
 
-### Flutter test
+### Flutter analyze (ZERO tolerance)
 ```
-Exit code: 1
+21 issues found. (ran in 5.1s)
 ```
 

@@ -2,16 +2,16 @@
 
 /**
  * Create 11 GitHub Issues for Phase-3 Trio Implementation
- * 
+ *
  * Run: node scripts/create-phase3-issues.mjs
  */
 
-import { execSync } from 'child_process';
+import { execSync } from "child_process";
 
 const issues = [
   {
-    title: 'Invoice Lite - Service Layer',
-    labels: ['feature', 'tools', 'area:frontend', 'ready'],
+    title: "Invoice Lite - Service Layer",
+    labels: ["feature", "tools", "area:frontend", "ready"],
     body: `## Description
 Implement the core service layer for Invoice Lite including invoice creation, calculation logic, PDF generation requests, and pay link creation.
 
@@ -50,11 +50,11 @@ test/tools/invoice_lite/
 - Requires \`lib/tools/invoice_lite/models.dart\` (already created)
 - Uses \`cloud_firestore\` for persistence
 - Uses \`firebase_auth\` for user scoping
-`
+`,
   },
   {
-    title: 'Invoice Lite - Screen UI',
-    labels: ['feature', 'tools', 'area:frontend', 'ready'],
+    title: "Invoice Lite - Screen UI",
+    labels: ["feature", "tools", "area:frontend", "ready"],
     body: `## Description
 Create the complete Invoice Lite user interface with form inputs, dynamic item rows, totals panel, and action buttons with proper billing gates.
 
@@ -108,11 +108,11 @@ test/tools/invoice_lite/
 - \`lib/billing/widgets/paywall_guard.dart\`
 - \`lib/billing/widgets/quota_banner.dart\`
 - \`lib/shared/cross_tool/share_bus.dart\`
-`
+`,
   },
   {
-    title: 'Invoice Lite - Backend Functions',
-    labels: ['feature', 'tools', 'area:backend', 'ready'],
+    title: "Invoice Lite - Backend Functions",
+    labels: ["feature", "tools", "area:backend", "ready"],
     body: `## Description
 Create Cloud Functions for generating invoice PDFs and creating Stripe payment links with proper auth, validation, and plan gates.
 
@@ -166,11 +166,11 @@ functions/test/invoice/
 - \`@google-cloud/storage\` for file uploads
 - \`stripe\` SDK for payment links
 - \`functions/src/middleware/withAuth.ts\`
-`
+`,
   },
   {
-    title: 'Invoice Lite - Cross-Tool Integration',
-    labels: ['feature', 'tools', 'area:frontend', 'ready'],
+    title: "Invoice Lite - Cross-Tool Integration",
+    labels: ["feature", "tools", "area:frontend", "ready"],
     body: `## Description
 Implement cross-tool import/export for Invoice Lite supporting JSON data import, PDF export, and Pay Link sharing to other tools.
 
@@ -215,11 +215,11 @@ lib/tools/qr_maker/qr_maker_screen.dart
 - \`lib/shared/cross_tool/share_bus.dart\`
 - \`lib/shared/cross_tool/share_envelope.dart\`
 - \`lib/shared/cross_tool/share_intent.dart\`
-`
+`,
   },
   {
-    title: 'Audio Converter - Full Tool Implementation',
-    labels: ['feature', 'tools', 'area:frontend', 'area:backend', 'ready'],
+    title: "Audio Converter - Full Tool Implementation",
+    labels: ["feature", "tools", "area:frontend", "area:backend", "ready"],
     body: `## Description
 Build complete audio conversion tool supporting multiple formats (mp3, wav, ogg, m4a) with client-side and server-side processing.
 
@@ -273,11 +273,11 @@ functions/test/media/
 ## Documentation
 - [ ] Add \`docs/tools/audio-converter.md\`
 - [ ] Document supported formats and quality settings
-`
+`,
   },
   {
-    title: 'File Compressor - Full Tool Implementation',
-    labels: ['feature', 'tools', 'area:frontend', 'area:backend', 'ready'],
+    title: "File Compressor - Full Tool Implementation",
+    labels: ["feature", "tools", "area:frontend", "area:backend", "ready"],
     body: `## Description
 Build file compression tool supporting images (quality/resize), documents (zip), with batch processing and cross-tool ingest.
 
@@ -329,11 +329,11 @@ functions/test/files/
 ## Documentation
 - [ ] Add \`docs/tools/file-compressor.md\`
 - [ ] Document compression profiles and limits
-`
+`,
   },
   {
-    title: 'Routes and Home Grid Integration',
-    labels: ['feature', 'tools', 'area:frontend', 'ready'],
+    title: "Routes and Home Grid Integration",
+    labels: ["feature", "tools", "area:frontend", "ready"],
     body: `## Description
 Add route definitions for the three new tools and integrate them into the home screen grid with "New" badges.
 
@@ -366,11 +366,11 @@ lib/tools/text_tools/text_tools_screen.dart
 lib/tools/json_doctor/json_doctor_screen.dart
 lib/tools/qr_maker/qr_maker_screen.dart
 \`\`\`
-`
+`,
   },
   {
-    title: 'Billing Configuration Update',
-    labels: ['feature', 'billing', 'area:frontend', 'ready'],
+    title: "Billing Configuration Update",
+    labels: ["feature", "billing", "area:frontend", "ready"],
     body: `## Description
 Extend billing configuration to include new heavy operations for Invoice Lite, Audio Converter, and File Compressor.
 
@@ -404,11 +404,11 @@ lib/billing/billing_service.dart
 lib/billing/billing_types.dart (if needed)
 test/billing/billing_service_test.dart
 \`\`\`
-`
+`,
   },
   {
-    title: 'Cross-Tool Wiring Verification',
-    labels: ['feature', 'tools', 'area:testing', 'ready'],
+    title: "Cross-Tool Wiring Verification",
+    labels: ["feature", "tools", "area:testing", "ready"],
     body: `## Description
 Create integration tests to verify cross-tool data sharing works correctly across all tool combinations.
 
@@ -439,11 +439,11 @@ test/integration/
 │   ├── share_bus_mock.dart
 │   ├── envelope_factory.dart
 \`\`\`
-`
+`,
   },
   {
-    title: 'Tests and CI Validation',
-    labels: ['feature', 'area:testing', 'ready'],
+    title: "Tests and CI Validation",
+    labels: ["feature", "area:testing", "ready"],
     body: `## Description
 Create unit tests, widget tests, and function tests for all new tools. Ensure CI pipeline passes with zero errors/warnings.
 
@@ -509,11 +509,11 @@ functions/test/media/
 functions/test/files/
 ├── compressFiles.test.ts
 \`\`\`
-`
+`,
   },
   {
-    title: 'Documentation and Dev-Log Update',
-    labels: ['documentation', 'tools', 'ready'],
+    title: "Documentation and Dev-Log Update",
+    labels: ["documentation", "tools", "ready"],
     body: `## Description
 Write comprehensive documentation for all three new tools and update dev-logs with implementation details and screenshots.
 
@@ -581,21 +581,23 @@ README.md (update)
 - [ ] Audio Converter: file list, conversion in progress, success
 - [ ] File Compressor: drag/drop, compression profiles, result
 - [ ] Cross-tool flow: Text Tools → JSON Doctor → Invoice Lite → QR Maker
-`
-  }
+`,
+  },
 ];
 
-console.log('🚀 Creating 11 Phase-3 Issues...\n');
+console.log("🚀 Creating 11 Phase-3 Issues...\n");
 
 issues.forEach((issue, index) => {
   const number = index + 1;
   console.log(`Creating Issue ${number}/11: ${issue.title}`);
-  
+
   try {
-    const labels = issue.labels.join(',');
-    const command = `gh issue create --title "${issue.title}" --body "${issue.body.replace(/"/g, '\\"')}" --label "${labels}"`;
-    
-    const result = execSync(command, { encoding: 'utf-8' });
+    const labels = issue.labels.join(",");
+    const command = `gh issue create --title "${
+      issue.title
+    }" --body "${issue.body.replace(/"/g, '\\"')}" --label "${labels}"`;
+
+    const result = execSync(command, { encoding: "utf-8" });
     console.log(`✅ Created: ${result.trim()}\n`);
   } catch (error) {
     console.error(`❌ Failed to create issue: ${issue.title}`);
@@ -603,4 +605,4 @@ issues.forEach((issue, index) => {
   }
 });
 
-console.log('✨ All issues created! Check GitHub for auto-branching.');
+console.log("✨ All issues created! Check GitHub for auto-branching.");

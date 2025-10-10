@@ -24,7 +24,8 @@ class InvoiceLite {
   final String currency;
   final double taxRate; // percentage (e.g., 10 for 10%)
   final double discountAmount;
-  final double discountPercent; // percentage discount (alternative to fixed amount)
+  final double
+      discountPercent; // percentage discount (alternative to fixed amount)
   final String? notes;
   final String? paymentTerms;
 

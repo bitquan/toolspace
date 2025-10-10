@@ -45,6 +45,13 @@ export { webhook as stripeWebhook } from "./billing/webhook";
 // Export legacy quota function (deprecated - for backward compatibility)
 export { getQuotaStatus } from "./tools/quota/getQuotaStatus";
 
+// Export Invoice Lite functions
+export { generateInvoicePdf } from "./tools/invoice_lite/generatePdf";
+export {
+  createInvoicePaymentLink,
+  deactivatePaymentLink,
+} from "./tools/invoice_lite/paymentLink";
+
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");

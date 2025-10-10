@@ -1,8 +1,8 @@
 # Phase-3 Dev Log: Invoice Lite Service Layer
 
-**Date**: 2025-10-09  
-**Issue**: [#109 Invoice Lite – Service Layer](https://github.com/bitquan/toolspace/issues/109)  
-**Status**: ✅ Complete  
+**Date**: 2025-10-09
+**Issue**: [#109 Invoice Lite – Service Layer](https://github.com/bitquan/toolspace/issues/109)
+**Status**: ✅ Complete
 **Author**: GitHub Copilot (AI coding agent)
 
 ---
@@ -14,6 +14,7 @@ Complete Dart service layer for Invoice Lite tool with mockable backends, billin
 ### Files Created
 
 **Models (Split into separate files):**
+
 - `lib/tools/invoice_lite/models/invoice_item.dart` - Line item with qty × price
 - `lib/tools/invoice_lite/models/business_info.dart` - Reusable business details
 - `lib/tools/invoice_lite/models/client_info.dart` - Client/customer info (new)
@@ -21,15 +22,18 @@ Complete Dart service layer for Invoice Lite tool with mockable backends, billin
 - `lib/tools/invoice_lite/models/models.dart` - Barrel file for exports
 
 **Service & Utilities:**
+
 - `lib/tools/invoice_lite/invoice_lite_service.dart` - Main service with 13 public methods
 - `lib/tools/invoice_lite/backend_adapter.dart` - Interface + Mock + Functions scaffold
 - `lib/tools/invoice_lite/exceptions.dart` - InvoiceValidationError, PaywallRequiredError
 - `lib/tools/invoice_lite/money_fmt.dart` - Pure Dart currency formatter (20+ currencies)
 
 **Tests:**
+
 - `test/tools/invoice_lite/invoice_lite_service_test.dart` - 44 tests, 100% pass rate, ≈95% coverage
 
 **Documentation:**
+
 - `docs/tools/invoice-lite.md` - Complete API reference with examples (750+ lines)
 - `dev-log/phase-3-2025-10-09-invoice-lite-service.md` - This file
 
@@ -42,6 +46,7 @@ Complete Dart service layer for Invoice Lite tool with mockable backends, billin
 **Decision**: Use `MockInvoiceBackendAdapter` by default via `const bool kUseMockInvoiceBackend = true`.
 
 **Rationale**:
+
 - PDF generation and Stripe API integration are heavy backend work
 - Service layer can be developed and tested independently
 - Frontend UI can mock PDF/paylink URLs for design iteration
@@ -54,12 +59,14 @@ Complete Dart service layer for Invoice Lite tool with mockable backends, billin
 **Decision**: `InvoiceLiteService` does NOT import `cloud_firestore`, `firebase_auth`, or `cloud_functions`. Billing checks are delegated to `BillingService` (injected).
 
 **Rationale**:
+
 - Cleaner separation of concerns
 - Easier to test (no Firebase initialization required in tests)
 - Backend adapter can be swapped (mock vs functions) without touching service
 - Follows dependency injection pattern
 
 **Implementation**: Used `dynamic` typing for `billing` parameter to allow mock injection in tests:
+
 ```dart
 InvoiceLiteService({
   required dynamic billing, // BillingService or mock
@@ -71,6 +78,7 @@ InvoiceLiteService({
 **Decision**: All models use hand-written `toJson()`/`fromJson()` methods instead of `json_serializable` or `freezed`.
 
 **Rationale**:
+
 - No external dependencies (keeps service lightweight)
 - Explicit control over serialization logic
 - No build runner step needed
@@ -83,11 +91,13 @@ InvoiceLiteService({
 **Decision**: `InvoiceLite` has both `discountAmount` (fixed) and `discountPercent` (percentage). `totalDiscount` getter computes sum.
 
 **Rationale**:
+
 - Real-world invoices often have mixed discounts ("$50 off + 10% discount")
 - Tax is applied AFTER discount (industry standard)
 - Flexible for future bulk discount features
 
 **Calculation order**:
+
 1. Subtotal = sum(items)
 2. Discount = fixed + (subtotal × percent)
 3. Tax = (subtotal - discount) × taxRate
@@ -98,16 +108,19 @@ InvoiceLiteService({
 **Decision**: Service provides `importFromEnvelope()` and three export methods: `exportAsJson()`, `exportPayLink()`, `exportPdfUrl()`.
 
 **Rationale**:
+
 - Enables Invoice Lite → JSON Doctor (validate invoice data)
 - Enables Invoice Lite → QR Maker (payment link QR codes)
 - Enables Invoice Lite → Link Shortener (shorten payment URLs)
 - Demonstrates Phase-3 cross-tool vision
 
 **Import patterns**:
+
 - `ShareKind.text` → Parse email + name for client info
 - `ShareKind.json` → Merge partial invoice data or full invoice round-trip
 
 **Export patterns**:
+
 - JSON envelope → for data tools (JSON Doctor, Transformer)
 - Text envelope → for payment links
 - FileUrl envelope → for PDF downloads
@@ -117,6 +130,7 @@ InvoiceLiteService({
 **Decision**: Created pure Dart `MoneyFmt` class with 20+ currency symbols and decimal rules.
 
 **Rationale**:
+
 - No external `intl` package dependency
 - Lightweight (100 lines)
 - Supports major currencies (USD, EUR, GBP, JPY, etc.)
@@ -133,6 +147,7 @@ InvoiceLiteService({
 **Problem**: Should `quantity: 0` be allowed?
 
 **Solution**: YES, but with validation:
+
 - `quantity >= 0` (non-negative)
 - `unitPrice >= 0` (non-negative)
 - Item total = `0 × price = 0` (valid edge case for free items)
@@ -154,6 +169,7 @@ InvoiceLiteService({
 **Problem**: Should tax be applied before or after discount?
 
 **Solution**: Industry standard = **Tax AFTER discount**:
+
 - Subtotal = $500
 - Discount (10%) = $50
 - Taxable amount = $450
@@ -167,6 +183,7 @@ InvoiceLiteService({
 **Problem**: What if user enters `currency: "INVALID"`?
 
 **Solution**: Validation via `MoneyFmt.isValidCurrency()`:
+
 - Must be exactly 3 letters
 - Must be uppercase A-Z
 - Regex: `^[A-Z]{3}$`
@@ -178,6 +195,7 @@ InvoiceLiteService({
 **Problem**: When quota/paywall blocks operation, user needs to know what plan to upgrade to.
 
 **Solution**: `PaywallRequiredError` includes:
+
 - `message`: Human-readable reason
 - `requiredPlan`: Minimum plan ID (e.g., "pro")
 - `currentPlan`: User's current plan (e.g., "free")
@@ -190,11 +208,12 @@ InvoiceLiteService({
 
 ### Test Coverage
 
-**Total tests**: 44  
-**Pass rate**: 100% (44/44)  
+**Total tests**: 44
+**Pass rate**: 100% (44/44)
 **Estimated coverage**: ≥95% (all public methods + edge cases)
 
 **Test groups**:
+
 - Core API - CRUD Operations (8 tests)
 - Calculations - Totals, Tax, Discount (9 tests)
 - Validation (4 tests)
@@ -207,28 +226,30 @@ InvoiceLiteService({
 
 ### Key Test Cases
 
-| Test | Purpose | Status |
-|------|---------|--------|
-| `draft() creates empty invoice with defaults` | Verify draft generation | ✅ |
-| `addItem() validates item` | Negative qty/price rejection | ✅ |
-| `complex calculation: subtotal, discount, tax` | Tax-after-discount math | ✅ |
-| `high precision calculation edge case` | Floating point rounding | ✅ |
-| `calculateTotals() fails on missing business info` | Validation enforcement | ✅ |
-| `PDF blocked by tool access` | Paywall at tool level | ✅ |
-| `PDF blocked by heavy op quota` | Paywall at quota level | ✅ |
-| `importFromEnvelope() round-trip with full invoice` | JSON serialization | ✅ |
-| `formatMoney() formats JPY without decimals` | Zero-decimal currencies | ✅ |
-| `FunctionsInvoiceBackendAdapter throws unimplemented` | Scaffold verification | ✅ |
+| Test                                                  | Purpose                      | Status |
+| ----------------------------------------------------- | ---------------------------- | ------ |
+| `draft() creates empty invoice with defaults`         | Verify draft generation      | ✅     |
+| `addItem() validates item`                            | Negative qty/price rejection | ✅     |
+| `complex calculation: subtotal, discount, tax`        | Tax-after-discount math      | ✅     |
+| `high precision calculation edge case`                | Floating point rounding      | ✅     |
+| `calculateTotals() fails on missing business info`    | Validation enforcement       | ✅     |
+| `PDF blocked by tool access`                          | Paywall at tool level        | ✅     |
+| `PDF blocked by heavy op quota`                       | Paywall at quota level       | ✅     |
+| `importFromEnvelope() round-trip with full invoice`   | JSON serialization           | ✅     |
+| `formatMoney() formats JPY without decimals`          | Zero-decimal currencies      | ✅     |
+| `FunctionsInvoiceBackendAdapter throws unimplemented` | Scaffold verification        | ✅     |
 
 ### Mock Strategy
 
 **MockBillingService**:
+
 - Duck-typed (not extends `BillingService` to avoid Firebase init)
 - Methods: `canAccessTool()`, `canPerformHeavyOp()`, `trackHeavyOp()`
 - Configurable via `setToolAccess()`, `setHeavyOpAccess()`
 - Tracks `trackHeavyOpCalls` for verification
 
 **TestBackendAdapter**:
+
 - Returns instant mock URLs (no delay)
 - PDF: `https://test.com/pdfs/{id}.pdf`
 - Payment: `https://checkout.test.com/pay/{id}`
@@ -240,6 +261,7 @@ InvoiceLiteService({
 ### Phase-3B (Next PR)
 
 1. **Invoice Lite Screen (UI)**
+
    - Form for business/client info
    - Dynamic item list (add/remove/edit)
    - Tax/discount controls
@@ -247,11 +269,13 @@ InvoiceLiteService({
    - PaywallGuard integration
 
 2. **Firebase Functions**
+
    - `functions/src/invoices/generateInvoicePdf.ts` - PDF generation (use `jspdf` or similar)
    - `functions/src/invoices/createInvoicePaymentLink.ts` - Stripe Checkout session creation
    - Auth checks, size limits, plan gates
 
 3. **Functions Backend Adapter**
+
    - Implement `FunctionsInvoiceBackendAdapter`
    - Call `firebase.functions().httpsCallable('generateInvoicePdf')`
    - Handle errors, retries, timeouts
@@ -264,19 +288,23 @@ InvoiceLiteService({
 ### Phase-3C (Future)
 
 5. **Invoice Templates**
+
    - Predefined business info profiles
    - Template invoices (consulting, retail, freelance)
 
 6. **Recurring Invoices**
+
    - Schedule monthly/quarterly invoices
    - Auto-send via email
 
 7. **Payment Tracking**
+
    - Webhooks from Stripe
    - Mark invoices as "Paid" / "Overdue"
    - Send reminders
 
 8. **Client Management**
+
    - Client database with history
    - Reuse client info across invoices
 
@@ -291,12 +319,14 @@ InvoiceLiteService({
 ### Service Operations
 
 All CRUD operations are **instant** (synchronous):
+
 - `draft()`: ~1μs (nanoid generation)
 - `addItem()`, `updateItem()`, `removeItem()`: ~1μs (list manipulation)
 - `applyTax()`, `applyDiscount()`: ~1μs (immutable copy)
 - `calculateTotals()`: ~1μs (validation + return)
 
 Backend operations are **async** (network-bound):
+
 - `getInvoicePdfUrl()`: Mock = 300ms, Functions = 3-10s
 - `createPayLink()`: Mock = 300ms, Functions = 1-3s
 
@@ -336,18 +366,18 @@ Backend operations are **async** (network-bound):
 
 ## Metrics
 
-| Metric | Value |
-|--------|-------|
-| Lines of code | ~1,200 (service + models) |
-| Test lines of code | ~750 |
-| Test coverage | ≥95% |
-| Pass rate | 100% (44/44) |
-| Analyzer errors | 0 |
-| Lint warnings | 0 |
-| Public API methods | 13 |
-| Supported currencies | 20+ |
-| Backend adapters | 2 (Mock, Functions scaffold) |
-| ShareEnvelope kinds | 3 (text, json, fileUrl) |
+| Metric               | Value                        |
+| -------------------- | ---------------------------- |
+| Lines of code        | ~1,200 (service + models)    |
+| Test lines of code   | ~750                         |
+| Test coverage        | ≥95%                         |
+| Pass rate            | 100% (44/44)                 |
+| Analyzer errors      | 0                            |
+| Lint warnings        | 0                            |
+| Public API methods   | 13                           |
+| Supported currencies | 20+                          |
+| Backend adapters     | 2 (Mock, Functions scaffold) |
+| ShareEnvelope kinds  | 3 (text, json, fileUrl)      |
 
 ---
 

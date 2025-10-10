@@ -60,6 +60,7 @@ void initState() {
 ## Auth Flow (Now Working Correctly)
 
 ### Sign-In Flow
+
 1. User enters email/password on `/auth/signin`
 2. `AuthService().signInWithEmail()` authenticates via Firebase
 3. Navigation: `Navigator.of(context).pushReplacementNamed('/')`
@@ -70,6 +71,7 @@ void initState() {
 8. **Shows `NeoHomeScreen` (dashboard)** ✅
 
 ### Sign-Out Flow
+
 1. User clicks "Sign Out"
 2. `FirebaseAuth.instance.signOut()`
 3. `authStateChanges()` emits `null`
@@ -80,12 +82,14 @@ void initState() {
 ## Testing
 
 ### Validation
+
 - ✅ All Flutter tests pass (570 tests, 100%)
 - ✅ Flutter analyze: No issues
 - ✅ Preflight CI: 8/8 checks passed
 - ✅ No breaking changes to auth flow
 
 ### Manual Test (Production)
+
 1. Open production app
 2. Click "Sign In"
 3. Enter valid credentials
@@ -99,6 +103,7 @@ void initState() {
 ## Related Code
 
 ### AuthGate Logic (`lib/main.dart`)
+
 ```dart
 // Root route (/) shows AuthGate
 if (settings.name == '/') {
@@ -113,13 +118,13 @@ class AuthGate extends StatefulWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snap) {
         final user = snap.data;
-        
+
         // Not signed in → Landing Page
         if (user == null) return const LandingPage();
-        
+
         // Signed in but not verified → Email Verification Screen
         if (!user.emailVerified) return const EmailVerificationScreen();
-        
+
         // Fully authenticated → Dashboard
         return const NeoHomeScreen();
       },
@@ -129,6 +134,7 @@ class AuthGate extends StatefulWidget {
 ```
 
 ### Sign-In Navigation (`lib/auth/screens/signin_screen.dart`)
+
 ```dart
 Future<void> _signIn() async {
   await AuthService().signInWithEmail(
@@ -150,14 +156,17 @@ Future<void> _signIn() async {
 ## Other Auth Edge Cases (Still Handled)
 
 ### Anonymous Users
+
 - If user is anonymous → sign out once, show landing page
 - Protected by `_hasCheckedAndClearedBadAuth` flag (prevents loop)
 
 ### Invalid Email Sessions
+
 - If user has no email → sign out once, show landing page
 - Handles old/corrupted sessions
 
 ### Email Verification
+
 - If signed in but email not verified → `EmailVerificationScreen`
 - Cannot access dashboard until verified
 
@@ -170,6 +179,7 @@ Future<void> _signIn() async {
 **Status:** ✅ Pushed to production
 
 ### Commit Message
+
 ```
 fix(auth): remove auto-signout on app startup
 
@@ -186,11 +196,13 @@ fix(auth): remove auto-signout on app startup
 ✅ **FIXED** - Sign-in now works correctly in production!
 
 ### Before
+
 - Sign in ❌
 - Stay on landing page ❌
 - Asked to sign in again ❌
 
 ### After
+
 - Sign in ✅
 - Navigate to dashboard ✅
 - Stay signed in ✅

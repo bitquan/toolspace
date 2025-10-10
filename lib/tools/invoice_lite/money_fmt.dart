@@ -44,13 +44,13 @@ class MoneyFmt {
   static String format(double amount, String currencyCode) {
     final symbol = _currencySymbols[currencyCode] ?? currencyCode;
     final decimals = _currencyDecimals[currencyCode] ?? 2;
-    
+
     // Round to appropriate decimal places
     final roundedAmount = _roundToDecimals(amount, decimals);
-    
+
     // Format with thousands separator
     final formatted = _formatWithSeparator(roundedAmount, decimals);
-    
+
     return '$symbol$formatted';
   }
 

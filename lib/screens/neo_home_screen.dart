@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../tools/text_tools/text_tools_screen.dart' deferred as text_tools;
 import '../tools/file_merger/file_merger_screen.dart' deferred as file_merger;
 import '../tools/json_doctor/json_doctor_screen.dart' deferred as json_doctor;
@@ -23,6 +24,12 @@ import '../tools/json_flatten/json_flatten_screen.dart'
     deferred as json_flatten;
 import '../tools/unit_converter/unit_converter_screen.dart'
     deferred as unit_converter;
+import '../tools/invoice_lite/invoice_lite_screen.dart'
+    deferred as invoice_lite;
+import '../tools/file_compressor/file_compressor_screen.dart'
+    deferred as file_compressor;
+import '../tools/audio_converter/audio_converter_screen.dart'
+    deferred as audio_converter;
 import '../core/ui/neo_playground_theme.dart';
 import '../core/ui/animated_background.dart';
 import '../core/ui/states.dart';
@@ -52,6 +59,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
     'Data',
     'Media',
     'Dev Tools',
+    'Business',
   ];
 
   @override
@@ -155,31 +163,73 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                 ],
                               ),
                             ),
-                            // Navigation buttons
-                            IconButton(
-                              icon: const Icon(Icons.home_outlined),
-                              tooltip: 'Landing Page',
-                              onPressed: () =>
-                                  Navigator.of(context).pushNamed('/'),
-                              style: IconButton.styleFrom(
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.1),
-                                foregroundColor:
-                                    isDark ? Colors.white : Colors.black87,
-                              ),
+                            // Navigation buttons - Account button when signed in
+                            StreamBuilder<User?>(
+                              stream: FirebaseAuth.instance.authStateChanges(),
+                              builder: (context, snapshot) {
+                                final user = snapshot.data;
+                                final isSignedIn = user != null;
+
+                                return IconButton(
+                                  icon: Icon(
+                                    isSignedIn
+                                        ? Icons.account_circle_outlined
+                                        : Icons.home_outlined,
+                                  ),
+                                  tooltip:
+                                      isSignedIn ? 'Account' : 'Landing Page',
+                                  onPressed: () {
+                                    if (isSignedIn) {
+                                      Navigator.of(context)
+                                          .pushNamed('/account');
+                                    } else {
+                                      Navigator.of(context).pushNamed('/');
+                                    }
+                                  },
+                                  style: IconButton.styleFrom(
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.1),
+                                    foregroundColor:
+                                        isDark ? Colors.white : Colors.black87,
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(width: 8),
-                            TextButton.icon(
-                              icon: const Icon(Icons.login, size: 18),
-                              label: const Text('Sign In'),
-                              onPressed: () => Navigator.of(context)
-                                  .pushNamed('/auth/signin'),
-                              style: TextButton.styleFrom(
-                                foregroundColor:
-                                    NeoPlaygroundTheme.primaryPurple,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.1),
-                              ),
+                            // Auth button (Sign In / Sign Out based on state)
+                            StreamBuilder<User?>(
+                              stream: FirebaseAuth.instance.authStateChanges(),
+                              builder: (context, snapshot) {
+                                final user = snapshot.data;
+                                final isSignedIn = user != null;
+
+                                return TextButton.icon(
+                                  icon: Icon(
+                                    isSignedIn ? Icons.logout : Icons.login,
+                                    size: 18,
+                                  ),
+                                  label:
+                                      Text(isSignedIn ? 'Sign Out' : 'Sign In'),
+                                  onPressed: () async {
+                                    if (isSignedIn) {
+                                      await FirebaseAuth.instance.signOut();
+                                      if (context.mounted) {
+                                        Navigator.of(context)
+                                            .pushReplacementNamed('/');
+                                      }
+                                    } else {
+                                      Navigator.of(context)
+                                          .pushNamed('/auth/signin');
+                                    }
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor:
+                                        NeoPlaygroundTheme.primaryPurple,
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.1),
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(width: 8),
                             // Billing button
@@ -335,6 +385,8 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
         return NeoPlaygroundTheme.accentPink;
       case 'Dev Tools':
         return NeoPlaygroundTheme.accentOrange;
+      case 'Business':
+        return const Color(0xFF10B981);
       default:
         return NeoPlaygroundTheme.primaryPurple;
     }
@@ -428,6 +480,42 @@ class _Tool {
 
 // Tools list
 final List<_Tool> _tools = [
+  _Tool(
+    id: 'invoice-lite',
+    title: 'Invoice Lite',
+    description: 'Create professional invoices with PDF export and payment links',
+    icon: Icons.receipt_long,
+    loader: () async {
+      await invoice_lite.loadLibrary();
+      return invoice_lite.InvoiceLiteScreen();
+    },
+    color: const Color(0xFF10B981),
+    category: 'Business',
+  ),
+  _Tool(
+    id: 'file-compressor',
+    title: 'File Compressor',
+    description: 'Compress files and folders into ZIP archives',
+    icon: Icons.archive,
+    loader: () async {
+      await file_compressor.loadLibrary();
+      return file_compressor.FileCompressorScreen();
+    },
+    color: const Color(0xFF8B5CF6),
+    category: 'Data',
+  ),
+  _Tool(
+    id: 'audio-converter',
+    title: 'Audio Converter',
+    description: 'Convert audio files between different formats',
+    icon: Icons.audiotrack,
+    loader: () async {
+      await audio_converter.loadLibrary();
+      return audio_converter.AudioConverterScreen();
+    },
+    color: const Color(0xFFEC4899),
+    category: 'Media',
+  ),
   _Tool(
     id: 'text-tools',
     title: 'Text Tools',

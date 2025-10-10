@@ -22,6 +22,7 @@ Each issue will be created via GitHub CLI with proper labels and structure.
 Implement the core service layer for Invoice Lite including invoice creation, calculation logic, PDF generation requests, and pay link creation.
 
 **Acceptance Criteria**:
+
 - [ ] Create `lib/tools/invoice_lite/invoice_lite_service.dart`
 - [ ] Implement `createInvoice()` - generate new invoice with unique ID
 - [ ] Implement `updateInvoice()` - update existing invoice
@@ -35,12 +36,14 @@ Implement the core service layer for Invoice Lite including invoice creation, ca
 - [ ] Store invoices under `users/{uid}/invoices/{invoiceId}` in Firestore
 
 **Tests Required**:
+
 - [ ] Unit test: `calculateTotals()` with various tax/discount scenarios
 - [ ] Unit test: Edge cases (negative amounts, zero items, rounding)
 - [ ] Unit test: `validateInvoice()` catches missing required fields
 - [ ] Unit test: Business info persistence round-trip
 
 **Files to Create**:
+
 ```
 lib/tools/invoice_lite/
 ├── invoice_lite_service.dart
@@ -49,10 +52,12 @@ test/tools/invoice_lite/
 ```
 
 **Documentation**:
+
 - [ ] Add `docs/tools/invoice-lite.md` with API usage examples
 - [ ] Document calculation formulas and rounding behavior
 
 **Dependencies**:
+
 - Requires `lib/tools/invoice_lite/models.dart` (already created)
 - Uses `cloud_firestore` for persistence
 - Uses `firebase_auth` for user scoping
@@ -69,6 +74,7 @@ test/tools/invoice_lite/
 Create the complete Invoice Lite user interface with form inputs, dynamic item rows, totals panel, and action buttons with proper billing gates.
 
 **Acceptance Criteria**:
+
 - [ ] Create `lib/tools/invoice_lite/invoice_lite_screen.dart`
 - [ ] Business info section: name, email, address, phone (auto-fill from last saved)
 - [ ] Client info section: name, email, address
@@ -88,6 +94,7 @@ Create the complete Invoice Lite user interface with form inputs, dynamic item r
 - [ ] Success/error snackbars with clear messaging
 
 **Widget Tests Required**:
+
 - [ ] Form renders all sections correctly
 - [ ] Add/remove item rows updates UI
 - [ ] Totals recalculate on input changes
@@ -95,6 +102,7 @@ Create the complete Invoice Lite user interface with form inputs, dynamic item r
 - [ ] Validation shows errors for required fields
 
 **Files to Create**:
+
 ```
 lib/tools/invoice_lite/
 ├── invoice_lite_screen.dart
@@ -108,12 +116,14 @@ test/tools/invoice_lite/
 ```
 
 **UI/UX Requirements**:
+
 - Use Neo-Playground theme (glass cards, gradient chips)
 - Responsive layout (mobile/tablet/desktop)
 - Keyboard shortcuts: Cmd/Ctrl+Enter → Generate PDF
 - Add subtle confetti animation on "PDF Generated!" success
 
 **Dependencies**:
+
 - `lib/tools/invoice_lite/invoice_lite_service.dart`
 - `lib/billing/widgets/paywall_guard.dart`
 - `lib/billing/widgets/quota_banner.dart`
@@ -131,6 +141,7 @@ test/tools/invoice_lite/
 Create Cloud Functions for generating invoice PDFs and creating Stripe payment links with proper auth, validation, and plan gates.
 
 **Acceptance Criteria**:
+
 - [ ] Create `functions/src/invoice/generateInvoicePdf.ts`
 - [ ] Create `functions/src/invoice/createInvoicePayLink.ts`
 - [ ] Create `functions/src/invoice/index.ts` with exports
@@ -155,6 +166,7 @@ Create Cloud Functions for generating invoice PDFs and creating Stripe payment l
 - [ ] Add logging for debugging
 
 **Tests Required**:
+
 - [ ] Unit test: Auth required (401 for anon)
 - [ ] Unit test: Free plan rejected (403)
 - [ ] Unit test: Pro plan success path
@@ -164,6 +176,7 @@ Create Cloud Functions for generating invoice PDFs and creating Stripe payment l
 - [ ] Integration test: End-to-end PDF generation flow
 
 **Files to Create**:
+
 ```
 functions/src/invoice/
 ├── generateInvoicePdf.ts
@@ -176,6 +189,7 @@ functions/test/invoice/
 ```
 
 **Dependencies**:
+
 - `pdfkit` or `pdfmake` for PDF rendering
 - `@google-cloud/storage` for file uploads
 - `stripe` SDK for payment links
@@ -193,6 +207,7 @@ functions/test/invoice/
 Implement cross-tool import/export for Invoice Lite supporting JSON data import, PDF export, and Pay Link sharing to other tools.
 
 **Acceptance Criteria**:
+
 - [ ] **Import Support**:
   - [ ] Accept `ShareEnvelope(kind: json)` with invoice data
   - [ ] Accept `ShareEnvelope(kind: text)` for plain text parsing (client name, items)
@@ -210,6 +225,7 @@ Implement cross-tool import/export for Invoice Lite supporting JSON data import,
 - [ ] Add undo functionality for imports (restore previous state)
 
 **Tests Required**:
+
 - [ ] Unit test: Parse JSON invoice and prefill form
 - [ ] Unit test: Export invoice as JSON matches schema
 - [ ] Unit test: Generate markdown representation
@@ -217,6 +233,7 @@ Implement cross-tool import/export for Invoice Lite supporting JSON data import,
 - [ ] Integration test: Invoice Lite → JSON Doctor → Invoice Lite round-trip
 
 **Files to Modify**:
+
 ```
 lib/tools/invoice_lite/invoice_lite_screen.dart
   - Add ShareBus listener in initState
@@ -228,6 +245,7 @@ lib/tools/qr_maker/qr_maker_screen.dart
 ```
 
 **Dependencies**:
+
 - `lib/shared/cross_tool/share_bus.dart`
 - `lib/shared/cross_tool/share_envelope.dart`
 - `lib/shared/cross_tool/share_intent.dart`
@@ -246,6 +264,7 @@ Build complete audio conversion tool supporting multiple formats (mp3, wav, ogg,
 **Acceptance Criteria**:
 
 **Frontend**:
+
 - [ ] Create `lib/tools/audio_converter/audio_converter_screen.dart`
 - [ ] File upload: drag/drop zone + file picker
 - [ ] Show file list with: name, size, format, status
@@ -262,6 +281,7 @@ Build complete audio conversion tool supporting multiple formats (mp3, wav, ogg,
 - [ ] `QuotaBanner` in header
 
 **Backend**:
+
 - [ ] Create `functions/src/media/convertAudio.ts`
 - [ ] Accept file Storage paths or upload URLs
 - [ ] Use `ffmpeg-static` or `fluent-ffmpeg` for conversions
@@ -272,12 +292,14 @@ Build complete audio conversion tool supporting multiple formats (mp3, wav, ogg,
 - [ ] Track heavy ops
 
 **Tests**:
+
 - [ ] Widget test: File list renders correctly
 - [ ] Widget test: PaywallGuard blocks batch for Free users
 - [ ] Unit test: Backend converts mp3→wav successfully
 - [ ] Unit test: Size limits enforced
 
 **Files to Create**:
+
 ```
 lib/tools/audio_converter/
 ├── audio_converter_screen.dart
@@ -293,6 +315,7 @@ functions/test/media/
 ```
 
 **Documentation**:
+
 - [ ] Add `docs/tools/audio-converter.md`
 - [ ] Document supported formats and quality settings
 
@@ -310,6 +333,7 @@ Build file compression tool supporting images (quality/resize), documents (zip),
 **Acceptance Criteria**:
 
 **Frontend**:
+
 - [ ] Create `lib/tools/file_compressor/file_compressor_screen.dart`
 - [ ] Drag/drop multi-file upload
 - [ ] Compression profiles:
@@ -324,6 +348,7 @@ Build file compression tool supporting images (quality/resize), documents (zip),
 - [ ] `QuotaBanner` in header
 
 **Backend**:
+
 - [ ] Create `functions/src/files/compressFiles.ts`
 - [ ] Accept list of `gs://` Storage paths
 - [ ] For images: use Sharp or ImageMagick for compression/resize
@@ -334,12 +359,14 @@ Build file compression tool supporting images (quality/resize), documents (zip),
 - [ ] Track heavy ops
 
 **Tests**:
+
 - [ ] Widget test: Profile selection updates UI
 - [ ] Widget test: Cross-tool ingest prefills file list
 - [ ] Unit test: Image compression reduces file size
 - [ ] Unit test: Zip creation includes all files
 
 **Files to Create**:
+
 ```
 lib/tools/file_compressor/
 ├── file_compressor_screen.dart
@@ -355,6 +382,7 @@ functions/test/files/
 ```
 
 **Documentation**:
+
 - [ ] Add `docs/tools/file-compressor.md`
 - [ ] Document compression profiles and limits
 
@@ -370,6 +398,7 @@ functions/test/files/
 Add route definitions for the three new tools and integrate them into the home screen grid with "New" badges.
 
 **Acceptance Criteria**:
+
 - [ ] Add routes to `lib/core/routes.dart`:
   - [ ] `/tools/invoice-lite` → `InvoiceLiteScreen`
   - [ ] `/tools/audio-converter` → `AudioConverterScreen`
@@ -386,11 +415,13 @@ Add route definitions for the three new tools and integrate them into the home s
 - [ ] Ensure deep links work: `/tools/invoice-lite?intent={base64}`
 
 **Tests**:
+
 - [ ] Widget test: New tool cards render on home screen
 - [ ] Widget test: Navigation to each new tool works
 - [ ] Integration test: Deep link with intent parameter loads correctly
 
 **Files to Modify**:
+
 ```
 lib/core/routes.dart
 lib/screens/home_screen.dart (or lib/screens/neo_home_screen.dart)
@@ -411,6 +442,7 @@ lib/tools/qr_maker/qr_maker_screen.dart
 Extend billing configuration to include new heavy operations for Invoice Lite, Audio Converter, and File Compressor.
 
 **Acceptance Criteria**:
+
 - [ ] Update `config/pricing.json`:
   - [ ] Add `invoice_lite.pdf` to `heavyTools` list (marked as `heavy`)
   - [ ] Add `invoice_lite.paylink` to `heavyTools` list
@@ -428,12 +460,14 @@ Extend billing configuration to include new heavy operations for Invoice Lite, A
 - [ ] Add `QuotaBanner` widget to all new tool screens
 
 **Tests**:
+
 - [ ] Unit test: `canPerformHeavyOp()` respects plan limits
 - [ ] Unit test: `trackHeavyOp()` increments usage counter
 - [ ] Unit test: Quota resets after 24 hours
 - [ ] Unit test: Free user blocked from batch operations
 
 **Files to Modify**:
+
 ```
 config/pricing.json
 lib/billing/billing_service.dart
@@ -453,6 +487,7 @@ test/billing/billing_service_test.dart
 Create integration tests to verify cross-tool data sharing works correctly across all tool combinations.
 
 **Acceptance Criteria**:
+
 - [ ] Test: Text Tools → JSON Doctor (text → json)
 - [ ] Test: JSON Doctor → Invoice Lite (json → form prefill)
 - [ ] Test: Invoice Lite → QR Maker (pay link → qr generation)
@@ -466,12 +501,14 @@ Create integration tests to verify cross-tool data sharing works correctly acros
 - [ ] Verify undo functionality restores previous state
 
 **Tests**:
+
 - [ ] Integration test suite in `test/integration/cross_tool_test.dart`
 - [ ] Each test: publish envelope → navigate → verify prefill → verify undo
 - [ ] Test expired envelopes are not consumed
 - [ ] Test multiple tools sharing simultaneously
 
 **Files to Create**:
+
 ```
 test/integration/
 ├── cross_tool_test.dart
@@ -494,6 +531,7 @@ Create unit tests, widget tests, and function tests for all new tools. Ensure CI
 **Acceptance Criteria**:
 
 **Dart Tests**:
+
 - [ ] Invoice Lite:
   - [ ] Unit: totals calculation (subtotal, tax, discount, rounding)
   - [ ] Unit: validation logic
@@ -511,12 +549,14 @@ Create unit tests, widget tests, and function tests for all new tools. Ensure CI
   - [ ] Unit: HandoffStore Firestore operations
 
 **Functions Tests**:
+
 - [ ] `generateInvoicePdf`: auth, plan check, PDF generation, signed URL
 - [ ] `createInvoicePayLink`: auth, plan check, Stripe session creation
 - [ ] `convertAudio`: auth, size limits, format conversion
 - [ ] `compressFiles`: auth, batch limits, compression
 
 **CI Validation**:
+
 - [ ] Run `flutter test --coverage`
 - [ ] Run `cd functions && npm test`
 - [ ] Run `scripts/preflight.mjs` locally
@@ -525,11 +565,13 @@ Create unit tests, widget tests, and function tests for all new tools. Ensure CI
 - [ ] Ensure UI Smoke tests pass
 
 **Coverage Requirements**:
-- [ ] >80% line coverage for services
-- [ ] >70% line coverage for screens
+
+- [ ] > 80% line coverage for services
+- [ ] > 70% line coverage for screens
 - [ ] 100% coverage for billing logic
 
 **Files to Create**:
+
 ```
 test/tools/invoice_lite/
 ├── invoice_lite_service_test.dart
@@ -567,6 +609,7 @@ Write comprehensive documentation for all three new tools and update dev-logs wi
 **Acceptance Criteria**:
 
 **Tool Documentation**:
+
 - [ ] Create `docs/tools/invoice-lite.md`:
   - [ ] Feature overview
   - [ ] Usage guide (business/client setup, items, PDF generation, pay links)
@@ -585,6 +628,7 @@ Write comprehensive documentation for all three new tools and update dev-logs wi
   - [ ] Batch limits and plan gates
 
 **Roadmap Update**:
+
 - [ ] Update `docs/roadmap/phase-3.md`:
   - [ ] Mark acceptance criteria as completed
   - [ ] Add implementation notes
@@ -592,6 +636,7 @@ Write comprehensive documentation for all three new tools and update dev-logs wi
   - [ ] Add performance metrics (if applicable)
 
 **Dev-Log**:
+
 - [ ] Create `dev-log/features/phase-3-trio-2025-10-09.md`:
   - [ ] Implementation summary
   - [ ] Technical decisions (why pdfkit, why ffmpeg, etc.)
@@ -602,18 +647,21 @@ Write comprehensive documentation for all three new tools and update dev-logs wi
   - [ ] Future enhancements
 
 **Main Docs Update**:
+
 - [ ] Update `DOCUMENTATION_SUMMARY.md`:
   - [ ] Add links to new tool docs
   - [ ] Update feature list
   - [ ] Update cross-tool section
 
 **README Update**:
+
 - [ ] Update `README.md`:
   - [ ] Add Invoice Lite, Audio Converter, File Compressor to tool list
   - [ ] Update tool count (was 17, now 20)
   - [ ] Add "New in Phase-3" section with highlights
 
 **Files to Create/Modify**:
+
 ```
 docs/tools/
 ├── invoice-lite.md (new)
@@ -628,10 +676,10 @@ README.md (update)
 ```
 
 **Screenshots Needed**:
+
 - [ ] Invoice Lite: empty form, filled form, PDF preview
 - [ ] Audio Converter: file list, conversion in progress, success
 - [ ] File Compressor: drag/drop, compression profiles, result
 - [ ] Cross-tool flow: Text Tools → JSON Doctor → Invoice Lite → QR Maker
 
 ---
-
