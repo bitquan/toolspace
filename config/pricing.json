@@ -37,7 +37,10 @@
           "image_resizer",
           "markdown_to_pdf",
           "qr_maker_batch",
-          "json_to_csv"
+          "json_to_csv",
+          "invoice_lite",
+          "audio_converter",
+          "file_compressor"
         ],
         "requiresUpgrade": true
       }
