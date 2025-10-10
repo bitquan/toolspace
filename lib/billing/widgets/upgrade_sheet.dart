@@ -6,7 +6,6 @@ library;
 
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -91,14 +90,8 @@ class _UpgradeSheetState extends State<UpgradeSheet> {
       return;
     }
 
-    // In debug mode (emulator), skip email verification
-    if (kDebugMode) {
-      _showError(
-        'Debug Mode: Stripe checkout disabled in emulator.\n'
-        'In production, this would open Stripe checkout for ${planId.name} plan.',
-      );
-      return;
-    }
+    // Note: Stripe checkout works in both debug and production modes
+    // The debug check has been removed to allow testing with live Stripe keys
 
     if (!currentUser.emailVerified) {
       // Show email verification dialog

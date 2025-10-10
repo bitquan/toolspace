@@ -66,12 +66,12 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
   Map<ShareKind, dynamic> _getExportData() {
     final input = _inputController.text.trim();
     final output = _outputController.text.trim();
-    
+
     Map<ShareKind, dynamic> exportData = {};
-    
+
     // Always export text
     exportData[ShareKind.text] = output.isNotEmpty ? output : input;
-    
+
     // Export as JSON if valid
     try {
       final dynamic jsonData = jsonDecode(output.isNotEmpty ? output : input);
@@ -79,7 +79,7 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
     } catch (e) {
       // If invalid JSON, just export as text
     }
-    
+
     return exportData;
   }
 
@@ -89,7 +89,8 @@ class _JsonDoctorScreenState extends State<JsonDoctorScreen>
         _inputController.text = envelope.value as String;
       } else if (envelope.kind == ShareKind.json) {
         try {
-          final jsonStr = const JsonEncoder.withIndent('  ').convert(envelope.value);
+          final jsonStr =
+              const JsonEncoder.withIndent('  ').convert(envelope.value);
           _inputController.text = jsonStr;
         } catch (e) {
           _inputController.text = envelope.value.toString();

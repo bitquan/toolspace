@@ -9,7 +9,7 @@ Toolspace implements a comprehensive billing and paywall system that controls ac
 ### Core Components
 
 1. **PaywallGuard Widget** - Wraps premium features with access control
-2. **BillingService** - Manages subscription state and Stripe integration  
+2. **BillingService** - Manages subscription state and Stripe integration
 3. **BillingTypes** - Type definitions for plans, features, and restrictions
 4. **Pricing Configuration** - JSON-based feature and limit definitions
 
@@ -29,6 +29,7 @@ PaywallGuard(
 ```
 
 **Key Features:**
+
 - **Automatic Enforcement**: Checks user subscription status
 - **Graceful Degradation**: Shows upgrade prompts instead of errors
 - **Real-time Updates**: Responds to subscription changes
@@ -41,11 +42,11 @@ class BillingService {
   // Subscription management
   Stream<SubscriptionStatus> subscriptionStream;
   Future<bool> hasAccess(String feature);
-  
+
   // Stripe integration
   Future<void> createCheckoutSession(String priceId);
   Future<void> createPortalSession();
-  
+
   // Usage tracking
   Future<void> trackUsage(String feature);
   Future<UsageStats> getUsageStats();
@@ -55,6 +56,7 @@ class BillingService {
 ## Feature Classification
 
 ### Free Tier Tools
+
 - **Text Tools** - Basic text manipulation
 - **JSON Doctor** - JSON validation and formatting
 - **QR Maker** - QR code generation
@@ -65,6 +67,7 @@ class BillingService {
 - **Password Generator** - Secure password creation
 
 ### Heavy/Premium Tools (PaywallGuard Protected)
+
 - **Invoice Lite** - Professional invoice generation
 - **Audio Converter** - Audio file format conversion
 - **File Compressor** - File compression and optimization
@@ -105,7 +108,7 @@ Located in `config/pricing.json`:
   },
   "heavyTools": [
     "invoice_lite",
-    "audio_converter", 
+    "audio_converter",
     "file_compressor",
     "palette_extractor",
     "md_to_pdf",
@@ -152,7 +155,7 @@ class ToolScreen extends StatefulWidget {
 
 class _ToolScreenState extends State<ToolScreen> {
   final BillingService _billing = BillingService();
-  
+
   Future<void> _performPremiumAction() async {
     if (await _billing.hasAccess('premium_feature')) {
       await _billing.trackUsage('premium_feature');
@@ -170,13 +173,13 @@ class _ToolScreenState extends State<ToolScreen> {
 ```dart
 class AppStateManager extends ChangeNotifier {
   late StreamSubscription _subscriptionListener;
-  
+
   void _initializeBilling() {
     _subscriptionListener = BillingService()
         .subscriptionStream
         .listen(_onSubscriptionChanged);
   }
-  
+
   void _onSubscriptionChanged(SubscriptionStatus status) {
     // Update app state
     // Refresh paywall guards
@@ -225,26 +228,28 @@ class AppStateManager extends ChangeNotifier {
 
 ```javascript
 // Firebase Function example
-exports.validateFeatureAccess = functions.https.onCall(async (data, context) => {
-  const userId = context.auth.uid;
-  const feature = data.feature;
-  
-  // Check subscription status
-  const subscription = await getSubscription(userId);
-  
-  // Validate feature access
-  if (!hasAccess(subscription, feature)) {
-    throw new functions.https.HttpsError(
-      'permission-denied',
-      'Premium subscription required'
-    );
+exports.validateFeatureAccess = functions.https.onCall(
+  async (data, context) => {
+    const userId = context.auth.uid;
+    const feature = data.feature;
+
+    // Check subscription status
+    const subscription = await getSubscription(userId);
+
+    // Validate feature access
+    if (!hasAccess(subscription, feature)) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Premium subscription required"
+      );
+    }
+
+    // Track usage
+    await trackUsage(userId, feature);
+
+    return { allowed: true };
   }
-  
-  // Track usage
-  await trackUsage(userId, feature);
-  
-  return { allowed: true };
-});
+);
 ```
 
 ### Data Protection
@@ -271,15 +276,15 @@ class AnalyticsService {
   void trackPaywallImpression(String feature) {
     // Record when paywall is shown
   }
-  
+
   void trackUpgradeClick(String source, String feature) {
     // Track conversion funnel
   }
-  
+
   void trackFeatureUsage(String feature, Duration duration) {
     // Monitor feature engagement
   }
-  
+
   void trackSubscriptionEvent(String event, Map<String, dynamic> properties) {
     // Billing lifecycle events
   }
@@ -310,14 +315,14 @@ testWidgets('Premium feature paywall flow', (tester) async {
   // Navigate to premium tool
   await tester.tap(find.text('Invoice Lite'));
   await tester.pumpAndSettle();
-  
+
   // Verify paywall is shown
   expect(find.byType(PremiumFeaturePaywall), findsOneWidget);
-  
+
   // Test upgrade button
   await tester.tap(find.text('Upgrade Now'));
   await tester.pumpAndSettle();
-  
+
   // Verify checkout initiated
   expect(find.byType(StripeCheckout), findsOneWidget);
 });
@@ -328,11 +333,13 @@ testWidgets('Premium feature paywall flow', (tester) async {
 ### Common Issues
 
 1. **Subscription Not Recognized**
+
    - Check Stripe webhook delivery
    - Verify user authentication
    - Refresh subscription cache
 
 2. **PaywallGuard Not Working**
+
    - Confirm feature name matches pricing config
    - Check BillingService initialization
    - Verify subscription stream connectivity

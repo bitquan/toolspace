@@ -11,12 +11,14 @@ Toolspace implements a sophisticated cross-tool data sharing system that enables
 The ShareBus is a singleton event bus that manages cross-tool communication with TTL-based expiry and multiple subscribers.
 
 **Key Features:**
+
 - **Event-Driven**: Uses Flutter's ChangeNotifier for reactive updates
 - **TTL Management**: Automatic cleanup of expired data (5-minute default)
 - **Multiple Data Types**: Supports text, JSON, CSV, file URLs, data URLs, markdown, and images
 - **Queue-Based**: Maintains chronological order of data sharing events
 
 **API Methods:**
+
 ```dart
 // Publishing data
 ShareBus.instance.publish(ShareEnvelope envelope)
@@ -41,6 +43,7 @@ ShareBus.instance.count
 Data wrapper that carries payload and metadata between tools.
 
 **Structure:**
+
 ```dart
 class ShareEnvelope {
   final ShareKind kind;        // Data type identifier
@@ -51,6 +54,7 @@ class ShareEnvelope {
 ```
 
 **Supported ShareKind Types:**
+
 - `text`: Plain text strings
 - `json`: JSON objects and arrays
 - `csv`: Tabular data as List<List<String>>
@@ -64,6 +68,7 @@ class ShareEnvelope {
 Universal cross-tool integration widget that provides import/export/send functionality.
 
 **Features:**
+
 - **Import Menu**: PopupMenuButton with available data types from ShareBus
 - **Export Data**: Tool-specific data export with automatic ShareBus publishing
 - **Send to Tool**: Direct navigation to target tools with data handoff
@@ -71,6 +76,7 @@ Universal cross-tool integration widget that provides import/export/send functio
 - **Undo Functionality**: Revert import operations
 
 **Integration Pattern:**
+
 ```dart
 ShareToolbar(
   toolId: 'your-tool-id',
@@ -92,6 +98,7 @@ ShareToolbar(
 Long-term storage for cross-tool data that survives app restarts.
 
 **Features:**
+
 - **Firebase Firestore**: Cloud-based persistence
 - **User-Specific**: Data isolated per authenticated user
 - **Automatic Cleanup**: TTL-based expiry (24 hours default)
@@ -100,9 +107,11 @@ Long-term storage for cross-tool data that survives app restarts.
 ## Data Flow Patterns
 
 ### 1. Simple Data Sharing
+
 ```
 Tool A → ShareBus → Tool B
 ```
+
 1. User exports data from Tool A
 2. Data published to ShareBus with ShareEnvelope
 3. User navigates to Tool B
@@ -110,19 +119,24 @@ Tool A → ShareBus → Tool B
 5. User imports data into Tool B
 
 ### 2. Multi-Tool Workflows
+
 ```
 JSON → Text Tools → JSON Doctor → Text Diff
 ```
+
 Example: JSON processing pipeline
+
 1. Raw JSON input in Text Tools
-2. Formatted and cleaned in JSON Doctor  
+2. Formatted and cleaned in JSON Doctor
 3. Compared versions in Text Diff
 4. Final output ready for use
 
 ### 3. Automated Test Flows
+
 ```
 E2E Playground → Automated Testing → Validation
 ```
+
 1. E2E Playground seeds test data
 2. Automated flows simulate user interactions
 3. Data flows validated across tool boundaries
@@ -133,6 +147,7 @@ E2E Playground → Automated Testing → Validation
 ### For New Tools
 
 1. **Add ShareToolbar Widget**:
+
    ```dart
    ShareToolbar(
      toolId: 'unique-tool-id',
@@ -142,6 +157,7 @@ E2E Playground → Automated Testing → Validation
    ```
 
 2. **Implement Data Handlers**:
+
    ```dart
    void _handleImport(ShareEnvelope envelope, String sourceTool) {
      switch (envelope.kind) {
@@ -153,7 +169,7 @@ E2E Playground → Automated Testing → Validation
          break;
      }
    }
-   
+
    Map<ShareKind, dynamic> _getExportData() {
      return {
        ShareKind.text: _textController.text,
