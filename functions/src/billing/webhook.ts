@@ -44,13 +44,58 @@ export const webhook = functions.https.onRequest(async (req, res) => {
     return;
   }
 
+  // Get the raw body - Firebase Functions provides this differently
+  let body: string | Buffer;
+  if (req.rawBody) {
+    body = req.rawBody;
+  } else if (typeof req.body === "string") {
+    body = req.body;
+  } else {
+    body = JSON.stringify(req.body);
+  }
+
+  functions.logger.info("Webhook signature verification attempt", {
+    hasSignature: !!sig,
+    hasWebhookSecret: !!webhookSecret,
+    bodyType: typeof body,
+    bodyLength: body.length,
+    webhookSecretLength: webhookSecret.length,
+    signaturePreview:
+      typeof sig === "string"
+        ? sig.substring(0, 20) + "..."
+        : Array.isArray(sig)
+        ? sig[0]?.substring(0, 20) + "..."
+        : "unknown",
+  });
+
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
+    // Ensure signature is a string
+    const signature =
+      typeof sig === "string" ? sig : Array.isArray(sig) ? sig[0] : "";
+
+    functions.logger.info("Attempting webhook construction", {
+      signatureLength: signature.length,
+      bodyLength: body.length,
+      webhookSecretPresent: !!webhookSecret,
+    });
+
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+
+    functions.logger.info("Webhook signature verification successful", {
+      eventType: event.type,
+      eventId: event.id,
+    });
   } catch (err: any) {
     functions.logger.error("Webhook signature verification failed", {
       error: err.message,
+      hasSignature: !!sig,
+      hasWebhookSecret: !!webhookSecret,
+      webhookSecretPreview:
+        webhookSecret.length > 10
+          ? webhookSecret.substring(0, 10) + "..."
+          : webhookSecret,
     });
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;
@@ -192,7 +237,48 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   }
 
   // Subscription will be updated via subscription.created event
-  // Just log the event for audit
+  // But also update billing profile directly as fallback in case subscription webhook fails
+  try {
+    const billingRef = db.doc(`users/${userId}/billing/profile`);
+    const now = Date.now();
+
+    const fallbackProfile = {
+      stripeCustomerId: customerId,
+      planId: planId as "pro" | "pro_plus",
+      status: "active" as const,
+      currentPeriodStart: now,
+      currentPeriodEnd: now + 30 * 24 * 60 * 60 * 1000, // 30 days
+      trialEnd: null,
+      cancelAtPeriodEnd: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await billingRef.set(fallbackProfile, { merge: true });
+
+    functions.logger.info(
+      "Updated billing profile from checkout completion (fallback)",
+      {
+        userId,
+        planId,
+        customerId,
+        sessionId: session.id,
+      }
+    );
+  } catch (error) {
+    functions.logger.error(
+      "Failed to update billing profile from checkout completion",
+      {
+        userId,
+        planId,
+        customerId,
+        sessionId: session.id,
+        error: (error as Error).message,
+      }
+    );
+  }
+
+  // Log the event for audit
   await logBillingEvent({
     eventId: event.id,
     type: "checkout.session.completed",

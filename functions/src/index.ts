@@ -41,6 +41,7 @@ setGlobalOptions({ maxInstances: 10 });
 export { createCheckoutSession } from "./billing/createCheckoutSession";
 export { createPortalLink } from "./billing/createPortalLink";
 export { webhook as stripeWebhook } from "./billing/webhook";
+export { updateUserPlan } from "./billing/updateUserPlan"; // Temporary function for testing
 
 // Export legacy quota function (deprecated - for backward compatibility)
 export { getQuotaStatus } from "./tools/quota/getQuotaStatus";
@@ -51,6 +52,9 @@ export {
   createInvoicePaymentLink,
   deactivatePaymentLink,
 } from "./tools/invoice_lite/paymentLink";
+
+// Temporary functions for manual plan updates
+export { quickUpdateUserPlan, updateRecentUsersToProPlan } from "./quickUpdate";
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
