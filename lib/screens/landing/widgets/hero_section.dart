@@ -72,22 +72,24 @@ class _HeroSectionState extends State<HeroSection>
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 60),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 60),
 
-                  // Headline
-                  Text(
-                    'Build Smarter,\nShip Faster',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: size.width < 600 ? 40 : 64,
-                      height: 1.1,
-                      color: isDark ? Colors.white : Colors.black87,
+                    // Headline
+                    Text(
+                      'Build Smarter,\nShip Faster',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: size.width < 600 ? 40 : 64,
+                        height: 1.1,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
-                  ),
 
                   const SizedBox(height: 24),
 
@@ -145,11 +147,12 @@ class _HeroSectionState extends State<HeroSection>
 
                   const SizedBox(height: 60),
 
-                  // Trust indicators
-                  _buildTrustIndicators(theme, isDark),
-                ],
+                      // Trust indicators
+                      _buildTrustIndicators(theme, isDark),
+                    ],
+                  ),
+                ),
               ),
-            ),
           ),
         ],
       ),

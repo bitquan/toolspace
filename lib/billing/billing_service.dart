@@ -9,11 +9,13 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
 import 'billing_types.dart';
 
 class BillingService {
@@ -26,8 +28,7 @@ class BillingService {
 
   // Streams
   StreamSubscription<DocumentSnapshot>? _billingProfileSubscription;
-  final _billingProfileController =
-      StreamController<BillingProfile>.broadcast();
+  final _billingProfileController = StreamController<BillingProfile>.broadcast();
 
   StreamSubscription<DocumentSnapshot>? _usageSubscription;
   final _usageController = StreamController<UsageRecord>.broadcast();
@@ -62,8 +63,7 @@ class BillingService {
     if (plan == null) {
       // Default to free
       final freePlan = await getPlan(PlanId.free);
-      return Entitlements.fromJson(
-          freePlan!['entitlements'] as Map<String, dynamic>);
+      return Entitlements.fromJson(freePlan!['entitlements'] as Map<String, dynamic>);
     }
     return Entitlements.fromJson(plan['entitlements'] as Map<String, dynamic>);
   }
@@ -83,50 +83,40 @@ class BillingService {
   void startListening() {
     final user = _auth.currentUser;
     if (user == null) {
-      debugPrint(
-          '[BillingService] No user logged in, skipping billing listener');
+      debugPrint('[BillingService] No user logged in, skipping billing listener');
       return;
     }
 
     final userId = user.uid;
     debugPrint(
         '[BillingService] Starting billing listener for user: $userId (isAnonymous: ${user.isAnonymous})');
-    debugPrint(
-        '[BillingService] User email: ${user.email}, verified: ${user.emailVerified}');
+    debugPrint('[BillingService] User email: ${user.email}, verified: ${user.emailVerified}');
 
     // Listen to billing profile
     _billingProfileSubscription =
         _firestore.doc('users/$userId/billing/profile').snapshots().listen(
       (snapshot) {
-        debugPrint(
-            '[BillingService] Billing profile snapshot received: exists=${snapshot.exists}');
+        debugPrint('[BillingService] Billing profile snapshot received: exists=${snapshot.exists}');
         if (snapshot.exists) {
           final profile = BillingProfile.fromJson(snapshot.data()!);
-          debugPrint(
-              '[BillingService] Loaded billing profile: ${profile.planId.id}');
+          debugPrint('[BillingService] Loaded billing profile: ${profile.planId.id}');
           _billingProfileController.add(profile);
         } else {
           // Create default free profile for new users (including anonymous)
           final freeProfile = BillingProfile.free();
-          debugPrint(
-              '[BillingService] Creating default billing profile for user $userId');
-          _firestore
-              .doc('users/$userId/billing/profile')
-              .set(freeProfile.toJson())
-              .then((_) {
+          debugPrint('[BillingService] Creating default billing profile for user $userId');
+          _firestore.doc('users/$userId/billing/profile').set(freeProfile.toJson()).then((_) {
             debugPrint('[BillingService] Successfully created billing profile');
             _billingProfileController.add(freeProfile);
           }).catchError((error) {
-            debugPrint(
-                '[BillingService] Error creating billing profile: $error');
+            debugPrint('[BillingService] Error creating billing profile: $error');
             // Still add the profile to stream for UI to work
             _billingProfileController.add(freeProfile);
           });
         }
       },
       onError: (error) {
-        debugPrint(
-            '[BillingService] Error listening to billing profile: $error');
+        debugPrint('[BillingService] Error listening to billing profile: $error');
         debugPrint('[BillingService] Error type: ${error.runtimeType}');
         // On error, provide a default free profile so UI doesn't break
         final freeProfile = BillingProfile.free();
@@ -138,11 +128,9 @@ class BillingService {
     // Listen to today's usage
     final today = _getTodayDateString();
     debugPrint('[BillingService] Starting usage listener for date: $today');
-    _usageSubscription =
-        _firestore.doc('users/$userId/usage/$today').snapshots().listen(
+    _usageSubscription = _firestore.doc('users/$userId/usage/$today').snapshots().listen(
       (snapshot) {
-        debugPrint(
-            '[BillingService] Usage snapshot received: exists=${snapshot.exists}');
+        debugPrint('[BillingService] Usage snapshot received: exists=${snapshot.exists}');
         if (snapshot.exists) {
           final usage = UsageRecord.fromJson(snapshot.data()!);
           debugPrint(
@@ -171,8 +159,7 @@ class BillingService {
   }
 
   /// Stream of billing profile
-  Stream<BillingProfile> get billingProfileStream =>
-      _billingProfileController.stream;
+  Stream<BillingProfile> get billingProfileStream => _billingProfileController.stream;
 
   /// Stream of today's usage
   Stream<UsageRecord> get usageStream => _usageController.stream;
@@ -181,14 +168,12 @@ class BillingService {
   Future<BillingProfile> getBillingProfile() async {
     final user = _auth.currentUser;
     if (user == null) {
-      throw Exception('User not authenticated');
+      // Return free plan for guest users to enable freemium access
+      return BillingProfile.free();
     }
 
-    final docRef = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('billing')
-        .doc('profile');
+    final docRef =
+        _firestore.collection('users').doc(user.uid).collection('billing').doc('profile');
 
     final snapshot = await docRef.get();
     if (!snapshot.exists) {
@@ -207,8 +192,7 @@ class BillingService {
     }
 
     final today = _getTodayDateString();
-    final snapshot =
-        await _firestore.doc('users/${user.uid}/usage/$today').get();
+    final snapshot = await _firestore.doc('users/${user.uid}/usage/$today').get();
 
     if (snapshot.exists) {
       return UsageRecord.fromJson(snapshot.data()!);
@@ -231,8 +215,7 @@ class BillingService {
         limit: entitlements.heavyOpsPerDay,
         planId: profile.planId,
         requiresUpgrade: profile.planId == PlanId.free,
-        suggestedPlan:
-            profile.planId == PlanId.free ? PlanId.pro : PlanId.proPlus,
+        suggestedPlan: profile.planId == PlanId.free ? PlanId.pro : PlanId.proPlus,
       );
     }
 
@@ -309,16 +292,13 @@ class BillingService {
     }
 
     final minPlan = PlanId.fromString(tool['minPlan'] as String);
-    final planIndex =
-        [PlanId.free, PlanId.pro, PlanId.proPlus].indexOf(profile.planId);
-    final requiredIndex =
-        [PlanId.free, PlanId.pro, PlanId.proPlus].indexOf(minPlan);
+    final planIndex = [PlanId.free, PlanId.pro, PlanId.proPlus].indexOf(profile.planId);
+    final requiredIndex = [PlanId.free, PlanId.pro, PlanId.proPlus].indexOf(minPlan);
 
     if (planIndex < requiredIndex) {
       return EntitlementCheckResult(
         allowed: false,
-        reason:
-            '${tool['name']} requires ${_getPlanDisplayName(minPlan)} plan or higher',
+        reason: '${tool['name']} requires ${_getPlanDisplayName(minPlan)} plan or higher',
         planId: profile.planId,
         requiresUpgrade: true,
         suggestedPlan: minPlan,
@@ -344,8 +324,7 @@ class BillingService {
 
       if (snapshot.exists) {
         final usage = UsageRecord.fromJson(snapshot.data()!);
-        transaction.update(
-            usageRef, usage.copyWith(heavyOps: usage.heavyOps + 1).toJson());
+        transaction.update(usageRef, usage.copyWith(heavyOps: usage.heavyOps + 1).toJson());
       } else {
         final newUsage = UsageRecord.empty(today).copyWith(heavyOps: 1);
         transaction.set(usageRef, newUsage.toJson());
@@ -392,8 +371,7 @@ class BillingService {
     required String cancelUrl,
   }) async {
     print('DEBUG: BillingService.createCheckoutSession called');
-    print(
-        'DEBUG: planId: ${planId.id}, successUrl: $successUrl, cancelUrl: $cancelUrl');
+    print('DEBUG: planId: ${planId.id}, successUrl: $successUrl, cancelUrl: $cancelUrl');
 
     final callable = _functions.httpsCallable('createCheckoutSession');
     print('DEBUG: Calling Firebase function: createCheckoutSession');
