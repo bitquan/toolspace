@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+
 import 'logic/kmeans_clustering.dart';
 import 'logic/palette_exporter.dart';
 import 'widgets/color_swatch_card.dart';
@@ -27,7 +29,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
   Future<void> _pickImage() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
+        type: FileType.custom,
         allowedExtensions: ['png', 'jpg', 'jpeg', 'webp'],
         withData: true,
       );
@@ -74,8 +76,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
       _image = frame.image;
 
       // Get pixel data
-      final byteData =
-          await _image!.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final byteData = await _image!.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (byteData == null) {
         throw Exception('Failed to get image pixel data');
       }
@@ -262,8 +263,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest
-                  .withValues(alpha: 0.3),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               border: Border(
                 bottom: BorderSide(
                   color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -394,8 +394,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 1.2,
                         crossAxisSpacing: 12,
@@ -403,10 +402,8 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                       ),
                       itemCount: _palette.length,
                       itemBuilder: (context, index) {
-                        final totalPixels =
-                            _frequencies.fold(0, (sum, f) => sum + f);
-                        final percentage =
-                            (_frequencies[index] / totalPixels) * 100;
+                        final totalPixels = _frequencies.fold(0, (sum, f) => sum + f);
+                        final percentage = (_frequencies[index] / totalPixels) * 100;
 
                         return ColorSwatchCard(
                           color: _palette[index],
@@ -418,9 +415,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                   ],
 
                   // Empty state
-                  if (_palette.isEmpty &&
-                      !_isExtracting &&
-                      _imageBytes == null) ...[
+                  if (_palette.isEmpty && !_isExtracting && _imageBytes == null) ...[
                     const SizedBox(height: 48),
                     Center(
                       child: Column(
@@ -442,8 +437,7 @@ class _PaletteExtractorScreenState extends State<PaletteExtractorScreen> {
                           Text(
                             'The tool will extract the most dominant colors using k-means clustering',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
