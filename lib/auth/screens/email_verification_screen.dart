@@ -44,7 +44,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       setState(() => _isVerified = true);
       _timer?.cancel();
 
-      // Redirect to home after verification
+      // AUTO-REFRESH TOKEN: Force token refresh for seamless experience
+      try {
+        await _authService.currentUser?.reload();
+        await _authService.currentUser?.getIdToken(true); // Force refresh
+      } catch (e) {
+        // Silent failure - token refresh is optional for UX improvement
+      }
+
+      // Redirect to home after verification with token refresh
       await Future.delayed(const Duration(seconds: 2));
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/');
