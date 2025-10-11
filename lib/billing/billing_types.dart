@@ -89,8 +89,7 @@ enum SubscriptionStatus {
     }
   }
 
-  bool get isActive =>
-      this == SubscriptionStatus.active || this == SubscriptionStatus.trialing;
+  bool get isActive => this == SubscriptionStatus.active || this == SubscriptionStatus.trialing;
 }
 
 /// Support level
@@ -231,8 +230,7 @@ class BillingProfile {
     return BillingProfile(
       stripeCustomerId: json['stripeCustomerId'] as String?,
       planId: PlanId.fromString(json['planId'] as String? ?? 'free'),
-      status:
-          SubscriptionStatus.fromString(json['status'] as String? ?? 'free'),
+      status: SubscriptionStatus.fromString(json['status'] as String? ?? 'free'),
       currentPeriodStart: safeParseTimestamp(json['currentPeriodStart']),
       currentPeriodEnd: safeParseTimestamp(json['currentPeriodEnd']),
       trialEnd: safeParseTimestamp(json['trialEnd']),
@@ -264,8 +262,7 @@ class BillingProfile {
     if (currentPeriodEnd == null) return false;
     final now = DateTime.now();
     const gracePeriod = Duration(days: 3); // matches backend
-    return now.isAfter(currentPeriodEnd!) &&
-        now.isBefore(currentPeriodEnd!.add(gracePeriod));
+    return now.isAfter(currentPeriodEnd!) && now.isBefore(currentPeriodEnd!.add(gracePeriod));
   }
 }
 
@@ -305,8 +302,7 @@ class UsageRecord {
       lightOps: json['lightOps'] as int? ?? 0,
       filesProcessed: json['filesProcessed'] as int? ?? 0,
       bytesProcessed: json['bytesProcessed'] as int? ?? 0,
-      lastUpdated:
-          DateTime.fromMillisecondsSinceEpoch(json['lastUpdated'] as int),
+      lastUpdated: DateTime.fromMillisecondsSinceEpoch(json['lastUpdated'] as int),
     );
   }
 
@@ -338,6 +334,260 @@ class UsageRecord {
   }
 }
 
+/// Credits System v2 - Billing profile with minute-based credits
+/// Firestore: users/{uid}/billing
+class CreditsBilling {
+  final PlanId plan;
+  final int planMinutes; // Total minutes allocated per month for this plan
+  final int creditsRemaining; // Remaining credits (1 credit = 1 minute)
+  final int creditsUsed; // Credits used this month
+  final DateTime lastRefill; // Last time credits were refilled
+  final DateTime? nextRefillDate; // When credits will refill next
+  final bool autoRefill; // Whether to auto-refill monthly
+
+  const CreditsBilling({
+    required this.plan,
+    required this.planMinutes,
+    required this.creditsRemaining,
+    required this.creditsUsed,
+    required this.lastRefill,
+    this.nextRefillDate,
+    this.autoRefill = true,
+  });
+
+  factory CreditsBilling.fromJson(Map<String, dynamic> json) {
+    return CreditsBilling(
+      plan: PlanId.fromString(json['plan'] as String),
+      planMinutes: json['planMinutes'] as int,
+      creditsRemaining: json['creditsRemaining'] as int,
+      creditsUsed: json['creditsUsed'] as int,
+      lastRefill: DateTime.parse(json['lastRefill'] as String),
+      nextRefillDate:
+          json['nextRefillDate'] != null ? DateTime.parse(json['nextRefillDate'] as String) : null,
+      autoRefill: json['autoRefill'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'plan': plan.id,
+      'planMinutes': planMinutes,
+      'creditsRemaining': creditsRemaining,
+      'creditsUsed': creditsUsed,
+      'lastRefill': lastRefill.toIso8601String(),
+      'nextRefillDate': nextRefillDate?.toIso8601String(),
+      'autoRefill': autoRefill,
+    };
+  }
+
+  /// Create default credits billing for a plan
+  factory CreditsBilling.forPlan(PlanId plan) {
+    final now = DateTime.now();
+    final planMinutes = _getPlanMinutes(plan);
+    return CreditsBilling(
+      plan: plan,
+      planMinutes: planMinutes,
+      creditsRemaining: planMinutes,
+      creditsUsed: 0,
+      lastRefill: now,
+      nextRefillDate: DateTime(now.year, now.month + 1, 1), // Next month
+      autoRefill: true,
+    );
+  }
+
+  static int _getPlanMinutes(PlanId plan) {
+    switch (plan) {
+      case PlanId.free:
+        return 10; // 10 minutes per month for free
+      case PlanId.pro:
+        return 600; // 10 hours per month for pro
+      case PlanId.proPlus:
+        return 1800; // 30 hours per month for pro plus
+    }
+  }
+
+  /// Check if user has enough credits for operation
+  bool hasCredits(int minutesRequired) {
+    return creditsRemaining >= minutesRequired;
+  }
+
+  /// Calculate credits needed for audio duration
+  static int creditsForDuration(Duration audioDuration) {
+    // 1 credit = 1 minute, round up to next minute
+    return (audioDuration.inSeconds / 60).ceil();
+  }
+
+  /// Deduct credits for operation
+  CreditsBilling deductCredits(int credits) {
+    final newRemaining = (creditsRemaining - credits).clamp(0, planMinutes);
+    final newUsed = creditsUsed + credits;
+
+    return CreditsBilling(
+      plan: plan,
+      planMinutes: planMinutes,
+      creditsRemaining: newRemaining,
+      creditsUsed: newUsed,
+      lastRefill: lastRefill,
+      nextRefillDate: nextRefillDate,
+      autoRefill: autoRefill,
+    );
+  }
+
+  /// Check if it's time for monthly refill
+  bool get needsRefill {
+    if (nextRefillDate == null) return false;
+    return DateTime.now().isAfter(nextRefillDate!);
+  }
+
+  /// Refill credits for new month
+  CreditsBilling refillCredits() {
+    final now = DateTime.now();
+    return CreditsBilling(
+      plan: plan,
+      planMinutes: planMinutes,
+      creditsRemaining: planMinutes, // Reset to full allocation
+      creditsUsed: 0, // Reset usage
+      lastRefill: now,
+      nextRefillDate: DateTime(now.year, now.month + 1, 1),
+      autoRefill: autoRefill,
+    );
+  }
+}
+
+/// VATS Job Status - tracks video processing progress
+enum VATSJobStatus {
+  uploading,
+  converting,
+  transcribing,
+  completed,
+  failed;
+
+  String get displayName {
+    switch (this) {
+      case VATSJobStatus.uploading:
+        return 'Uploading video...';
+      case VATSJobStatus.converting:
+        return 'Converting to audio...';
+      case VATSJobStatus.transcribing:
+        return 'Transcribing audio...';
+      case VATSJobStatus.completed:
+        return 'Completed';
+      case VATSJobStatus.failed:
+        return 'Failed';
+    }
+  }
+}
+
+/// VATS Job - tracks video to transcript conversion
+/// Firestore: users/{uid}/vats_jobs/{jobId}
+class VATSJob {
+  final String id;
+  final String userId;
+  final String fileName;
+  final String videoUrl; // Storage URL
+  final String? audioUrl; // Converted audio URL
+  final VATSJobStatus status;
+  final int progressPercent;
+  final DateTime createdAt;
+  final DateTime? completedAt;
+  final String? errorMessage;
+  final Duration? audioDuration;
+  final int? creditsUsed;
+  final String? transcriptText;
+  final String? srtContent;
+
+  const VATSJob({
+    required this.id,
+    required this.userId,
+    required this.fileName,
+    required this.videoUrl,
+    this.audioUrl,
+    required this.status,
+    this.progressPercent = 0,
+    required this.createdAt,
+    this.completedAt,
+    this.errorMessage,
+    this.audioDuration,
+    this.creditsUsed,
+    this.transcriptText,
+    this.srtContent,
+  });
+
+  factory VATSJob.fromJson(Map<String, dynamic> json) {
+    return VATSJob(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      fileName: json['fileName'] as String,
+      videoUrl: json['videoUrl'] as String,
+      audioUrl: json['audioUrl'] as String?,
+      status: VATSJobStatus.values.firstWhere(
+        (s) => s.name == json['status'],
+        orElse: () => VATSJobStatus.uploading,
+      ),
+      progressPercent: json['progressPercent'] as int? ?? 0,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      completedAt:
+          json['completedAt'] != null ? DateTime.parse(json['completedAt'] as String) : null,
+      errorMessage: json['errorMessage'] as String?,
+      audioDuration: json['audioDurationSeconds'] != null
+          ? Duration(seconds: json['audioDurationSeconds'] as int)
+          : null,
+      creditsUsed: json['creditsUsed'] as int?,
+      transcriptText: json['transcriptText'] as String?,
+      srtContent: json['srtContent'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'fileName': fileName,
+      'videoUrl': videoUrl,
+      'audioUrl': audioUrl,
+      'status': status.name,
+      'progressPercent': progressPercent,
+      'createdAt': createdAt.toIso8601String(),
+      'completedAt': completedAt?.toIso8601String(),
+      'errorMessage': errorMessage,
+      'audioDurationSeconds': audioDuration?.inSeconds,
+      'creditsUsed': creditsUsed,
+      'transcriptText': transcriptText,
+      'srtContent': srtContent,
+    };
+  }
+
+  VATSJob copyWith({
+    String? videoUrl,
+    VATSJobStatus? status,
+    int? progressPercent,
+    String? audioUrl,
+    DateTime? completedAt,
+    String? errorMessage,
+    Duration? audioDuration,
+    int? creditsUsed,
+    String? transcriptText,
+    String? srtContent,
+  }) {
+    return VATSJob(
+      id: id,
+      userId: userId,
+      fileName: fileName,
+      videoUrl: videoUrl ?? this.videoUrl,
+      audioUrl: audioUrl ?? this.audioUrl,
+      status: status ?? this.status,
+      progressPercent: progressPercent ?? this.progressPercent,
+      createdAt: createdAt,
+      completedAt: completedAt ?? this.completedAt,
+      errorMessage: errorMessage ?? this.errorMessage,
+      audioDuration: audioDuration ?? this.audioDuration,
+      creditsUsed: creditsUsed ?? this.creditsUsed,
+      transcriptText: transcriptText ?? this.transcriptText,
+      srtContent: srtContent ?? this.srtContent,
+    );
+  }
+}
+
 /// Entitlement check result
 class EntitlementCheckResult {
   final bool allowed;
@@ -358,8 +608,7 @@ class EntitlementCheckResult {
     this.suggestedPlan,
   });
 
-  int get remaining =>
-      limit != null && currentUsage != null ? limit! - currentUsage! : 0;
+  int get remaining => limit != null && currentUsage != null ? limit! - currentUsage! : 0;
 
   bool get isNearLimit {
     if (limit == null || currentUsage == null) return false;

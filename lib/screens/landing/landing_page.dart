@@ -10,12 +10,13 @@
 library;
 
 import 'package:flutter/material.dart';
+
+import 'widgets/free_tools_section.dart';
 import 'widgets/hero_section.dart';
-import 'widgets/features_grid.dart';
-import 'widgets/pricing_section.dart';
-import 'widgets/social_proof_section.dart';
 import 'widgets/landing_footer.dart';
 import 'widgets/landing_nav_bar.dart';
+import 'widgets/pricing_section.dart';
+import 'widgets/social_proof_section.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -32,8 +33,8 @@ class LandingPage extends StatelessWidget {
 
             SizedBox(height: 80),
 
-            // Features Grid
-            FeaturesGrid(),
+            // Free Tools Section
+            FreeToolsSection(),
 
             SizedBox(height: 80),
 

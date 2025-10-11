@@ -8,13 +8,14 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 
 ✅ **PRODUCTION READY**
 
-**Current Status:** Complete production blueprint implemented with single-environment deployment strategy
+**Current Status:** Complete production blueprint implemented with freemium strategy and guest usage model
 
 **Key Features:**
 
 - ✅ Real user authentication (Google, Apple, Email)
 - ✅ Secure database rules and functions
 - ✅ Stripe billing integration (Free/Pro $9/Pro+ $19)
+- ✅ Freemium landing page with 5 uses per month for guests
 - ✅ Comprehensive security audit complete
 - ✅ CI/CD deployment pipeline
 - ✅ Production monitoring and alerts
@@ -22,8 +23,8 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 **Production Deployment:**
 
 - 🌐 Live at: [toolspace-beta.web.app](https://toolspace-beta.web.app)
-- 📊 Version: v3.0.0 (Phase 3 Complete)
-- 🚀 Status: 17+ tools with integrated billing system
+- 📊 Version: v3.1.0 (Freemium Strategy Complete)
+- 🚀 Status: 24+ tools with integrated billing system and guest access
 - 🔧 CI/CD: Automated deployment pipeline active
 
 ---
@@ -78,7 +79,7 @@ Example: Format JSON in JSON Doctor → Share → Generate QR code in QR Maker
 
 ## 🛠️ Tools
 
-### 17+ Production-Ready Tools with Integrated Billing System
+### 24 Production-Ready Tools with Integrated Billing System
 
 #### 💰 Business Tools (Pro Plan Required)
 
@@ -88,44 +89,71 @@ Example: Format JSON in JSON Doctor → Share → Generate QR code in QR Maker
 - ✅ Stripe payment links
 - ✅ Tax calculations and line items
 
-**Audio Converter** - Professional audio format conversion  
+**Audio Converter** - Professional audio format conversion
+
 - ✅ Multiple format support (MP3, WAV, OGG)
 - ✅ Quality settings and batch processing
 
+**Video Converter** - Convert video files to high-quality audio formats
+
+- ✅ Support for MP4, MOV, WEBM, AVI formats
+- ✅ Batch processing with progress tracking
+
+**Audio Transcriber** - Convert speech in audio files to text transcripts
+
+- ✅ AI-powered speech recognition
+- ✅ Multiple audio format support
+- ✅ Clipboard integration
+
+**Subtitle Maker** - Convert text transcripts into formatted subtitle files
+
+- ✅ SRT and VTT format support
+- ✅ Real-time preview and editing
+- ✅ Copy and download functionality
+
 **File Compressor** - Reduce file sizes efficiently
+
 - ✅ Image and document compression
 - ✅ Quality control and format options
 
 **Markdown to PDF** - Convert MD files to professional PDFs
+
 - ✅ Styling options and custom themes
 
 ### 📊 Data Tools (Free + Pro Features)
 
 **JSON Doctor** - JSON validation, formatting, and processing
+
 - ✅ Schema validation
 - ✅ Cross-tool data sharing enabled
 
 **JSON to CSV** - Convert JSON data to CSV format
+
 - ✅ Custom field mapping
 - ✅ Batch processing capabilities
 
 **JSON Flatten** - Flatten nested JSON structures
+
 - ✅ Configurable depth levels
 
 ### 🔧 Text & Utility Tools (Free)
 
 **Text Tools** - Case conversion, formatting, validation
+
 - ✅ Multiple text transformations
 - ✅ Cross-tool integration
 
 **Text Diff** - Compare texts with detailed differences
+
 - ✅ Line-by-line and word-level comparison
 
 **QR Maker** - Generate customizable QR codes
+
 - ✅ Batch generation
 - ✅ Custom styling options
 
 **Password Generator** - Secure password creation
+
 - ✅ Customizable rules and strength
 
 **URL Shortener** - Create short, trackable links
@@ -139,9 +167,46 @@ Example: Format JSON in JSON Doctor → Share → Generate QR code in QR Maker
 ### 🔄 Cross-Tool Integration
 
 All tools support seamless data sharing through our HandoffStore system:
+
 - 📋 One-click data transfer between tools
 - 🔄 Shared clipboard for complex workflows
 - 📊 CSV to Invoice generation workflows
+
+#### 🎬 New: Modular Media Processing Pipeline
+
+The platform now features a complete modular media processing workflow:
+
+**Video → Audio → Transcript → Subtitles**
+
+1. **Video Converter**: Upload video files (MP4, MOV, WEBM) → Extract high-quality audio
+2. **Audio Transcriber**: Process audio files → Generate accurate text transcripts
+3. **Subtitle Maker**: Convert transcripts → Export as SRT/VTT subtitle files
+
+Each tool works independently or can be chained together for complete video-to-subtitle workflows.
+
+#### 🆓 Freemium Strategy - Try Before You Signup
+
+**Instant Access to 12 Powerful Tools (No Signup Required):**
+
+Landing page visitors get 5 uses per month of each free tool without creating an account:
+
+- **Text Tools** - Case conversion, formatting, word count
+- **JSON Doctor** - JSON validation, formatting, and beautification
+- **QR Maker** - Generate customizable QR codes with styling
+- **Password Generator** - Secure passwords with custom rules
+- **Text Diff** - Compare texts with detailed difference highlighting
+- **Unit Converter** - Convert between various units and measurements
+- **Time Zone Converter** - Calculate times across different zones
+- **Regex Tester** - Test and validate regular expressions
+- **ID Generator** - Generate UUIDs and custom identifier formats
+- **Codec Lab** - Encode/decode Base64, Hex, URL formats
+- **CSV Cleaner** - Clean and format CSV data
+- **Color Palette Extractor** - Extract colors from images
+
+**Pro Tools (Subscription Required):**
+
+- Video/Audio processing, Invoice generation, File compression
+- Require Pro subscription for server-side processing
 
 ## 🏗️ Architecture
 

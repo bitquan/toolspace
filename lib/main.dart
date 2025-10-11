@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -9,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'auth/screens/email_verification_screen.dart';
 import 'billing/billing_service.dart';
 import 'billing/billing_types.dart';
+import 'core/routes.dart';
 import 'core/services/debug_logger.dart';
 import 'core/ui/neo_playground_theme.dart';
-import 'core/routes.dart';
 import 'firebase_options.dart';
 import 'screens/landing/landing_page.dart';
 import 'screens/neo_home_screen.dart';
@@ -121,8 +120,7 @@ class _AuthGateState extends State<AuthGate> {
     if (user != null) {
       final billingService = BillingService();
       billingService.startListening();
-      _billingSubscription =
-          billingService.billingProfileStream.listen(_handleBillingChange);
+      _billingSubscription = billingService.billingProfileStream.listen(_handleBillingChange);
     }
   }
 
@@ -196,8 +194,7 @@ class _AuthGateState extends State<AuthGate> {
 
         // Anonymous user or no email (old session) → sign out ONCE
         final hasInvalidEmail = user.email == null || user.email!.isEmpty;
-        if ((user.isAnonymous || hasInvalidEmail) &&
-            !_hasCheckedAndClearedBadAuth) {
+        if ((user.isAnonymous || hasInvalidEmail) && !_hasCheckedAndClearedBadAuth) {
           _hasCheckedAndClearedBadAuth = true;
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             await FirebaseAuth.instance.signOut();

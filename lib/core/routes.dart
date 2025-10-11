@@ -1,36 +1,41 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../screens/neo_home_screen.dart';
-import '../marketing/features_screen.dart';
-import '../marketing/pricing_screen.dart';
-import '../tools/text_tools/text_tools_screen.dart';
-import '../tools/file_merger/file_merger_screen.dart';
-import '../tools/json_doctor/json_doctor_screen.dart';
-import '../tools/text_diff/text_diff_screen.dart';
-import '../tools/qr_maker/qr_maker_screen.dart';
-import '../tools/url_short/url_short_screen.dart';
-import '../tools/codec_lab/codec_lab_screen.dart';
-import '../tools/time_convert/time_convert_screen.dart';
-import '../tools/regex_tester/regex_tester_screen.dart';
-import '../tools/id_gen/id_gen_screen.dart';
-import '../tools/palette_extractor/palette_extractor_screen.dart';
-import '../tools/md_to_pdf/md_to_pdf_screen.dart';
-import '../tools/csv_cleaner/csv_cleaner_screen.dart';
-import '../tools/image_resizer/image_resizer_screen.dart';
-import '../tools/password_gen/password_gen_screen.dart';
-import '../tools/json_flatten/json_flatten_screen.dart';
-import '../tools/unit_converter/unit_converter_screen.dart';
-import '../tools/invoice_lite/invoice_lite_screen.dart';
-import '../tools/audio_converter/audio_converter_screen.dart';
-import '../tools/file_compressor/file_compressor_screen.dart';
+import 'package:flutter/material.dart';
+
+import '../auth/screens/account_screen.dart';
+import '../auth/screens/email_verification_screen.dart';
+import '../auth/screens/password_reset_screen.dart';
 import '../auth/screens/signin_screen.dart';
 import '../auth/screens/signup_screen.dart';
-import '../auth/screens/password_reset_screen.dart';
-import '../auth/screens/email_verification_screen.dart';
-import '../auth/screens/account_screen.dart';
-import '../screens/billing/billing_success_screen.dart';
-import '../screens/billing/billing_cancel_screen.dart';
 import '../dev/e2e_playground.dart';
+import '../marketing/features_screen.dart';
+import '../marketing/pricing_screen.dart';
+import '../screens/billing/billing_cancel_screen.dart';
+import '../screens/billing/billing_success_screen.dart';
+import '../screens/landing/landing_page.dart';
+import '../screens/neo_home_screen.dart';
+import '../tools/audio_converter/audio_converter_screen.dart';
+import '../tools/audio_transcriber/audio_transcriber_screen.dart';
+import '../tools/codec_lab/codec_lab_screen.dart';
+import '../tools/csv_cleaner/csv_cleaner_screen.dart';
+import '../tools/file_compressor/file_compressor_screen.dart';
+import '../tools/file_merger/file_merger_screen.dart';
+import '../tools/id_gen/id_gen_screen.dart';
+import '../tools/image_resizer/image_resizer_screen.dart';
+import '../tools/invoice_lite/invoice_lite_screen.dart';
+import '../tools/json_doctor/json_doctor_screen.dart';
+import '../tools/json_flatten/json_flatten_screen.dart';
+import '../tools/md_to_pdf/md_to_pdf_screen.dart';
+import '../tools/palette_extractor/palette_extractor_screen.dart';
+import '../tools/password_gen/password_gen_screen.dart';
+import '../tools/qr_maker/qr_maker_screen.dart';
+import '../tools/regex_tester/regex_tester_screen.dart';
+import '../tools/subtitle_maker/subtitle_maker_screen.dart';
+import '../tools/text_diff/text_diff_screen.dart';
+import '../tools/text_tools/text_tools_screen.dart';
+import '../tools/time_convert/time_convert_screen.dart';
+import '../tools/unit_converter/unit_converter_screen.dart';
+import '../tools/url_short/url_short_screen.dart';
+import '../tools/video_converter/video_converter_screen.dart';
 
 // Central router for Toolspace micro-tools
 class ToolspaceRouter {
@@ -57,6 +62,10 @@ class ToolspaceRouter {
   static const String invoiceLite = '/tools/invoice-lite';
   static const String audioConverter = '/tools/audio-converter';
   static const String fileCompressor = '/tools/file-compressor';
+  // Phase 4 tools - Modular VATS components
+  static const String videoConverter = '/tools/video-converter';
+  static const String audioTranscriber = '/tools/audio-transcriber';
+  static const String subtitleMaker = '/tools/subtitle-maker';
   // Auth and billing
   static const String auth = '/auth';
   static const String authSignIn = '/auth/signin';
@@ -76,9 +85,9 @@ class ToolspaceRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
-        // TEMPORARY: Skip landing page due to rendering issues, go straight to dashboard
+        // Landing page with free tools section
         return MaterialPageRoute(
-          builder: (_) => const NeoHomeScreen(),
+          builder: (_) => const LandingPage(),
         );
       case dashboard:
         // Dashboard requires authentication
@@ -168,6 +177,18 @@ class ToolspaceRouter {
       case fileCompressor:
         return MaterialPageRoute(
           builder: (_) => const FileCompressorScreen(),
+        );
+      case videoConverter:
+        return MaterialPageRoute(
+          builder: (_) => const VideoConverterScreen(),
+        );
+      case audioTranscriber:
+        return MaterialPageRoute(
+          builder: (_) => const AudioTranscriberScreen(),
+        );
+      case subtitleMaker:
+        return MaterialPageRoute(
+          builder: (_) => const SubtitleMakerScreen(),
         );
       case auth:
         return MaterialPageRoute(

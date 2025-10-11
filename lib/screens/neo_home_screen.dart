@@ -1,44 +1,38 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../tools/text_tools/text_tools_screen.dart' deferred as text_tools;
-import '../tools/file_merger/file_merger_screen.dart' deferred as file_merger;
-import '../tools/json_doctor/json_doctor_screen.dart' deferred as json_doctor;
-import '../tools/text_diff/text_diff_screen.dart' deferred as text_diff;
-import '../tools/qr_maker/qr_maker_screen.dart' deferred as qr_maker;
-import '../tools/url_short/url_short_screen.dart' deferred as url_short;
-import '../tools/codec_lab/codec_lab_screen.dart' deferred as codec_lab;
-import '../tools/time_convert/time_convert_screen.dart'
-    deferred as time_convert;
-import '../tools/regex_tester/regex_tester_screen.dart'
-    deferred as regex_tester;
-import '../tools/id_gen/id_gen_screen.dart' deferred as id_gen;
-import '../tools/palette_extractor/palette_extractor_screen.dart'
-    deferred as palette_extractor;
-import '../tools/md_to_pdf/md_to_pdf_screen.dart' deferred as md_to_pdf;
-import '../tools/csv_cleaner/csv_cleaner_screen.dart' deferred as csv_cleaner;
-import '../tools/image_resizer/image_resizer_screen.dart'
-    deferred as image_resizer;
-import '../tools/password_gen/password_gen_screen.dart'
-    deferred as password_gen;
-import '../tools/json_flatten/json_flatten_screen.dart'
-    deferred as json_flatten;
-import '../tools/unit_converter/unit_converter_screen.dart'
-    deferred as unit_converter;
-import '../tools/invoice_lite/invoice_lite_screen.dart'
-    deferred as invoice_lite;
-import '../tools/file_compressor/file_compressor_screen.dart'
-    deferred as file_compressor;
-import '../tools/audio_converter/audio_converter_screen.dart'
-    deferred as audio_converter;
-import '../core/ui/neo_playground_theme.dart';
-import '../core/ui/animated_background.dart';
-import '../core/ui/states.dart';
-import '../core/widgets/tool_card.dart';
-import '../core/services/perf_monitor.dart';
+import 'package:flutter/material.dart';
+
 import '../billing/billing_service.dart';
 import '../billing/billing_types.dart';
-import '../billing/widgets/upgrade_sheet.dart';
 import '../billing/widgets/manage_billing_button.dart';
+import '../billing/widgets/upgrade_sheet.dart';
+import '../core/services/perf_monitor.dart';
+import '../core/ui/animated_background.dart';
+import '../core/ui/neo_playground_theme.dart';
+import '../core/ui/states.dart';
+import '../core/widgets/tool_card.dart';
+import '../tools/audio_converter/audio_converter_screen.dart' deferred as audio_converter;
+import '../tools/audio_transcriber/audio_transcriber_screen.dart' deferred as audio_transcriber;
+import '../tools/codec_lab/codec_lab_screen.dart' deferred as codec_lab;
+import '../tools/csv_cleaner/csv_cleaner_screen.dart' deferred as csv_cleaner;
+import '../tools/file_compressor/file_compressor_screen.dart' deferred as file_compressor;
+import '../tools/file_merger/file_merger_screen.dart' deferred as file_merger;
+import '../tools/id_gen/id_gen_screen.dart' deferred as id_gen;
+import '../tools/image_resizer/image_resizer_screen.dart' deferred as image_resizer;
+import '../tools/invoice_lite/invoice_lite_screen.dart' deferred as invoice_lite;
+import '../tools/json_doctor/json_doctor_screen.dart' deferred as json_doctor;
+import '../tools/json_flatten/json_flatten_screen.dart' deferred as json_flatten;
+import '../tools/md_to_pdf/md_to_pdf_screen.dart' deferred as md_to_pdf;
+import '../tools/palette_extractor/palette_extractor_screen.dart' deferred as palette_extractor;
+import '../tools/password_gen/password_gen_screen.dart' deferred as password_gen;
+import '../tools/qr_maker/qr_maker_screen.dart' deferred as qr_maker;
+import '../tools/regex_tester/regex_tester_screen.dart' deferred as regex_tester;
+import '../tools/subtitle_maker/subtitle_maker_screen.dart' deferred as subtitle_maker;
+import '../tools/text_diff/text_diff_screen.dart' deferred as text_diff;
+import '../tools/text_tools/text_tools_screen.dart' deferred as text_tools;
+import '../tools/time_convert/time_convert_screen.dart' deferred as time_convert;
+import '../tools/unit_converter/unit_converter_screen.dart' deferred as unit_converter;
+import '../tools/url_short/url_short_screen.dart' deferred as url_short;
+import '../tools/video_converter/video_converter_screen.dart' deferred as video_converter;
 
 class NeoHomeScreen extends StatefulWidget {
   const NeoHomeScreen({super.key});
@@ -89,8 +83,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
 
     // Filter by category
     if (_selectedCategory != 'All') {
-      tools =
-          tools.where((tool) => tool.category == _selectedCategory).toList();
+      tools = tools.where((tool) => tool.category == _selectedCategory).toList();
     }
 
     return tools;
@@ -144,17 +137,13 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                 children: [
                                   Text(
                                     'Toolspace ⚙️',
-                                    style: NeoPlaygroundTheme.headingLarge
-                                        .copyWith(
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black87,
+                                    style: NeoPlaygroundTheme.headingLarge.copyWith(
+                                      color: isDark ? Colors.white : Colors.black87,
                                     ),
                                   ),
                                   Text(
                                     'Your Playground for Creative Tools',
-                                    style:
-                                        NeoPlaygroundTheme.bodyMedium.copyWith(
+                                    style: NeoPlaygroundTheme.bodyMedium.copyWith(
                                       color: isDark
                                           ? Colors.white.withValues(alpha: 0.6)
                                           : Colors.black.withValues(alpha: 0.5),
@@ -176,21 +165,17 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                         ? Icons.account_circle_outlined
                                         : Icons.home_outlined,
                                   ),
-                                  tooltip:
-                                      isSignedIn ? 'Account' : 'Landing Page',
+                                  tooltip: isSignedIn ? 'Account' : 'Landing Page',
                                   onPressed: () {
                                     if (isSignedIn) {
-                                      Navigator.of(context)
-                                          .pushNamed('/account');
+                                      Navigator.of(context).pushNamed('/account');
                                     } else {
                                       Navigator.of(context).pushNamed('/');
                                     }
                                   },
                                   style: IconButton.styleFrom(
-                                    backgroundColor:
-                                        Colors.white.withValues(alpha: 0.1),
-                                    foregroundColor:
-                                        isDark ? Colors.white : Colors.black87,
+                                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                    foregroundColor: isDark ? Colors.white : Colors.black87,
                                   ),
                                 );
                               },
@@ -208,25 +193,20 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                                     isSignedIn ? Icons.logout : Icons.login,
                                     size: 18,
                                   ),
-                                  label:
-                                      Text(isSignedIn ? 'Sign Out' : 'Sign In'),
+                                  label: Text(isSignedIn ? 'Sign Out' : 'Sign In'),
                                   onPressed: () async {
                                     if (isSignedIn) {
                                       await FirebaseAuth.instance.signOut();
                                       if (context.mounted) {
-                                        Navigator.of(context)
-                                            .pushReplacementNamed('/');
+                                        Navigator.of(context).pushReplacementNamed('/');
                                       }
                                     } else {
-                                      Navigator.of(context)
-                                          .pushNamed('/auth/signin');
+                                      Navigator.of(context).pushNamed('/auth/signin');
                                     }
                                   },
                                   style: TextButton.styleFrom(
-                                    foregroundColor:
-                                        NeoPlaygroundTheme.primaryPurple,
-                                    backgroundColor:
-                                        Colors.white.withValues(alpha: 0.1),
+                                    foregroundColor: NeoPlaygroundTheme.primaryPurple,
+                                    backgroundColor: Colors.white.withValues(alpha: 0.1),
                                   ),
                                 );
                               },
@@ -285,8 +265,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: _categories.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 12),
+                            separatorBuilder: (context, index) => const SizedBox(width: 12),
                             itemBuilder: (context, index) {
                               final category = _categories[index];
                               return CategoryChip(
@@ -311,8 +290,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.all(24.0),
                   sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 350,
                       mainAxisSpacing: 20,
                       crossAxisSpacing: 20,
@@ -416,8 +394,7 @@ class _NeoHomeScreenState extends State<NeoHomeScreen> {
         Navigator.of(context).push(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => screen,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
               const begin = Offset(1.0, 0.0);
               const end = Offset.zero;
               const curve = Curves.easeOutCubic;
@@ -517,10 +494,45 @@ final List<_Tool> _tools = [
     category: 'Media',
   ),
   _Tool(
+    id: 'video-converter',
+    title: 'Video Converter',
+    description: 'Convert video files to high-quality audio formats',
+    icon: Icons.video_file,
+    loader: () async {
+      await video_converter.loadLibrary();
+      return video_converter.VideoConverterScreen();
+    },
+    color: const Color(0xFF9333EA),
+    category: 'Media',
+  ),
+  _Tool(
+    id: 'audio-transcriber',
+    title: 'Audio Transcriber',
+    description: 'Convert speech in audio files to accurate text transcripts',
+    icon: Icons.mic,
+    loader: () async {
+      await audio_transcriber.loadLibrary();
+      return audio_transcriber.AudioTranscriberScreen();
+    },
+    color: const Color(0xFFEA580C),
+    category: 'Media',
+  ),
+  _Tool(
+    id: 'subtitle-maker',
+    title: 'Subtitle Maker',
+    description: 'Convert text transcripts into formatted subtitle files (SRT, VTT)',
+    icon: Icons.subtitles,
+    loader: () async {
+      await subtitle_maker.loadLibrary();
+      return subtitle_maker.SubtitleMakerScreen();
+    },
+    color: const Color(0xFF0EA5E9),
+    category: 'Media',
+  ),
+  _Tool(
     id: 'text-tools',
     title: 'Text Tools',
-    description:
-        'Case conversion, cleaning, JSON formatting, and more text utilities',
+    description: 'Case conversion, cleaning, JSON formatting, and more text utilities',
     icon: Icons.text_fields,
     loader: () async {
       await text_tools.loadLibrary();
@@ -604,8 +616,7 @@ final List<_Tool> _tools = [
   _Tool(
     id: 'time-convert',
     title: 'Time Converter',
-    description:
-        'Convert timestamps between formats and parse natural language',
+    description: 'Convert timestamps between formats and parse natural language',
     icon: Icons.schedule,
     loader: () async {
       await time_convert.loadLibrary();
@@ -617,8 +628,7 @@ final List<_Tool> _tools = [
   _Tool(
     id: 'regex-tester',
     title: 'Regex Tester',
-    description:
-        'Test regex patterns with live match highlighting and capture groups',
+    description: 'Test regex patterns with live match highlighting and capture groups',
     icon: Icons.pattern,
     loader: () async {
       await regex_tester.loadLibrary();

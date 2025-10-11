@@ -5,6 +5,7 @@ This directory contains summary documentation for completed and in-progress epic
 ## Purpose
 
 Epic documents serve as:
+
 - **Completion Records**: Comprehensive summaries of finished multi-task initiatives
 - **Implementation References**: Technical details and architecture decisions
 - **Cross-References**: Links to all related code, tests, and documentation
@@ -27,6 +28,7 @@ Each epic document includes:
 ### Completed ✅
 
 - **[File Merger v1](./file-merger-v1-summary.md)**: PDF/image merging tool with quota management
+- **[Modular VATS Architecture](./modular-vats-architecture.md)**: Transformation from monolithic VATS to 3 focused micro-tools (Video Converter, Audio Transcriber, Subtitle Maker)
 
 ### In Progress 🔄
 

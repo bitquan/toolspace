@@ -13,6 +13,8 @@ class NeoPlaygroundTheme {
   static const Color primaryBlue = Color(0xFF3B82F6);
   static const Color accentPink = Color(0xFFEC4899);
   static const Color accentOrange = Color(0xFFF97316);
+  static const Color accentGreen = Color(0xFF10B981);
+  static const Color accentRed = Color(0xFFEF4444);
   static const Color darkBackground = Color(0xFF0F172A);
   static const Color lightBackground = Color(0xFFF8FAFC);
 
@@ -242,6 +244,12 @@ class NeoPlaygroundTheme {
     fontSize: 12,
     fontWeight: FontWeight.normal,
     letterSpacing: 0.5,
+  );
+
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    letterSpacing: 0.25,
   );
 
   // Animation durations
