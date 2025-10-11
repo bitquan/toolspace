@@ -12,6 +12,13 @@ The dev-log serves as a historical record of:
 - Decision-making processes
 - Lessons learned
 
+## Chronological Index
+
+### Phase 3 Development (October 2025)
+
+- **[2025-10-09: Phase 3 Final Wrapup](PHASE3_WRAPUP.md)** - Complete Phase 3 summary with all technical achievements, production metrics, and next phase planning
+- **[2025-10-09: Invoice Lite Service](phase-3-2025-10-09-invoice-lite-service.md)** - Invoice Lite implementation details
+
 ## Structure
 
 ### Quality Logs (`quality/logs/`)

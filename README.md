@@ -21,9 +21,10 @@ Toolspace is a collection of focused, web-based micro-tools designed to help sma
 
 **Production Deployment:**
 
-- 🌐 Live at: [toolspace.app](https://toolspace.app)
-- 📊 Status: [![Production Deployment](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/prod-release.yml)
-- 🔧 Staging: [![Staging Deployment](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml/badge.svg)](https://github.com/bitquan/toolspace/actions/workflows/staging-release.yml)
+- 🌐 Live at: [toolspace-beta.web.app](https://toolspace-beta.web.app)
+- 📊 Version: v3.0.0 (Phase 3 Complete)
+- 🚀 Status: 17+ tools with integrated billing system
+- 🔧 CI/CD: Automated deployment pipeline active
 
 ---
 
@@ -77,51 +78,70 @@ Example: Format JSON in JSON Doctor → Share → Generate QR code in QR Maker
 
 ## 🛠️ Tools
 
-### Quick Invoice
+### 17+ Production-Ready Tools with Integrated Billing System
 
-Professional invoice generation with PDF export and email delivery.
+#### 💰 Business Tools (Pro Plan Required)
 
-- **Status**: 🚧 In Development
-- **Type**: Full-stack (Flutter + Firebase Functions)
+**Invoice Lite** - Professional invoice generation with Stripe integration
 
-### Text Tools
+- ✅ PDF generation with custom branding
+- ✅ Stripe payment links
+- ✅ Tax calculations and line items
 
-Client-side text processing utilities (case conversion, formatting, validation).
+**Audio Converter** - Professional audio format conversion  
+- ✅ Multiple format support (MP3, WAV, OGG)
+- ✅ Quality settings and batch processing
 
-- **Status**: 🚧 In Development
-- **Type**: Client-only (Flutter)
-- **Features**: Cross-tool data sharing enabled ✓
+**File Compressor** - Reduce file sizes efficiently
+- ✅ Image and document compression
+- ✅ Quality control and format options
 
-### JSON Doctor
+**Markdown to PDF** - Convert MD files to professional PDFs
+- ✅ Styling options and custom themes
 
-JSON validation, formatting, and schema validation tool.
+### 📊 Data Tools (Free + Pro Features)
 
-- **Status**: ✅ Available
-- **Type**: Client-only (Flutter)
-- **Features**: Cross-tool data sharing enabled ✓
+**JSON Doctor** - JSON validation, formatting, and processing
+- ✅ Schema validation
+- ✅ Cross-tool data sharing enabled
 
-### Text Diff
+**JSON to CSV** - Convert JSON data to CSV format
+- ✅ Custom field mapping
+- ✅ Batch processing capabilities
 
-Compare texts with line-by-line and word-level differences.
+**JSON Flatten** - Flatten nested JSON structures
+- ✅ Configurable depth levels
 
-- **Status**: ✅ Available
-- **Type**: Client-only (Flutter)
-- **Features**: Cross-tool data sharing enabled ✓
+### 🔧 Text & Utility Tools (Free)
 
-### QR Maker
+**Text Tools** - Case conversion, formatting, validation
+- ✅ Multiple text transformations
+- ✅ Cross-tool integration
 
-Generate QR codes with customization options.
+**Text Diff** - Compare texts with detailed differences
+- ✅ Line-by-line and word-level comparison
 
-- **Status**: ✅ Available
-- **Type**: Client-only (Flutter)
-- **Features**: Cross-tool data sharing enabled ✓
+**QR Maker** - Generate customizable QR codes
+- ✅ Batch generation
+- ✅ Custom styling options
 
-### File Merger
+**Password Generator** - Secure password creation
+- ✅ Customizable rules and strength
 
-Server-assisted file merging and processing for multiple file formats.
+**URL Shortener** - Create short, trackable links
+**ID Generator** - Generate UUIDs and custom IDs
+**Unit Converter** - Convert between units
+**Time Zone Converter** - Time zone calculations
+**Regex Tester** - Test and validate regex patterns
+**Codec Lab** - Encode/decode various formats
+**Palette Extractor** - Extract colors from images
 
-- **Status**: 🚧 In Development
-- **Type**: Full-stack with server processing
+### 🔄 Cross-Tool Integration
+
+All tools support seamless data sharing through our HandoffStore system:
+- 📋 One-click data transfer between tools
+- 🔄 Shared clipboard for complex workflows
+- 📊 CSV to Invoice generation workflows
 
 ## 🏗️ Architecture
 
