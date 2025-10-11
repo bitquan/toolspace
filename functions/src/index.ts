@@ -40,7 +40,7 @@ setGlobalOptions({ maxInstances: 10 });
 // Export billing functions
 export { createCheckoutSession } from "./billing/createCheckoutSession";
 export { createPortalLink } from "./billing/createPortalLink";
-export { webhook as stripeWebhook } from "./billing/webhook";
+export { stripeWebhook } from "./billing/webhook";
 export { updateUserPlan } from "./billing/updateUserPlan"; // Temporary function for testing
 
 // Export legacy quota function (deprecated - for backward compatibility)

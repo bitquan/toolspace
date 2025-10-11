@@ -35,7 +35,7 @@ const webhookSecret =
   functions.config().stripe?.webhook_secret ||
   "";
 
-export const webhook = functions.https.onRequest(async (req, res) => {
+export const stripeWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
@@ -198,6 +198,9 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     planId,
     customerId,
     sessionId: session.id,
+    sessionMetadata: session.metadata,
+    clientReferenceId: session.client_reference_id,
+    allMetadataKeys: Object.keys(session.metadata || {}),
     source: session.metadata?.userId
       ? "metadata.userId"
       : session.metadata?.firebaseUid
@@ -303,6 +306,16 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
   let userId =
     subscription.metadata?.userId || subscription.metadata?.firebaseUid;
 
+  functions.logger.info(
+    "Processing subscription update - initial metadata check",
+    {
+      subscriptionId: subscription.id,
+      subscriptionMetadata: subscription.metadata,
+      foundUserId: userId,
+      allMetadataKeys: Object.keys(subscription.metadata || {}),
+    }
+  );
+
   // If not in subscription metadata, check customer metadata
   if (!userId && subscription.customer) {
     try {
@@ -311,6 +324,11 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
       );
       if (!customer.deleted) {
         userId = customer.metadata?.firebaseUserId || customer.metadata?.uid;
+        functions.logger.info("Resolved userId from customer metadata", {
+          customerId: subscription.customer,
+          customerMetadata: customer.metadata,
+          resolvedUserId: userId,
+        });
       }
     } catch (error) {
       functions.logger.warn("Failed to retrieve customer for subscription", {
@@ -359,19 +377,35 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
     updatedAt: Date.now(),
   };
 
-  await billingRef.set(updatedProfile, { merge: true });
+  try {
+    await billingRef.set(updatedProfile, { merge: true });
 
-  functions.logger.info("Subscription updated", {
-    userId,
-    planId,
-    status: subscription.status,
-    subscriptionId: subscription.id,
-    source: subscription.metadata?.userId
-      ? "subscription.metadata.userId"
-      : subscription.metadata?.firebaseUid
-      ? "subscription.metadata.firebaseUid"
-      : "customer.metadata",
-  });
+    functions.logger.info("Subscription updated successfully", {
+      userId,
+      planId,
+      validPlan,
+      finalPlanId: updatedProfile.planId,
+      status: subscription.status,
+      subscriptionId: subscription.id,
+      firestorePath: `users/${userId}/billing/profile`,
+      updatedProfile,
+      source: subscription.metadata?.userId
+        ? "subscription.metadata.userId"
+        : subscription.metadata?.firebaseUid
+        ? "subscription.metadata.firebaseUid"
+        : "customer.metadata",
+    });
+  } catch (error) {
+    functions.logger.error("Failed to update billing profile", {
+      userId,
+      planId,
+      subscriptionId: subscription.id,
+      firestorePath: `users/${userId}/billing/profile`,
+      error: (error as Error).message,
+      updatedProfile,
+    });
+    throw error; // Re-throw to cause 500 response for retry
+  }
 
   await logBillingEvent({
     eventId: event.id,
@@ -482,22 +516,32 @@ async function handleInvoicePaid(event: Stripe.Event) {
 
   // Update is handled by subscription.updated event
   // Just log for audit
-  await logBillingEvent({
-    eventId: event.id,
-    type: "invoice.paid",
-    userId: null, // Will be resolved via customerId
-    customerId,
-    subscriptionId,
-    planId: null,
-    status: "paid",
-    timestamp: Date.now(),
-    metadata: {
-      invoiceId: invoice.id,
-      amount: invoice.amount_paid,
-      currency: invoice.currency,
-    },
-    processed: true,
-  });
+  try {
+    await logBillingEvent({
+      eventId: event.id,
+      type: "invoice.paid",
+      userId: null, // Will be resolved via customerId
+      customerId,
+      subscriptionId,
+      planId: null,
+      status: "paid",
+      timestamp: Date.now(),
+      metadata: {
+        invoiceId: invoice.id,
+        amount: invoice.amount_paid,
+        currency: invoice.currency,
+      },
+      processed: true,
+    });
+  } catch (error) {
+    functions.logger.error("Failed to log invoice.paid event", {
+      eventId: event.id,
+      customerId,
+      subscriptionId,
+      error: (error as Error).message,
+    });
+    // Don't throw - invoice.paid is for audit logging only
+  }
 }
 
 /**

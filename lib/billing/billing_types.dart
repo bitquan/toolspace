@@ -218,24 +218,27 @@ class BillingProfile {
   }
 
   factory BillingProfile.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely parse timestamp
+    DateTime? safeParseTimestamp(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+      if (value is double && !value.isNaN && value.isFinite) {
+        return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+      }
+      return null; // Invalid timestamp
+    }
+
     return BillingProfile(
       stripeCustomerId: json['stripeCustomerId'] as String?,
       planId: PlanId.fromString(json['planId'] as String? ?? 'free'),
       status:
           SubscriptionStatus.fromString(json['status'] as String? ?? 'free'),
-      currentPeriodStart: json['currentPeriodStart'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-              json['currentPeriodStart'] as int)
-          : null,
-      currentPeriodEnd: json['currentPeriodEnd'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['currentPeriodEnd'] as int)
-          : null,
-      trialEnd: json['trialEnd'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['trialEnd'] as int)
-          : null,
+      currentPeriodStart: safeParseTimestamp(json['currentPeriodStart']),
+      currentPeriodEnd: safeParseTimestamp(json['currentPeriodEnd']),
+      trialEnd: safeParseTimestamp(json['trialEnd']),
       cancelAtPeriodEnd: json['cancelAtPeriodEnd'] as bool? ?? false,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int),
+      createdAt: safeParseTimestamp(json['createdAt']) ?? DateTime.now(),
+      updatedAt: safeParseTimestamp(json['updatedAt']) ?? DateTime.now(),
     );
   }
 

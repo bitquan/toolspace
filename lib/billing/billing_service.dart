@@ -89,43 +89,77 @@ class BillingService {
     }
 
     final userId = user.uid;
+    debugPrint(
+        '[BillingService] Starting billing listener for user: $userId (isAnonymous: ${user.isAnonymous})');
+    debugPrint(
+        '[BillingService] User email: ${user.email}, verified: ${user.emailVerified}');
 
     // Listen to billing profile
     _billingProfileSubscription =
         _firestore.doc('users/$userId/billing/profile').snapshots().listen(
       (snapshot) {
+        debugPrint(
+            '[BillingService] Billing profile snapshot received: exists=${snapshot.exists}');
         if (snapshot.exists) {
           final profile = BillingProfile.fromJson(snapshot.data()!);
+          debugPrint(
+              '[BillingService] Loaded billing profile: ${profile.planId.id}');
           _billingProfileController.add(profile);
         } else {
-          // Create default free profile
+          // Create default free profile for new users (including anonymous)
           final freeProfile = BillingProfile.free();
+          debugPrint(
+              '[BillingService] Creating default billing profile for user $userId');
           _firestore
               .doc('users/$userId/billing/profile')
-              .set(freeProfile.toJson());
-          _billingProfileController.add(freeProfile);
+              .set(freeProfile.toJson())
+              .then((_) {
+            debugPrint('[BillingService] Successfully created billing profile');
+            _billingProfileController.add(freeProfile);
+          }).catchError((error) {
+            debugPrint(
+                '[BillingService] Error creating billing profile: $error');
+            // Still add the profile to stream for UI to work
+            _billingProfileController.add(freeProfile);
+          });
         }
       },
       onError: (error) {
         debugPrint(
             '[BillingService] Error listening to billing profile: $error');
+        debugPrint('[BillingService] Error type: ${error.runtimeType}');
+        // On error, provide a default free profile so UI doesn't break
+        final freeProfile = BillingProfile.free();
+        debugPrint('[BillingService] Providing fallback free profile');
+        _billingProfileController.add(freeProfile);
       },
     );
 
     // Listen to today's usage
     final today = _getTodayDateString();
+    debugPrint('[BillingService] Starting usage listener for date: $today');
     _usageSubscription =
         _firestore.doc('users/$userId/usage/$today').snapshots().listen(
       (snapshot) {
+        debugPrint(
+            '[BillingService] Usage snapshot received: exists=${snapshot.exists}');
         if (snapshot.exists) {
           final usage = UsageRecord.fromJson(snapshot.data()!);
+          debugPrint(
+              '[BillingService] Loaded usage: ${usage.heavyOps + usage.lightOps} operations');
           _usageController.add(usage);
         } else {
+          debugPrint('[BillingService] No usage data, creating empty record');
           _usageController.add(UsageRecord.empty(today));
         }
       },
       onError: (error) {
         debugPrint('[BillingService] Error listening to usage: $error');
+        debugPrint('[BillingService] Usage error type: ${error.runtimeType}');
+        // On error, provide empty usage so UI doesn't break
+        final today = _getTodayDateString();
+        debugPrint('[BillingService] Providing fallback empty usage');
+        _usageController.add(UsageRecord.empty(today));
       },
     );
   }

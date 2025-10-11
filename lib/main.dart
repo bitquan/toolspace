@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'auth/screens/email_verification_screen.dart';
+import 'billing/billing_service.dart';
+import 'billing/billing_types.dart';
 import 'core/services/debug_logger.dart';
 import 'core/ui/neo_playground_theme.dart';
 import 'core/routes.dart';
@@ -39,18 +42,13 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Use Firebase emulators in debug mode
-    if (kDebugMode) {
-      // Connect to emulators
-      FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-      FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+    // PRODUCTION MODE: Using production Firebase services only
+    DebugLogger.info('🌐 Using production Firebase services');
 
-      DebugLogger.info(
-          '🔧 Using Firebase emulators (Auth:9099, Firestore:8080, Functions:5001)');
-    }
+    // Ensure we're NOT using any emulators - completely disabled
+    // No emulator configuration at all
 
-    // 🚫 DO NOT sign in anonymously here (removed)
+    // 🚫 DO NOT sign in anonymously here in production
     // Anonymous auth prevents proper email verification flow
   } catch (e) {
     // Firebase initialization failed - continue with app but Firebase features won't work
@@ -94,12 +92,87 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   bool _hasCheckedAndClearedBadAuth = false;
+  StreamSubscription<User?>? _authStateSubscription;
+  StreamSubscription<BillingProfile>? _billingSubscription;
+  User? _previousUser;
+  PlanId? _previousPlan;
 
   @override
   void initState() {
     super.initState();
     // NOTE: Removed _clearCachedAuth() - it was signing out users on every app load
     // This was causing the "sign in but stay on landing page" bug in production
+
+    // AUTO-REFRESH TOKEN: Listen for auth state changes to detect email verification
+    _authStateSubscription =
+        FirebaseAuth.instance.authStateChanges().listen(_handleAuthStateChange);
+  }
+
+  @override
+  void dispose() {
+    _authStateSubscription?.cancel();
+    _billingSubscription?.cancel();
+    super.dispose();
+  }
+
+  /// Setup billing profile listener for auto-refresh on upgrade
+  void _setupBillingListener() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final billingService = BillingService();
+      billingService.startListening();
+      _billingSubscription =
+          billingService.billingProfileStream.listen(_handleBillingChange);
+    }
+  }
+
+  /// Handle billing profile changes and auto-refresh token when plan changes
+  void _handleBillingChange(BillingProfile profile) async {
+    final currentPlan = profile.planId;
+
+    if (_previousPlan != null && _previousPlan != currentPlan) {
+      // Plan changed - likely an upgrade or downgrade
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await user.reload();
+          await user.getIdToken(true); // Force token refresh
+          DebugLogger.info(
+              '🔄 Auto-refreshed token after plan change: ${_previousPlan?.id} → ${currentPlan.id}');
+        }
+      } catch (e) {
+        DebugLogger.warning('Token refresh failed after plan change: $e');
+      }
+    }
+
+    _previousPlan = currentPlan;
+  }
+
+  /// Handle auth state changes and auto-refresh token when email becomes verified
+  void _handleAuthStateChange(User? user) async {
+    if (user != null && _previousUser != null) {
+      // Check if email verification status changed from false to true
+      final wasUnverified = !_previousUser!.emailVerified;
+      final nowVerified = user.emailVerified;
+
+      if (wasUnverified && nowVerified) {
+        try {
+          // Auto-refresh token when email verification is detected
+          await user.reload();
+          await user.getIdToken(true); // Force token refresh
+          DebugLogger.info('🔄 Auto-refreshed token after email verification');
+        } catch (e) {
+          DebugLogger.warning('Token refresh failed: $e');
+        }
+      }
+    }
+
+    _previousUser = user;
+
+    // Setup billing listener when user logs in
+    if (user != null && _previousUser == null) {
+      _setupBillingListener();
+    }
   }
 
   @override

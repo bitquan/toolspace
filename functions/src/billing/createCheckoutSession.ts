@@ -28,25 +28,36 @@ const stripe = new Stripe(
 );
 
 export const createCheckoutSession = functions.https.onCall(
-  async (
-    data: CreateCheckoutSessionRequest,
-    context
-  ): Promise<CreateCheckoutSessionResponse> => {
-    console.log("DEBUG: createCheckoutSession called with data:", data);
-
-    // Require authentication
+  async (data, context) => {
+    // Verify user is authenticated
     if (!context.auth) {
-      console.log("DEBUG: Authentication failed");
+      console.log("DEBUG: No auth context");
       throw new functions.https.HttpsError(
         "unauthenticated",
-        "Must be logged in"
+        "User must be authenticated"
       );
     }
 
-    console.log("DEBUG: User authenticated:", context.auth.uid);
+    // Log EVERYTHING about the auth context
+    console.log("DEBUG: Full auth context analysis:", {
+      authExists: !!context.auth,
+      uid: context.auth.uid,
+      uidLength: context.auth.uid?.length,
+      uidCharCodes: context.auth.uid?.split("").map((c) => c.charCodeAt(0)),
+      token: {
+        email: context.auth.token?.email,
+        email_verified: context.auth.token?.email_verified,
+        sub: context.auth.token?.sub,
+        firebase: {
+          identities: context.auth.token?.firebase?.identities,
+          sign_in_provider: context.auth.token?.firebase?.sign_in_provider,
+        },
+      },
+      rawContextAuth: JSON.stringify(context.auth),
+    });
 
-    // Require email verification before checkout
-    if (!context.auth.token.email_verified) {
+    // Check if user's email is verified
+    if (!context.auth.token?.email_verified) {
       console.log("DEBUG: Email not verified");
       throw new functions.https.HttpsError(
         "failed-precondition",
@@ -54,14 +65,76 @@ export const createCheckoutSession = functions.https.onCall(
       );
     }
 
-    const userId = context.auth.uid;
+    const rawUserId = context.auth.uid;
     const { planId, successUrl, cancelUrl } = data;
 
+    // Log the raw user ID for debugging
+    console.log("DEBUG: Raw user ID extracted:", {
+      rawUserId,
+      length: rawUserId?.length,
+      charCodes: rawUserId?.split("").map((c) => c.charCodeAt(0)),
+    });
+
+    // Validate and potentially correct user ID
+    // Check if this user exists in our database
+    let userId = rawUserId;
+    try {
+      const userDoc = await db.collection("users").doc(rawUserId).get();
+      if (!userDoc.exists) {
+        console.log(
+          "DEBUG: User not found with raw ID, checking for similar IDs"
+        );
+
+        // Look for users with similar IDs (potential character encoding issues)
+        const usersSnapshot = await db.collection("users").get();
+        let foundCorrectId = null;
+
+        usersSnapshot.forEach((doc) => {
+          const docId = doc.id;
+          // Check if the IDs are similar (same length, mostly same characters)
+          if (docId.length === rawUserId.length) {
+            let differences = 0;
+            for (let i = 0; i < docId.length; i++) {
+              if (docId[i] !== rawUserId[i]) {
+                differences++;
+              }
+            }
+            // If only 1-2 character differences, this might be the correct ID
+            if (differences <= 2) {
+              foundCorrectId = docId;
+              console.log("DEBUG: Found potential correct user ID:", {
+                original: rawUserId,
+                corrected: docId,
+                differences: differences,
+              });
+            }
+          }
+        });
+
+        if (foundCorrectId) {
+          userId = foundCorrectId;
+          console.log("DEBUG: Using corrected user ID:", userId);
+        } else {
+          console.log("DEBUG: No similar user ID found, using raw ID");
+        }
+      } else {
+        console.log("DEBUG: User found with raw ID, proceeding normally");
+      }
+    } catch (error) {
+      console.log("DEBUG: Error checking user existence:", error);
+    }
+
     console.log("DEBUG: Processing checkout for:", {
-      userId,
+      rawUserId,
+      finalUserId: userId,
+      userIdLength: userId?.length,
       planId,
       successUrl,
       cancelUrl,
+      authContext: {
+        uid: context.auth?.uid,
+        email: context.auth?.token?.email,
+      },
     });
 
     // Validate plan
