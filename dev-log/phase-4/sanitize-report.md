@@ -1,0 +1,655 @@
+# Repository Sanitize Report - Phase 4A
+
+Generated: 2025-10-12T01:39:56.211Z
+
+## Summary
+- 📁 Total files scanned: 851
+- 💾 Total size: 46.61 MB
+- 🗑️ Orphaned files: 93
+- 📍 Misplaced files: 207
+- ❌ Invalid extensions: 77
+- 📂 Empty directories: 5
+
+## File Type Distribution
+
+- .md: 344 files
+- .dart: 181 files
+- .js: 74 files
+- .ts: 50 files
+- .json: 36 files
+- .map: 35 files
+- .png: 28 files
+- .mjs: 19 files
+- no-extension: 15 files
+- .txt: 11 files
+- .ps1: 11 files
+- .yml: 9 files
+- .sh: 5 files
+- .log: 4 files
+- .symbols: 4 files
+- .wasm: 4 files
+- .cjs: 3 files
+- .html: 2 files
+- .xml: 2 files
+- .yaml: 2 files
+- .rules: 2 files
+- .cache: 1 files
+- .bin: 1 files
+- .otf: 1 files
+- .frag: 1 files
+- .backup: 1 files
+- .template: 1 files
+- .ico: 1 files
+- .lock: 1 files
+- .csv: 1 files
+- .iml: 1 files
+
+## 🗑️ Orphaned Files
+
+- `.firebase/logs/vsce-debug.log` (521.9 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-192.png` (5.17 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-512.png` (8.06 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-maskable-192.png` (5.46 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-maskable-512.png` (20.51 KB)
+- `core/routes.dart` (9.71 KB)
+- `core/routes.dart.backup` (25.07 KB)
+- `core/ui/clipboard_btn.dart` (1.81 KB)
+- `firestore-debug.log` (1.14 KB)
+- `flutter_01.log` (4.33 KB)
+- `flutter_02.log` (2.77 KB)
+- `lib/auth/guards/route_guards.dart` (12.57 KB)
+- `lib/auth/helpers/reauth_helper.dart` (8.56 KB)
+- `lib/auth/screens/account_screen.dart` (23.24 KB)
+- `lib/auth/screens/email_verification_screen.dart` (14.45 KB)
+- `lib/auth/screens/password_reset_screen.dart` (11.81 KB)
+- `lib/auth/screens/signin_screen.dart` (12.28 KB)
+- `lib/auth/screens/signup_screen.dart` (14.53 KB)
+- `lib/auth/services/auth_service.dart` (13.43 KB)
+- `lib/auth/widgets/auth_form_field.dart` (3.43 KB)
+- `lib/auth/widgets/auth_glass_panel.dart` (1.37 KB)
+- `lib/auth/widgets/email_verification_dialog.dart` (11.07 KB)
+- `lib/auth/widgets/google_sign_in_button.dart` (2.7 KB)
+- `lib/billing/billing_service.dart` (14.39 KB)
+- `lib/billing/billing_types.dart` (17.35 KB)
+- `lib/billing/credits_service.dart` (7.29 KB)
+- `lib/billing/integration_example.dart` (2.74 KB)
+- `lib/billing/widgets/manage_billing_button.dart` (2.08 KB)
+- `lib/billing/widgets/paywall_guard.dart` (8.05 KB)
+- `lib/billing/widgets/plan_status_banner.dart` (11.01 KB)
+- `lib/billing/widgets/quota_banner.dart` (4.33 KB)
+- `lib/billing/widgets/upgrade_sheet.dart` (14.97 KB)
+- `lib/config/stripe_config.dart` (899 Bytes)
+- `lib/cross/widgets/share_toolbar.dart` (13.48 KB)
+- `lib/dev/e2e_playground.dart` (16.23 KB)
+- `lib/marketing/features_screen.dart` (7.52 KB)
+- `lib/marketing/pricing_screen.dart` (12.18 KB)
+- `lib/tools/codec_lab/logic/codec_engine.dart` (7.14 KB)
+- `lib/tools/csv_cleaner/logic/csv_processor.dart` (5.11 KB)
+- `lib/tools/file_merger/logic/upload_manager.dart` (5.2 KB)
+- `lib/tools/file_merger/widgets/file_list.dart` (3.66 KB)
+- `lib/tools/file_merger/widgets/file_upload_zone.dart` (2.31 KB)
+- `lib/tools/file_merger/widgets/merge_progress.dart` (2.01 KB)
+- `lib/tools/file_merger/widgets/quota_banner.dart` (4.83 KB)
+- `lib/tools/image_resizer/logic/upload_manager.dart` (3.74 KB)
+- `lib/tools/image_resizer/widgets/image_list.dart` (1.96 KB)
+- `lib/tools/image_resizer/widgets/image_upload_zone.dart` (2.33 KB)
+- `lib/tools/image_resizer/widgets/resize_progress.dart` (1.39 KB)
+- `lib/tools/invoice_lite/models/business_info.dart` (1.37 KB)
+- `lib/tools/invoice_lite/models/client_info.dart` (1.11 KB)
+- `lib/tools/invoice_lite/models/invoice_item.dart` (1.56 KB)
+- `lib/tools/invoice_lite/models/invoice_lite.dart` (5.95 KB)
+- `lib/tools/invoice_lite/models/models.dart` (146 Bytes)
+- `lib/tools/json_doctor/logic/jsonpath_query.dart` (5.81 KB)
+- `lib/tools/json_doctor/logic/schema_validator.dart` (6.88 KB)
+- `lib/tools/json_flatten/logic/json_flattener.dart` (8.83 KB)
+- `lib/tools/md_to_pdf/logic/pdf_exporter.dart` (895 Bytes)
+- `lib/tools/md_to_pdf/widgets/export_options_dialog.dart` (6.75 KB)
+- `lib/tools/palette_extractor/logic/color_utils.dart` (2.53 KB)
+- `lib/tools/palette_extractor/logic/kmeans_clustering.dart` (7.62 KB)
+- `lib/tools/palette_extractor/logic/palette_exporter.dart` (4.18 KB)
+- `lib/tools/palette_extractor/widgets/color_swatch_card.dart` (7.2 KB)
+- `lib/tools/palette_extractor/widgets/image_upload_zone.dart` (3.02 KB)
+- `lib/tools/password_gen/logic/password_generator.dart` (4.5 KB)
+- `lib/tools/regex_tester/logic/regex_engine.dart` (4.28 KB)
+- `lib/tools/regex_tester/logic/regex_presets.dart` (5.96 KB)
+- `lib/tools/text_diff/logic/word_diff_engine.dart` (8.04 KB)
+- `lib/tools/text_tools/logic/case_convert.dart` (3.63 KB)
+- `lib/tools/text_tools/logic/clean_text.dart` (3.71 KB)
+- `lib/tools/text_tools/logic/counters.dart` (5.56 KB)
+- `lib/tools/text_tools/logic/json_tools.dart` (5.6 KB)
+- `lib/tools/text_tools/logic/nanoid_gen.dart` (4.6 KB)
+- `lib/tools/text_tools/logic/slugify.dart` (4.53 KB)
+- `lib/tools/text_tools/logic/uuid_gen.dart` (3.86 KB)
+- `lib/tools/time_convert/logic/timestamp_converter.dart` (6.96 KB)
+- `lib/tools/unit_converter/logic/conversion_history.dart` (1.08 KB)
+- `lib/tools/unit_converter/logic/unit_converter.dart` (7.71 KB)
+- `lib/tools/unit_converter/logic/unit_search.dart` (4.69 KB)
+- `test/test_helpers/firebase_test_helper.dart` (4.18 KB)
+- `tools/smoke/run_smoke.dart` (11.04 KB)
+- `tools/smoke/run_smoke_broken.dart` (16.16 KB)
+- `tools/smoke/run_smoke_fixed.dart` (10.76 KB)
+- `tools/text_tools/logic/case_convert.dart` (3.63 KB)
+- `tools/text_tools/logic/clean_text.dart` (3.71 KB)
+- `tools/text_tools/logic/counters.dart` (5.56 KB)
+- `tools/text_tools/logic/json_tools.dart` (5.6 KB)
+- `tools/text_tools/logic/slugify.dart` (4.53 KB)
+- `tools/text_tools/logic/uuid_gen.dart` (2.83 KB)
+- `tools/text_tools/text_tools_screen.dart` (16.94 KB)
+- `web/icons/Icon-192.png` (5.17 KB)
+- `web/icons/Icon-512.png` (8.06 KB)
+- `web/icons/Icon-maskable-192.png` (5.46 KB)
+- `web/icons/Icon-maskable-512.png` (20.51 KB)
+
+## 📍 Misplaced Files
+
+- `.firebase/toolspace-beta/hosting/canvaskit/canvaskit.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/chromium/canvaskit.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/skwasm.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/skwasm_heavy.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter_bootstrap.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter_service_worker.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_1.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_10.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_11.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_12.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_13.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_14.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_15.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_16.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_17.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_18.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_19.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_2.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_20.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_21.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_22.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_23.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_3.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_4.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_5.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_6.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_7.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_8.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_9.part.js`: Scripts should be in scripts/ directory
+- `.github/ISSUE_TEMPLATE/bug_report.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/feature_request.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/phase3-issues.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/task.md`: Documentation should be in docs/ directory
+- `.github/PULL_REQUEST_TEMPLATE.md`: Documentation should be in docs/ directory
+- `AGENTS.md`: Documentation should be in docs/ directory
+- `CONTRIBUTING.md`: Documentation should be in docs/ directory
+- `CRITICAL_IMPLEMENTATION_GAPS.md`: Documentation should be in docs/ directory
+- `DEPLOYMENT.md`: Documentation should be in docs/ directory
+- `DEV_MANUAL.md`: Documentation should be in docs/ directory
+- `FINAL_IMPLEMENTATION_STATUS.md`: Documentation should be in docs/ directory
+- `FULL_APP_TEST_REPORT.md`: Documentation should be in docs/ directory
+- `HARD_REFRESH_NEEDED.md`: Documentation should be in docs/ directory
+- `LOCAL_DEV_GUIDE.md`: Documentation should be in docs/ directory
+- `LOCAL_TEST_STATUS.md`: Documentation should be in docs/ directory
+- `MONETIZATION_ROADMAP.md`: Documentation should be in docs/ directory
+- `NEXT_STEPS.md`: Documentation should be in docs/ directory
+- `PRODUCTION_CHECKLIST.md`: Documentation should be in docs/ directory
+- `PRODUCTION_READINESS_REPORT.md`: Documentation should be in docs/ directory
+- `STATUS.md`: Documentation should be in docs/ directory
+- `STRIPE_CLI_INSTALL.md`: Documentation should be in docs/ directory
+- `archive/AUTH01_IMPLEMENTATION_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/AUTH_01_EXECUTION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/AUTH_EMAIL_VERIFICATION_FIX.md`: Documentation should be in docs/ directory
+- `archive/AUTH_SECURITY_EPIC_PLAN.md`: Documentation should be in docs/ directory
+- `archive/AUTH_SIGNIN_FIX.md`: Documentation should be in docs/ directory
+- `archive/CI_REFACTOR_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/COMPLETE_FIX_REPORT.md`: Documentation should be in docs/ directory
+- `archive/FIX_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/IMPLEMENTATION_STATUS.md`: Documentation should be in docs/ directory
+- `archive/IMPLEMENTATION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_FAILURE_REPORT.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_START_FIX.md`: Documentation should be in docs/ directory
+- `archive/NEO_DESIGN_UNIVERSAL_STATUS.md`: Documentation should be in docs/ directory
+- `archive/NEO_UI_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/PALETTE_EXTRACTOR_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/PHASE3A_PR_DESCRIPTION.md`: Documentation should be in docs/ directory
+- `archive/SESSION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_PROGRESS.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_PROGRESS_REPORT.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_SETUP.md`: Documentation should be in docs/ directory
+- `archive/TEST_FIX_STRATEGY.md`: Documentation should be in docs/ directory
+- `archive/TEST_RESULTS_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/TOOLSPACE_STATUS_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/WHITE_SCREEN_FIX.md`: Documentation should be in docs/ directory
+- `archive/issue-ci-hygiene.md`: Documentation should be in docs/ directory
+- `archive/issue-firebase-hosting.md`: Documentation should be in docs/ directory
+- `archive/issue-google-sign-in.md`: Documentation should be in docs/ directory
+- `archive/pr-audit-comment.md`: Documentation should be in docs/ directory
+- `archive/pr-body-updated.md`: Documentation should be in docs/ directory
+- `archive/temp-issue-branch-protection.md`: Documentation should be in docs/ directory
+- `archive/temp-issue-secrets.md`: Documentation should be in docs/ directory
+- `batch-merge-prs.ps1`: Scripts should be in scripts/ directory
+- `core/README.md`: Documentation should be in docs/ directory
+- `dev-log/2025-10-phase4-local.md`: Documentation should be in docs/ directory
+- `dev-log/PHASE3_WRAPUP.md`: Documentation should be in docs/ directory
+- `dev-log/README.md`: Documentation should be in docs/ directory
+- `dev-log/modular-vats-implementation-2025-10-11.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-06-json-flatten-implementation.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-08-ci-refactor.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-08-ops-localgate.md`: Documentation should be in docs/ directory
+- `dev-log/operations/csv-cleaner-implementation-2025-10-06.md`: Documentation should be in docs/ directory
+- `dev-log/phase-3-2025-10-09-invoice-lite-service.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/E2E-TESTS.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/E2E_TESTING_COMPLETION.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/FINAL-CODE-SYNC-REPORT.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/TOOL_AUDIT_FINDINGS.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/billing-audit-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/code-sync-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/docs-rollout-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/progress.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/route-audit-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/sanitize-report.md`: Documentation should be in docs/ directory
+- `dev-start.ps1`: Scripts should be in scripts/ directory
+- `flutter-run-clean.sh`: Scripts should be in scripts/ directory
+- `functions/.eslintrc.js`: Scripts should be in scripts/ directory
+- `functions/eslint.config.js`: Scripts should be in scripts/ directory
+- `functions/jest.config.js`: Scripts should be in scripts/ directory
+- `functions/jest.config.rules.js`: Scripts should be in scripts/ directory
+- `functions/lib/__tests__/health.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/__tests__/setup.js`: Scripts should be in scripts/ directory
+- `functions/lib/admin.js`: Scripts should be in scripts/ directory
+- `functions/lib/api/health.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/createCheckoutSession.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/createPortalLink.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/entitlements.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/updateUserPlan.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/webhook.js`: Scripts should be in scripts/ directory
+- `functions/lib/config/validation.js`: Scripts should be in scripts/ directory
+- `functions/lib/health.js`: Scripts should be in scripts/ directory
+- `functions/lib/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/auth-validation.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/auth.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/withAuth.js`: Scripts should be in scripts/ directory
+- `functions/lib/quickUpdate.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/__tests__/quota.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/merge_pdfs.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/quota.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/image_resizer/resize_images.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/invoice_lite/generatePdf.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/invoice_lite/paymentLink.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/__tests__/themes.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/generate_pdf.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/themes.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/quota/getQuotaStatus.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/url-short/__tests__/url-short.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/url-short/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/auth.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/billing.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/errors.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/guards.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/logger.js`: Scripts should be in scripts/ directory
+- `functions/security-validation.js`: Scripts should be in scripts/ directory
+- `functions/test/rules.spec.js`: Scripts should be in scripts/ directory
+- `lib/auth/screens/account_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/email_verification_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/password_reset_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/signin_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/signup_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/services/auth_service.dart`: Tool implementations should be in lib/tools/
+- `lib/billing/billing_service.dart`: Tool implementations should be in lib/tools/
+- `lib/billing/credits_service.dart`: Tool implementations should be in lib/tools/
+- `lib/core/README.md`: Documentation should be in docs/ directory
+- `lib/core/services/README.md`: Documentation should be in docs/ directory
+- `lib/core/services/shared_data_service.dart`: Tool implementations should be in lib/tools/
+- `lib/marketing/features_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/marketing/pricing_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/billing/billing_cancel_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/billing/billing_success_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/home_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/neo_home_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/shared/shared_data_service.dart`: Tool implementations should be in lib/tools/
+- `lib/tools/password_gen/README.md`: Documentation should be in docs/ directory
+- `lib/tools/text_tools/README.md`: Documentation should be in docs/ directory
+- `lib/tools/url_short/README.md`: Documentation should be in docs/ directory
+- `local-ci/MISSION_ACCOMPLISHED.md`: Documentation should be in docs/ directory
+- `local-ci/TEST_FAILURES_REPORT.md`: Documentation should be in docs/ directory
+- `local-ci/WEB_BUILD_STATUS.md`: Documentation should be in docs/ directory
+- `local-ci/ZERO_TOLERANCE_STATUS.md`: Documentation should be in docs/ directory
+- `local-ci/summary.md`: Documentation should be in docs/ directory
+- `merge-prs.ps1`: Scripts should be in scripts/ directory
+- `operations/logs/2025-10-06-local-stabilize-billing-e2e.md`: Documentation should be in docs/ directory
+- `operations/logs/2025-10-06-monetization-v1-prodgate.md`: Documentation should be in docs/ directory
+- `operations/logs/monetization-v1-progress.md`: Documentation should be in docs/ directory
+- `operations/logs/monetization-v1-ui.md`: Documentation should be in docs/ directory
+- `operations/logs/phase3a-summary.md`: Documentation should be in docs/ directory
+- `operations/logs/phase4-neo-ui-overhaul.md`: Documentation should be in docs/ directory
+- `operations/logs/task-roadmap-seeding.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/feat-ci-hygiene-unified-pipeline.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/fix-ci-firebase-hosting-missing-flutter.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/fix-ci-google-sign-in-dart-sdk-mismatch.md`: Documentation should be in docs/ directory
+- `public/README.md`: Documentation should be in docs/ directory
+- `simple-batch-merge.ps1`: Scripts should be in scripts/ directory
+- `temp_update_plan.js`: Scripts should be in scripts/ directory
+- `test/tools/json_doctor/IMPLEMENTATION_NOTES.md`: Documentation should be in docs/ directory
+- `test/tools/json_doctor/README.md`: Documentation should be in docs/ directory
+- `test/tools/json_doctor/TESTING.md`: Documentation should be in docs/ directory
+- `tools/file_merger/README.md`: Documentation should be in docs/ directory
+- `tools/quick_invoice/README.md`: Documentation should be in docs/ directory
+- `tools/smoke/fixtures/md/sample.md`: Documentation should be in docs/ directory
+- `tools/smoke/report/smoke_report.md`: Documentation should be in docs/ directory
+- `tools/smoke/smoke_plan.md`: Documentation should be in docs/ directory
+- `tools/text_tools/README.md`: Documentation should be in docs/ directory
+- `tools/text_tools/text_tools_screen.dart`: Tool implementations should be in lib/tools/
+- `tools/video_converter/CHANGELOG.md`: Documentation should be in docs/ directory
+- `tools/video_converter/INTEGRATION.md`: Documentation should be in docs/ directory
+- `tools/video_converter/LIMITS.md`: Documentation should be in docs/ directory
+- `tools/video_converter/README.md`: Documentation should be in docs/ directory
+- `tools/video_converter/TESTS.md`: Documentation should be in docs/ directory
+- `tools/video_converter/UX.md`: Documentation should be in docs/ directory
+- `update_plan.ps1`: Scripts should be in scripts/ directory
+- `update_plan_smart.js`: Scripts should be in scripts/ directory
+
+## 🧹 Cleanup Plan
+
+### Files to Delete
+- `.firebase/logs/vsce-debug.log`: Orphaned file (saves 521.9 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-192.png`: Orphaned file (saves 5.17 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-512.png`: Orphaned file (saves 8.06 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-maskable-192.png`: Orphaned file (saves 5.46 KB)
+- `.firebase/toolspace-beta/hosting/icons/Icon-maskable-512.png`: Orphaned file (saves 20.51 KB)
+- `core/routes.dart`: Orphaned file (saves 9.71 KB)
+- `core/routes.dart.backup`: Orphaned file (saves 25.07 KB)
+- `core/ui/clipboard_btn.dart`: Orphaned file (saves 1.81 KB)
+- `firestore-debug.log`: Orphaned file (saves 1.14 KB)
+- `flutter_01.log`: Orphaned file (saves 4.33 KB)
+- `flutter_02.log`: Orphaned file (saves 2.77 KB)
+- `lib/auth/guards/route_guards.dart`: Orphaned file (saves 12.57 KB)
+- `lib/auth/helpers/reauth_helper.dart`: Orphaned file (saves 8.56 KB)
+- `lib/auth/screens/account_screen.dart`: Orphaned file (saves 23.24 KB)
+- `lib/auth/screens/email_verification_screen.dart`: Orphaned file (saves 14.45 KB)
+- `lib/auth/screens/password_reset_screen.dart`: Orphaned file (saves 11.81 KB)
+- `lib/auth/screens/signin_screen.dart`: Orphaned file (saves 12.28 KB)
+- `lib/auth/screens/signup_screen.dart`: Orphaned file (saves 14.53 KB)
+- `lib/auth/services/auth_service.dart`: Orphaned file (saves 13.43 KB)
+- `lib/auth/widgets/auth_form_field.dart`: Orphaned file (saves 3.43 KB)
+- `lib/auth/widgets/auth_glass_panel.dart`: Orphaned file (saves 1.37 KB)
+- `lib/auth/widgets/email_verification_dialog.dart`: Orphaned file (saves 11.07 KB)
+- `lib/auth/widgets/google_sign_in_button.dart`: Orphaned file (saves 2.7 KB)
+- `lib/billing/billing_service.dart`: Orphaned file (saves 14.39 KB)
+- `lib/billing/billing_types.dart`: Orphaned file (saves 17.35 KB)
+- `lib/billing/credits_service.dart`: Orphaned file (saves 7.29 KB)
+- `lib/billing/integration_example.dart`: Orphaned file (saves 2.74 KB)
+- `lib/billing/widgets/manage_billing_button.dart`: Orphaned file (saves 2.08 KB)
+- `lib/billing/widgets/paywall_guard.dart`: Orphaned file (saves 8.05 KB)
+- `lib/billing/widgets/plan_status_banner.dart`: Orphaned file (saves 11.01 KB)
+- `lib/billing/widgets/quota_banner.dart`: Orphaned file (saves 4.33 KB)
+- `lib/billing/widgets/upgrade_sheet.dart`: Orphaned file (saves 14.97 KB)
+- `lib/config/stripe_config.dart`: Orphaned file (saves 899 Bytes)
+- `lib/cross/widgets/share_toolbar.dart`: Orphaned file (saves 13.48 KB)
+- `lib/dev/e2e_playground.dart`: Orphaned file (saves 16.23 KB)
+- `lib/marketing/features_screen.dart`: Orphaned file (saves 7.52 KB)
+- `lib/marketing/pricing_screen.dart`: Orphaned file (saves 12.18 KB)
+- `lib/tools/codec_lab/logic/codec_engine.dart`: Orphaned file (saves 7.14 KB)
+- `lib/tools/csv_cleaner/logic/csv_processor.dart`: Orphaned file (saves 5.11 KB)
+- `lib/tools/file_merger/logic/upload_manager.dart`: Orphaned file (saves 5.2 KB)
+- `lib/tools/file_merger/widgets/file_list.dart`: Orphaned file (saves 3.66 KB)
+- `lib/tools/file_merger/widgets/file_upload_zone.dart`: Orphaned file (saves 2.31 KB)
+- `lib/tools/file_merger/widgets/merge_progress.dart`: Orphaned file (saves 2.01 KB)
+- `lib/tools/file_merger/widgets/quota_banner.dart`: Orphaned file (saves 4.83 KB)
+- `lib/tools/image_resizer/logic/upload_manager.dart`: Orphaned file (saves 3.74 KB)
+- `lib/tools/image_resizer/widgets/image_list.dart`: Orphaned file (saves 1.96 KB)
+- `lib/tools/image_resizer/widgets/image_upload_zone.dart`: Orphaned file (saves 2.33 KB)
+- `lib/tools/image_resizer/widgets/resize_progress.dart`: Orphaned file (saves 1.39 KB)
+- `lib/tools/invoice_lite/models/business_info.dart`: Orphaned file (saves 1.37 KB)
+- `lib/tools/invoice_lite/models/client_info.dart`: Orphaned file (saves 1.11 KB)
+- `lib/tools/invoice_lite/models/invoice_item.dart`: Orphaned file (saves 1.56 KB)
+- `lib/tools/invoice_lite/models/invoice_lite.dart`: Orphaned file (saves 5.95 KB)
+- `lib/tools/invoice_lite/models/models.dart`: Orphaned file (saves 146 Bytes)
+- `lib/tools/json_doctor/logic/jsonpath_query.dart`: Orphaned file (saves 5.81 KB)
+- `lib/tools/json_doctor/logic/schema_validator.dart`: Orphaned file (saves 6.88 KB)
+- `lib/tools/json_flatten/logic/json_flattener.dart`: Orphaned file (saves 8.83 KB)
+- `lib/tools/md_to_pdf/logic/pdf_exporter.dart`: Orphaned file (saves 895 Bytes)
+- `lib/tools/md_to_pdf/widgets/export_options_dialog.dart`: Orphaned file (saves 6.75 KB)
+- `lib/tools/palette_extractor/logic/color_utils.dart`: Orphaned file (saves 2.53 KB)
+- `lib/tools/palette_extractor/logic/kmeans_clustering.dart`: Orphaned file (saves 7.62 KB)
+- `lib/tools/palette_extractor/logic/palette_exporter.dart`: Orphaned file (saves 4.18 KB)
+- `lib/tools/palette_extractor/widgets/color_swatch_card.dart`: Orphaned file (saves 7.2 KB)
+- `lib/tools/palette_extractor/widgets/image_upload_zone.dart`: Orphaned file (saves 3.02 KB)
+- `lib/tools/password_gen/logic/password_generator.dart`: Orphaned file (saves 4.5 KB)
+- `lib/tools/regex_tester/logic/regex_engine.dart`: Orphaned file (saves 4.28 KB)
+- `lib/tools/regex_tester/logic/regex_presets.dart`: Orphaned file (saves 5.96 KB)
+- `lib/tools/text_diff/logic/word_diff_engine.dart`: Orphaned file (saves 8.04 KB)
+- `lib/tools/text_tools/logic/case_convert.dart`: Orphaned file (saves 3.63 KB)
+- `lib/tools/text_tools/logic/clean_text.dart`: Orphaned file (saves 3.71 KB)
+- `lib/tools/text_tools/logic/counters.dart`: Orphaned file (saves 5.56 KB)
+- `lib/tools/text_tools/logic/json_tools.dart`: Orphaned file (saves 5.6 KB)
+- `lib/tools/text_tools/logic/nanoid_gen.dart`: Orphaned file (saves 4.6 KB)
+- `lib/tools/text_tools/logic/slugify.dart`: Orphaned file (saves 4.53 KB)
+- `lib/tools/text_tools/logic/uuid_gen.dart`: Orphaned file (saves 3.86 KB)
+- `lib/tools/time_convert/logic/timestamp_converter.dart`: Orphaned file (saves 6.96 KB)
+- `lib/tools/unit_converter/logic/conversion_history.dart`: Orphaned file (saves 1.08 KB)
+- `lib/tools/unit_converter/logic/unit_converter.dart`: Orphaned file (saves 7.71 KB)
+- `lib/tools/unit_converter/logic/unit_search.dart`: Orphaned file (saves 4.69 KB)
+- `test/test_helpers/firebase_test_helper.dart`: Orphaned file (saves 4.18 KB)
+- `tools/smoke/run_smoke.dart`: Orphaned file (saves 11.04 KB)
+- `tools/smoke/run_smoke_broken.dart`: Orphaned file (saves 16.16 KB)
+- `tools/smoke/run_smoke_fixed.dart`: Orphaned file (saves 10.76 KB)
+- `tools/text_tools/logic/case_convert.dart`: Orphaned file (saves 3.63 KB)
+- `tools/text_tools/logic/clean_text.dart`: Orphaned file (saves 3.71 KB)
+- `tools/text_tools/logic/counters.dart`: Orphaned file (saves 5.56 KB)
+- `tools/text_tools/logic/json_tools.dart`: Orphaned file (saves 5.6 KB)
+- `tools/text_tools/logic/slugify.dart`: Orphaned file (saves 4.53 KB)
+- `tools/text_tools/logic/uuid_gen.dart`: Orphaned file (saves 2.83 KB)
+- `tools/text_tools/text_tools_screen.dart`: Orphaned file (saves 16.94 KB)
+- `web/icons/Icon-192.png`: Orphaned file (saves 5.17 KB)
+- `web/icons/Icon-512.png`: Orphaned file (saves 8.06 KB)
+- `web/icons/Icon-maskable-192.png`: Orphaned file (saves 5.46 KB)
+- `web/icons/Icon-maskable-512.png`: Orphaned file (saves 20.51 KB)
+
+### Files to Move
+- `.firebase/toolspace-beta/hosting/canvaskit/canvaskit.js` → `scripts/canvaskit.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/chromium/canvaskit.js` → `scripts/canvaskit.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/skwasm.js` → `scripts/skwasm.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/canvaskit/skwasm_heavy.js` → `scripts/skwasm_heavy.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter.js` → `scripts/flutter.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter_bootstrap.js` → `scripts/flutter_bootstrap.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/flutter_service_worker.js` → `scripts/flutter_service_worker.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js` → `scripts/main.dart.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_1.part.js` → `scripts/main.dart.js_1.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_10.part.js` → `scripts/main.dart.js_10.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_11.part.js` → `scripts/main.dart.js_11.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_12.part.js` → `scripts/main.dart.js_12.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_13.part.js` → `scripts/main.dart.js_13.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_14.part.js` → `scripts/main.dart.js_14.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_15.part.js` → `scripts/main.dart.js_15.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_16.part.js` → `scripts/main.dart.js_16.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_17.part.js` → `scripts/main.dart.js_17.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_18.part.js` → `scripts/main.dart.js_18.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_19.part.js` → `scripts/main.dart.js_19.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_2.part.js` → `scripts/main.dart.js_2.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_20.part.js` → `scripts/main.dart.js_20.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_21.part.js` → `scripts/main.dart.js_21.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_22.part.js` → `scripts/main.dart.js_22.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_23.part.js` → `scripts/main.dart.js_23.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_3.part.js` → `scripts/main.dart.js_3.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_4.part.js` → `scripts/main.dart.js_4.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_5.part.js` → `scripts/main.dart.js_5.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_6.part.js` → `scripts/main.dart.js_6.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_7.part.js` → `scripts/main.dart.js_7.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_8.part.js` → `scripts/main.dart.js_8.part.js`: Scripts should be in scripts/ directory
+- `.firebase/toolspace-beta/hosting/main.dart.js_9.part.js` → `scripts/main.dart.js_9.part.js`: Scripts should be in scripts/ directory
+- `.github/ISSUE_TEMPLATE/bug_report.md` → `docs/bug_report.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/feature_request.md` → `docs/feature_request.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/phase3-issues.md` → `docs/phase3-issues.md`: Documentation should be in docs/ directory
+- `.github/ISSUE_TEMPLATE/task.md` → `docs/task.md`: Documentation should be in docs/ directory
+- `.github/PULL_REQUEST_TEMPLATE.md` → `docs/PULL_REQUEST_TEMPLATE.md`: Documentation should be in docs/ directory
+- `AGENTS.md` → `docs/AGENTS.md`: Documentation should be in docs/ directory
+- `CONTRIBUTING.md` → `docs/CONTRIBUTING.md`: Documentation should be in docs/ directory
+- `CRITICAL_IMPLEMENTATION_GAPS.md` → `docs/CRITICAL_IMPLEMENTATION_GAPS.md`: Documentation should be in docs/ directory
+- `DEPLOYMENT.md` → `docs/DEPLOYMENT.md`: Documentation should be in docs/ directory
+- `DEV_MANUAL.md` → `docs/DEV_MANUAL.md`: Documentation should be in docs/ directory
+- `FINAL_IMPLEMENTATION_STATUS.md` → `docs/FINAL_IMPLEMENTATION_STATUS.md`: Documentation should be in docs/ directory
+- `FULL_APP_TEST_REPORT.md` → `docs/FULL_APP_TEST_REPORT.md`: Documentation should be in docs/ directory
+- `HARD_REFRESH_NEEDED.md` → `docs/HARD_REFRESH_NEEDED.md`: Documentation should be in docs/ directory
+- `LOCAL_DEV_GUIDE.md` → `docs/LOCAL_DEV_GUIDE.md`: Documentation should be in docs/ directory
+- `LOCAL_TEST_STATUS.md` → `docs/LOCAL_TEST_STATUS.md`: Documentation should be in docs/ directory
+- `MONETIZATION_ROADMAP.md` → `docs/MONETIZATION_ROADMAP.md`: Documentation should be in docs/ directory
+- `NEXT_STEPS.md` → `docs/NEXT_STEPS.md`: Documentation should be in docs/ directory
+- `PRODUCTION_CHECKLIST.md` → `docs/PRODUCTION_CHECKLIST.md`: Documentation should be in docs/ directory
+- `PRODUCTION_READINESS_REPORT.md` → `docs/PRODUCTION_READINESS_REPORT.md`: Documentation should be in docs/ directory
+- `STATUS.md` → `docs/STATUS.md`: Documentation should be in docs/ directory
+- `STRIPE_CLI_INSTALL.md` → `docs/STRIPE_CLI_INSTALL.md`: Documentation should be in docs/ directory
+- `archive/AUTH01_IMPLEMENTATION_COMPLETE.md` → `docs/AUTH01_IMPLEMENTATION_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/AUTH_01_EXECUTION_SUMMARY.md` → `docs/AUTH_01_EXECUTION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/AUTH_EMAIL_VERIFICATION_FIX.md` → `docs/AUTH_EMAIL_VERIFICATION_FIX.md`: Documentation should be in docs/ directory
+- `archive/AUTH_SECURITY_EPIC_PLAN.md` → `docs/AUTH_SECURITY_EPIC_PLAN.md`: Documentation should be in docs/ directory
+- `archive/AUTH_SIGNIN_FIX.md` → `docs/AUTH_SIGNIN_FIX.md`: Documentation should be in docs/ directory
+- `archive/CI_REFACTOR_SUMMARY.md` → `docs/CI_REFACTOR_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/COMPLETE_FIX_REPORT.md` → `docs/COMPLETE_FIX_REPORT.md`: Documentation should be in docs/ directory
+- `archive/FIX_SUMMARY.md` → `docs/FIX_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/IMPLEMENTATION_STATUS.md` → `docs/IMPLEMENTATION_STATUS.md`: Documentation should be in docs/ directory
+- `archive/IMPLEMENTATION_SUMMARY.md` → `docs/IMPLEMENTATION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_COMPLETE.md` → `docs/LANDING_PAGE_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_FAILURE_REPORT.md` → `docs/LANDING_PAGE_FAILURE_REPORT.md`: Documentation should be in docs/ directory
+- `archive/LANDING_PAGE_START_FIX.md` → `docs/LANDING_PAGE_START_FIX.md`: Documentation should be in docs/ directory
+- `archive/NEO_DESIGN_UNIVERSAL_STATUS.md` → `docs/NEO_DESIGN_UNIVERSAL_STATUS.md`: Documentation should be in docs/ directory
+- `archive/NEO_UI_COMPLETE.md` → `docs/NEO_UI_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/PALETTE_EXTRACTOR_SUMMARY.md` → `docs/PALETTE_EXTRACTOR_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/PHASE3A_PR_DESCRIPTION.md` → `docs/PHASE3A_PR_DESCRIPTION.md`: Documentation should be in docs/ directory
+- `archive/SESSION_SUMMARY.md` → `docs/SESSION_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_COMPLETE.md` → `docs/SPRINT_COMPLETE.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_PROGRESS.md` → `docs/SPRINT_PROGRESS.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_PROGRESS_REPORT.md` → `docs/SPRINT_PROGRESS_REPORT.md`: Documentation should be in docs/ directory
+- `archive/SPRINT_SETUP.md` → `docs/SPRINT_SETUP.md`: Documentation should be in docs/ directory
+- `archive/TEST_FIX_STRATEGY.md` → `docs/TEST_FIX_STRATEGY.md`: Documentation should be in docs/ directory
+- `archive/TEST_RESULTS_SUMMARY.md` → `docs/TEST_RESULTS_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/TOOLSPACE_STATUS_SUMMARY.md` → `docs/TOOLSPACE_STATUS_SUMMARY.md`: Documentation should be in docs/ directory
+- `archive/WHITE_SCREEN_FIX.md` → `docs/WHITE_SCREEN_FIX.md`: Documentation should be in docs/ directory
+- `archive/issue-ci-hygiene.md` → `docs/issue-ci-hygiene.md`: Documentation should be in docs/ directory
+- `archive/issue-firebase-hosting.md` → `docs/issue-firebase-hosting.md`: Documentation should be in docs/ directory
+- `archive/issue-google-sign-in.md` → `docs/issue-google-sign-in.md`: Documentation should be in docs/ directory
+- `archive/pr-audit-comment.md` → `docs/pr-audit-comment.md`: Documentation should be in docs/ directory
+- `archive/pr-body-updated.md` → `docs/pr-body-updated.md`: Documentation should be in docs/ directory
+- `archive/temp-issue-branch-protection.md` → `docs/temp-issue-branch-protection.md`: Documentation should be in docs/ directory
+- `archive/temp-issue-secrets.md` → `docs/temp-issue-secrets.md`: Documentation should be in docs/ directory
+- `core/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `dev-log/2025-10-phase4-local.md` → `docs/2025-10-phase4-local.md`: Documentation should be in docs/ directory
+- `dev-log/PHASE3_WRAPUP.md` → `docs/PHASE3_WRAPUP.md`: Documentation should be in docs/ directory
+- `dev-log/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `dev-log/modular-vats-implementation-2025-10-11.md` → `docs/modular-vats-implementation-2025-10-11.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-06-json-flatten-implementation.md` → `docs/2025-10-06-json-flatten-implementation.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-08-ci-refactor.md` → `docs/2025-10-08-ci-refactor.md`: Documentation should be in docs/ directory
+- `dev-log/operations/2025-10-08-ops-localgate.md` → `docs/2025-10-08-ops-localgate.md`: Documentation should be in docs/ directory
+- `dev-log/operations/csv-cleaner-implementation-2025-10-06.md` → `docs/csv-cleaner-implementation-2025-10-06.md`: Documentation should be in docs/ directory
+- `dev-log/phase-3-2025-10-09-invoice-lite-service.md` → `docs/phase-3-2025-10-09-invoice-lite-service.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/E2E-TESTS.md` → `docs/E2E-TESTS.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/E2E_TESTING_COMPLETION.md` → `docs/E2E_TESTING_COMPLETION.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/FINAL-CODE-SYNC-REPORT.md` → `docs/FINAL-CODE-SYNC-REPORT.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/TOOL_AUDIT_FINDINGS.md` → `docs/TOOL_AUDIT_FINDINGS.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/billing-audit-report.md` → `docs/billing-audit-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/code-sync-report.md` → `docs/code-sync-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/docs-rollout-report.md` → `docs/docs-rollout-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/progress.md` → `docs/progress.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/route-audit-report.md` → `docs/route-audit-report.md`: Documentation should be in docs/ directory
+- `dev-log/phase-4/sanitize-report.md` → `docs/sanitize-report.md`: Documentation should be in docs/ directory
+- `functions/.eslintrc.js` → `scripts/.eslintrc.js`: Scripts should be in scripts/ directory
+- `functions/eslint.config.js` → `scripts/eslint.config.js`: Scripts should be in scripts/ directory
+- `functions/jest.config.js` → `scripts/jest.config.js`: Scripts should be in scripts/ directory
+- `functions/jest.config.rules.js` → `scripts/jest.config.rules.js`: Scripts should be in scripts/ directory
+- `functions/lib/__tests__/health.test.js` → `scripts/health.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/__tests__/setup.js` → `scripts/setup.js`: Scripts should be in scripts/ directory
+- `functions/lib/admin.js` → `scripts/admin.js`: Scripts should be in scripts/ directory
+- `functions/lib/api/health.js` → `scripts/health.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/createCheckoutSession.js` → `scripts/createCheckoutSession.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/createPortalLink.js` → `scripts/createPortalLink.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/entitlements.js` → `scripts/entitlements.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/index.js` → `scripts/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/updateUserPlan.js` → `scripts/updateUserPlan.js`: Scripts should be in scripts/ directory
+- `functions/lib/billing/webhook.js` → `scripts/webhook.js`: Scripts should be in scripts/ directory
+- `functions/lib/config/validation.js` → `scripts/validation.js`: Scripts should be in scripts/ directory
+- `functions/lib/health.js` → `scripts/health.js`: Scripts should be in scripts/ directory
+- `functions/lib/index.js` → `scripts/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/auth-validation.js` → `scripts/auth-validation.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/auth.js` → `scripts/auth.js`: Scripts should be in scripts/ directory
+- `functions/lib/middleware/withAuth.js` → `scripts/withAuth.js`: Scripts should be in scripts/ directory
+- `functions/lib/quickUpdate.js` → `scripts/quickUpdate.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/__tests__/quota.test.js` → `scripts/quota.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/merge_pdfs.js` → `scripts/merge_pdfs.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/file_merger/quota.js` → `scripts/quota.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/image_resizer/resize_images.js` → `scripts/resize_images.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/invoice_lite/generatePdf.js` → `scripts/generatePdf.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/invoice_lite/paymentLink.js` → `scripts/paymentLink.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/__tests__/themes.test.js` → `scripts/themes.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/generate_pdf.js` → `scripts/generate_pdf.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/md_to_pdf/themes.js` → `scripts/themes.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/quota/getQuotaStatus.js` → `scripts/getQuotaStatus.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/url-short/__tests__/url-short.test.js` → `scripts/url-short.test.js`: Scripts should be in scripts/ directory
+- `functions/lib/tools/url-short/index.js` → `scripts/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/auth.js` → `scripts/auth.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/billing.js` → `scripts/billing.js`: Scripts should be in scripts/ directory
+- `functions/lib/types/index.js` → `scripts/index.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/errors.js` → `scripts/errors.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/guards.js` → `scripts/guards.js`: Scripts should be in scripts/ directory
+- `functions/lib/util/logger.js` → `scripts/logger.js`: Scripts should be in scripts/ directory
+- `functions/security-validation.js` → `scripts/security-validation.js`: Scripts should be in scripts/ directory
+- `functions/test/rules.spec.js` → `scripts/rules.spec.js`: Scripts should be in scripts/ directory
+- `lib/auth/screens/account_screen.dart` → `lib/tools/utility/account/account_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/email_verification_screen.dart` → `lib/tools/utility/email_verification/email_verification_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/password_reset_screen.dart` → `lib/tools/utility/password_reset/password_reset_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/signin_screen.dart` → `lib/tools/utility/signin/signin_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/screens/signup_screen.dart` → `lib/tools/utility/signup/signup_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/auth/services/auth_service.dart` → `lib/tools/utility/auth/auth_service.dart`: Tool implementations should be in lib/tools/
+- `lib/billing/billing_service.dart` → `lib/tools/utility/billing/billing_service.dart`: Tool implementations should be in lib/tools/
+- `lib/billing/credits_service.dart` → `lib/tools/utility/credits/credits_service.dart`: Tool implementations should be in lib/tools/
+- `lib/core/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `lib/core/services/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `lib/core/services/shared_data_service.dart` → `lib/tools/utility/shared_data/shared_data_service.dart`: Tool implementations should be in lib/tools/
+- `lib/marketing/features_screen.dart` → `lib/tools/utility/features/features_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/marketing/pricing_screen.dart` → `lib/tools/utility/pricing/pricing_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/billing/billing_cancel_screen.dart` → `lib/tools/utility/billing_cancel/billing_cancel_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/billing/billing_success_screen.dart` → `lib/tools/utility/billing_success/billing_success_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/home_screen.dart` → `lib/tools/utility/home/home_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/screens/neo_home_screen.dart` → `lib/tools/utility/neo_home/neo_home_screen.dart`: Tool implementations should be in lib/tools/
+- `lib/shared/shared_data_service.dart` → `lib/tools/utility/shared_data/shared_data_service.dart`: Tool implementations should be in lib/tools/
+- `lib/tools/password_gen/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `lib/tools/text_tools/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `lib/tools/url_short/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `local-ci/MISSION_ACCOMPLISHED.md` → `docs/MISSION_ACCOMPLISHED.md`: Documentation should be in docs/ directory
+- `local-ci/TEST_FAILURES_REPORT.md` → `docs/TEST_FAILURES_REPORT.md`: Documentation should be in docs/ directory
+- `local-ci/WEB_BUILD_STATUS.md` → `docs/WEB_BUILD_STATUS.md`: Documentation should be in docs/ directory
+- `local-ci/ZERO_TOLERANCE_STATUS.md` → `docs/ZERO_TOLERANCE_STATUS.md`: Documentation should be in docs/ directory
+- `local-ci/summary.md` → `docs/summary.md`: Documentation should be in docs/ directory
+- `operations/logs/2025-10-06-local-stabilize-billing-e2e.md` → `docs/2025-10-06-local-stabilize-billing-e2e.md`: Documentation should be in docs/ directory
+- `operations/logs/2025-10-06-monetization-v1-prodgate.md` → `docs/2025-10-06-monetization-v1-prodgate.md`: Documentation should be in docs/ directory
+- `operations/logs/monetization-v1-progress.md` → `docs/monetization-v1-progress.md`: Documentation should be in docs/ directory
+- `operations/logs/monetization-v1-ui.md` → `docs/monetization-v1-ui.md`: Documentation should be in docs/ directory
+- `operations/logs/phase3a-summary.md` → `docs/phase3a-summary.md`: Documentation should be in docs/ directory
+- `operations/logs/phase4-neo-ui-overhaul.md` → `docs/phase4-neo-ui-overhaul.md`: Documentation should be in docs/ directory
+- `operations/logs/task-roadmap-seeding.md` → `docs/task-roadmap-seeding.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/feat-ci-hygiene-unified-pipeline.md` → `docs/feat-ci-hygiene-unified-pipeline.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/fix-ci-firebase-hosting-missing-flutter.md` → `docs/fix-ci-firebase-hosting-missing-flutter.md`: Documentation should be in docs/ directory
+- `ops/ci/notes/fix-ci-google-sign-in-dart-sdk-mismatch.md` → `docs/fix-ci-google-sign-in-dart-sdk-mismatch.md`: Documentation should be in docs/ directory
+- `public/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `temp_update_plan.js` → `scripts/temp_update_plan.js`: Scripts should be in scripts/ directory
+- `test/tools/json_doctor/IMPLEMENTATION_NOTES.md` → `docs/IMPLEMENTATION_NOTES.md`: Documentation should be in docs/ directory
+- `test/tools/json_doctor/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `test/tools/json_doctor/TESTING.md` → `docs/TESTING.md`: Documentation should be in docs/ directory
+- `tools/file_merger/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `tools/quick_invoice/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `tools/smoke/fixtures/md/sample.md` → `docs/sample.md`: Documentation should be in docs/ directory
+- `tools/smoke/report/smoke_report.md` → `docs/smoke_report.md`: Documentation should be in docs/ directory
+- `tools/smoke/smoke_plan.md` → `docs/smoke_plan.md`: Documentation should be in docs/ directory
+- `tools/text_tools/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `tools/text_tools/text_tools_screen.dart` → `lib/tools/utility/text_tools/text_tools_screen.dart`: Tool implementations should be in lib/tools/
+- `tools/video_converter/CHANGELOG.md` → `docs/CHANGELOG.md`: Documentation should be in docs/ directory
+- `tools/video_converter/INTEGRATION.md` → `docs/INTEGRATION.md`: Documentation should be in docs/ directory
+- `tools/video_converter/LIMITS.md` → `docs/LIMITS.md`: Documentation should be in docs/ directory
+- `tools/video_converter/README.md` → `docs/README.md`: Documentation should be in docs/ directory
+- `tools/video_converter/TESTS.md` → `docs/TESTS.md`: Documentation should be in docs/ directory
+- `tools/video_converter/UX.md` → `docs/UX.md`: Documentation should be in docs/ directory
+- `update_plan_smart.js` → `scripts/update_plan_smart.js`: Scripts should be in scripts/ directory
+
+## Recommendations
+
+- Add test files for main library components

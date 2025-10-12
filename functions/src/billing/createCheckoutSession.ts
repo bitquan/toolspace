@@ -8,13 +8,9 @@
 
 import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
-import {
-  BillingProfile,
-  CreateCheckoutSessionRequest,
-  CreateCheckoutSessionResponse,
-} from "../types/billing";
-import { loadPricingConfig } from "./entitlements";
 import { db } from "../admin";
+import { BillingProfile } from "../types/billing";
+import { loadPricingConfig } from "./entitlements";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY ||
@@ -273,6 +269,53 @@ export const createCheckoutSession = functions.https.onCall(
         "Failed to create checkout session",
         error.message
       );
+    }
+  }
+);
+
+// Lightweight HTTP wrapper for E2E testing via REST
+export const createCheckoutSessionHttp = functions.https.onRequest(
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.set("Allow", "POST");
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    try {
+      const { priceId, successUrl, cancelUrl, customerEmail, uid } =
+        req.body || {};
+
+      // In staging, allow unauthenticated invocation for automation; require explicit uid
+      const isStaging =
+        process.env.FIREBASE_PROJECT_ID === "toolz-space-staging" ||
+        (process.env.FIREBASE_CONFIG || "").includes("toolz-space-staging");
+
+      if (!isStaging) {
+        return res.status(403).json({ error: "Forbidden outside staging" });
+      }
+
+      if (!uid || !customerEmail) {
+        return res
+          .status(400)
+          .json({ error: "uid and customerEmail required" });
+      }
+
+      // Minimal session creation using provided priceId
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        line_items: [{ price: priceId || "price_test_pro", quantity: 1 }],
+        success_url:
+          successUrl || `${process.env.PUBLIC_BASE_URL}/billing/success`,
+        cancel_url:
+          cancelUrl || `${process.env.PUBLIC_BASE_URL}/billing/cancel`,
+        customer_email: customerEmail,
+        metadata: { uid },
+      });
+
+      return res.status(200).json({ url: session.url });
+    } catch (err) {
+      console.error("createCheckoutSessionHttp error", err);
+      return res.status(500).json({ error: String(err?.message || err) });
     }
   }
 );

@@ -1,0 +1,160 @@
+{
+  "phase": "4C",
+  "title": "Pre-Prod Staging with Test Keys - Readiness Report",
+  "timestamp": "2025-10-12T14:09:19.520Z",
+  "environment": "staging",
+  "status": "needs_work",
+  "summary": {
+    "overall_status": "needs_work",
+    "readiness_percentage": 60,
+    "ready_conditions": 3,
+    "total_conditions": 5,
+    "critical_blockers": 2
+  },
+  "sections": {
+    "environment": {
+      "status": "ready",
+      "files": {
+        ".env.staging": true,
+        "functions/.env.staging": true,
+        "env/staging.json": true,
+        "config/seo-staging.json": true,
+        "firebase.staging.json": true
+      },
+      "notes": [
+        "✅ Root staging environment configured",
+        "✅ Functions staging environment configured",
+        "✅ Flutter staging config ready"
+      ]
+    },
+    "e2e_tests": {
+      "status": "pending",
+      "billing_checkout": {
+        "status": "not_run"
+      },
+      "webhook_acknowledgment": {
+        "timestamp": "2025-10-12T14:05:43.242Z",
+        "ok_count": 0
+      },
+      "notes": [
+        "⏳ Billing checkout test pending",
+        "✅ Webhook acknowledgment test completed"
+      ]
+    },
+    "smoke_tests": {
+      "status": "not_run",
+      "notes": [
+        "⏳ Smoke tests not yet executed"
+      ]
+    },
+    "configuration": {
+      "status": "ready",
+      "vscode_tasks": true,
+      "firebase_config": true,
+      "seo_staging": true,
+      "notes": [
+        "✅ VS Code staging tasks configured",
+        "✅ Firebase configuration present",
+        "✅ Staging SEO settings configured"
+      ]
+    },
+    "security": {
+      "status": "secure",
+      "test_keys_only": true,
+      "no_live_keys": true,
+      "staging_robots_txt": true,
+      "notes": [
+        "✅ Stripe test keys detected",
+        "✅ No live keys detected",
+        "✅ Staging environment isolated from production"
+      ]
+    },
+    "performance": {},
+    "readiness_checklist": {}
+  },
+  "artifacts": [],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "Testing",
+      "message": "Execute and pass all E2E tests before switching to live keys"
+    },
+    {
+      "priority": "high",
+      "category": "Testing",
+      "message": "Run smoke test suite and ensure all critical paths are functional"
+    },
+    {
+      "priority": "medium",
+      "category": "Security",
+      "message": "Audit all environment variables before production deployment"
+    },
+    {
+      "priority": "low",
+      "category": "Performance",
+      "message": "Run Lighthouse CI tests to ensure performance benchmarks are met"
+    }
+  ],
+  "switch_to_live_checklist": [
+    {
+      "category": "Environment Variables",
+      "items": [
+        "🔑 Replace sk_test_ with sk_live_ in production .env",
+        "🔑 Replace whsec_test_ with whsec_live_ webhook secrets",
+        "🔥 Update Firebase project ID to production project",
+        "📧 Update any test email addresses to production addresses",
+        "🌐 Update PUBLIC_BASE_URL to production domain"
+      ]
+    },
+    {
+      "category": "Configuration Files",
+      "items": [
+        "🤖 Replace robots.staging.txt with production robots.txt",
+        "📊 Update Google Analytics tracking ID to production",
+        "🔍 Enable production sitemap generation",
+        "📱 Update Firebase hosting configuration for production",
+        "⚙️ Review and update any staging-specific feature flags"
+      ]
+    },
+    {
+      "category": "Security",
+      "items": [
+        "🔒 Verify all Stripe webhook endpoints use live webhook secrets",
+        "🛡️ Review CORS configuration for production domains",
+        "🔐 Audit all API keys and ensure production keys are used",
+        "🚨 Remove any debug/staging logging from production code",
+        "🔍 Run security scan on production configuration"
+      ]
+    },
+    {
+      "category": "Testing",
+      "items": [
+        "🧪 Run full E2E test suite against production (with live keys)",
+        "💨 Execute smoke tests on production environment",
+        "💳 Test actual billing flow with real payment method",
+        "📧 Verify email notifications work with production SMTP",
+        "🎯 Performance test with production data volumes"
+      ]
+    },
+    {
+      "category": "Deployment",
+      "items": [
+        "🚀 Deploy Functions to production Firebase project",
+        "📦 Build and deploy Flutter web to production hosting",
+        "🌐 Update DNS records to point to production",
+        "📈 Set up production monitoring and alerting",
+        "📋 Update support documentation with production details"
+      ]
+    },
+    {
+      "category": "Validation",
+      "items": [
+        "✅ Verify all tools load correctly on production",
+        "💰 Confirm billing flow works end-to-end with real payments",
+        "📊 Check analytics data is being collected",
+        "🔍 Verify SEO meta tags and robots.txt are production-ready",
+        "📱 Test mobile responsiveness on production domain"
+      ]
+    }
+  ]
+}

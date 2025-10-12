@@ -1,0 +1,108 @@
+{
+  "timestamp": "2025-10-11T12:13:06.894484",
+  "duration_seconds": 0,
+  "summary": {
+    "total_tests": 12,
+    "passed": 12,
+    "failed": 0,
+    "success_rate": 100
+  },
+  "results": [
+    {
+      "toolId": "json_doctor",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 20
+    },
+    {
+      "toolId": "text_diff",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 1
+    },
+    {
+      "toolId": "qr_maker",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 0
+    },
+    {
+      "toolId": "password_generator",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 8
+    },
+    {
+      "toolId": "unit_converter",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 1
+    },
+    {
+      "toolId": "regex_tester",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 28
+    },
+    {
+      "toolId": "id_generator",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 2
+    },
+    {
+      "toolId": "palette_extractor",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 0
+    },
+    {
+      "toolId": "csv_cleaner",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 6
+    },
+    {
+      "toolId": "file_merger",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 0
+    },
+    {
+      "toolId": "image_resizer",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 0
+    },
+    {
+      "toolId": "markdown_to_pdf",
+      "expected": "success",
+      "actual": "success",
+      "pass": true,
+      "notes": "Test passed",
+      "duration_ms": 0
+    }
+  ]
+}

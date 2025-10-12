@@ -1,0 +1,25 @@
+# STAGING robots.txt - Block all crawlers
+# This is for staging environment only - NOT for production
+
+User-agent: *
+Disallow: /
+
+# Block common bots explicitly
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: facebookexternalhit
+Disallow: /
+
+# Staging notice
+# This staging environment is not intended for search engine indexing
+# For production robots.txt, see /public/robots.txt

@@ -1,0 +1,1772 @@
+{
+  "deleteFiles": [
+    {
+      "action": "delete",
+      "path": ".firebase/logs/vsce-debug.log",
+      "reason": "Orphaned file",
+      "size": 534425
+    },
+    {
+      "action": "delete",
+      "path": ".firebase/toolspace-beta/hosting/icons/Icon-192.png",
+      "reason": "Orphaned file",
+      "size": 5292
+    },
+    {
+      "action": "delete",
+      "path": ".firebase/toolspace-beta/hosting/icons/Icon-512.png",
+      "reason": "Orphaned file",
+      "size": 8252
+    },
+    {
+      "action": "delete",
+      "path": ".firebase/toolspace-beta/hosting/icons/Icon-maskable-192.png",
+      "reason": "Orphaned file",
+      "size": 5594
+    },
+    {
+      "action": "delete",
+      "path": ".firebase/toolspace-beta/hosting/icons/Icon-maskable-512.png",
+      "reason": "Orphaned file",
+      "size": 20998
+    },
+    {
+      "action": "delete",
+      "path": "core/routes.dart",
+      "reason": "Orphaned file",
+      "size": 9944
+    },
+    {
+      "action": "delete",
+      "path": "core/routes.dart.backup",
+      "reason": "Orphaned file",
+      "size": 25676
+    },
+    {
+      "action": "delete",
+      "path": "core/ui/clipboard_btn.dart",
+      "reason": "Orphaned file",
+      "size": 1855
+    },
+    {
+      "action": "delete",
+      "path": "firestore-debug.log",
+      "reason": "Orphaned file",
+      "size": 1168
+    },
+    {
+      "action": "delete",
+      "path": "flutter_01.log",
+      "reason": "Orphaned file",
+      "size": 4430
+    },
+    {
+      "action": "delete",
+      "path": "flutter_02.log",
+      "reason": "Orphaned file",
+      "size": 2839
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/guards/route_guards.dart",
+      "reason": "Orphaned file",
+      "size": 12867
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/helpers/reauth_helper.dart",
+      "reason": "Orphaned file",
+      "size": 8764
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/screens/account_screen.dart",
+      "reason": "Orphaned file",
+      "size": 23800
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/screens/email_verification_screen.dart",
+      "reason": "Orphaned file",
+      "size": 14794
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/screens/password_reset_screen.dart",
+      "reason": "Orphaned file",
+      "size": 12095
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/screens/signin_screen.dart",
+      "reason": "Orphaned file",
+      "size": 12570
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/screens/signup_screen.dart",
+      "reason": "Orphaned file",
+      "size": 14880
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/services/auth_service.dart",
+      "reason": "Orphaned file",
+      "size": 13756
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/widgets/auth_form_field.dart",
+      "reason": "Orphaned file",
+      "size": 3517
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/widgets/auth_glass_panel.dart",
+      "reason": "Orphaned file",
+      "size": 1401
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/widgets/email_verification_dialog.dart",
+      "reason": "Orphaned file",
+      "size": 11336
+    },
+    {
+      "action": "delete",
+      "path": "lib/auth/widgets/google_sign_in_button.dart",
+      "reason": "Orphaned file",
+      "size": 2769
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/billing_service.dart",
+      "reason": "Orphaned file",
+      "size": 14735
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/billing_types.dart",
+      "reason": "Orphaned file",
+      "size": 17769
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/credits_service.dart",
+      "reason": "Orphaned file",
+      "size": 7469
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/integration_example.dart",
+      "reason": "Orphaned file",
+      "size": 2806
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/widgets/manage_billing_button.dart",
+      "reason": "Orphaned file",
+      "size": 2132
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/widgets/paywall_guard.dart",
+      "reason": "Orphaned file",
+      "size": 8243
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/widgets/plan_status_banner.dart",
+      "reason": "Orphaned file",
+      "size": 11274
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/widgets/quota_banner.dart",
+      "reason": "Orphaned file",
+      "size": 4436
+    },
+    {
+      "action": "delete",
+      "path": "lib/billing/widgets/upgrade_sheet.dart",
+      "reason": "Orphaned file",
+      "size": 15325
+    },
+    {
+      "action": "delete",
+      "path": "lib/config/stripe_config.dart",
+      "reason": "Orphaned file",
+      "size": 899
+    },
+    {
+      "action": "delete",
+      "path": "lib/cross/widgets/share_toolbar.dart",
+      "reason": "Orphaned file",
+      "size": 13804
+    },
+    {
+      "action": "delete",
+      "path": "lib/dev/e2e_playground.dart",
+      "reason": "Orphaned file",
+      "size": 16617
+    },
+    {
+      "action": "delete",
+      "path": "lib/marketing/features_screen.dart",
+      "reason": "Orphaned file",
+      "size": 7704
+    },
+    {
+      "action": "delete",
+      "path": "lib/marketing/pricing_screen.dart",
+      "reason": "Orphaned file",
+      "size": 12472
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/codec_lab/logic/codec_engine.dart",
+      "reason": "Orphaned file",
+      "size": 7307
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/csv_cleaner/logic/csv_processor.dart",
+      "reason": "Orphaned file",
+      "size": 5235
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/file_merger/logic/upload_manager.dart",
+      "reason": "Orphaned file",
+      "size": 5323
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/file_merger/widgets/file_list.dart",
+      "reason": "Orphaned file",
+      "size": 3745
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/file_merger/widgets/file_upload_zone.dart",
+      "reason": "Orphaned file",
+      "size": 2367
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/file_merger/widgets/merge_progress.dart",
+      "reason": "Orphaned file",
+      "size": 2054
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/file_merger/widgets/quota_banner.dart",
+      "reason": "Orphaned file",
+      "size": 4944
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/image_resizer/logic/upload_manager.dart",
+      "reason": "Orphaned file",
+      "size": 3834
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/image_resizer/widgets/image_list.dart",
+      "reason": "Orphaned file",
+      "size": 2007
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/image_resizer/widgets/image_upload_zone.dart",
+      "reason": "Orphaned file",
+      "size": 2384
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/image_resizer/widgets/resize_progress.dart",
+      "reason": "Orphaned file",
+      "size": 1420
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/invoice_lite/models/business_info.dart",
+      "reason": "Orphaned file",
+      "size": 1400
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/invoice_lite/models/client_info.dart",
+      "reason": "Orphaned file",
+      "size": 1141
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/invoice_lite/models/invoice_item.dart",
+      "reason": "Orphaned file",
+      "size": 1598
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/invoice_lite/models/invoice_lite.dart",
+      "reason": "Orphaned file",
+      "size": 6096
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/invoice_lite/models/models.dart",
+      "reason": "Orphaned file",
+      "size": 146
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/json_doctor/logic/jsonpath_query.dart",
+      "reason": "Orphaned file",
+      "size": 5949
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/json_doctor/logic/schema_validator.dart",
+      "reason": "Orphaned file",
+      "size": 7048
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/json_flatten/logic/json_flattener.dart",
+      "reason": "Orphaned file",
+      "size": 9039
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/md_to_pdf/logic/pdf_exporter.dart",
+      "reason": "Orphaned file",
+      "size": 895
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/md_to_pdf/widgets/export_options_dialog.dart",
+      "reason": "Orphaned file",
+      "size": 6917
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/palette_extractor/logic/color_utils.dart",
+      "reason": "Orphaned file",
+      "size": 2595
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/palette_extractor/logic/kmeans_clustering.dart",
+      "reason": "Orphaned file",
+      "size": 7804
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/palette_extractor/logic/palette_exporter.dart",
+      "reason": "Orphaned file",
+      "size": 4282
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/palette_extractor/widgets/color_swatch_card.dart",
+      "reason": "Orphaned file",
+      "size": 7368
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/palette_extractor/widgets/image_upload_zone.dart",
+      "reason": "Orphaned file",
+      "size": 3095
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/password_gen/logic/password_generator.dart",
+      "reason": "Orphaned file",
+      "size": 4606
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/regex_tester/logic/regex_engine.dart",
+      "reason": "Orphaned file",
+      "size": 4382
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/regex_tester/logic/regex_presets.dart",
+      "reason": "Orphaned file",
+      "size": 6102
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_diff/logic/word_diff_engine.dart",
+      "reason": "Orphaned file",
+      "size": 8229
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/case_convert.dart",
+      "reason": "Orphaned file",
+      "size": 3719
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/clean_text.dart",
+      "reason": "Orphaned file",
+      "size": 3801
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/counters.dart",
+      "reason": "Orphaned file",
+      "size": 5692
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/json_tools.dart",
+      "reason": "Orphaned file",
+      "size": 5735
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/nanoid_gen.dart",
+      "reason": "Orphaned file",
+      "size": 4708
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/slugify.dart",
+      "reason": "Orphaned file",
+      "size": 4643
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/text_tools/logic/uuid_gen.dart",
+      "reason": "Orphaned file",
+      "size": 3951
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/time_convert/logic/timestamp_converter.dart",
+      "reason": "Orphaned file",
+      "size": 7126
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/unit_converter/logic/conversion_history.dart",
+      "reason": "Orphaned file",
+      "size": 1107
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/unit_converter/logic/unit_converter.dart",
+      "reason": "Orphaned file",
+      "size": 7897
+    },
+    {
+      "action": "delete",
+      "path": "lib/tools/unit_converter/logic/unit_search.dart",
+      "reason": "Orphaned file",
+      "size": 4806
+    },
+    {
+      "action": "delete",
+      "path": "test/test_helpers/firebase_test_helper.dart",
+      "reason": "Orphaned file",
+      "size": 4285
+    },
+    {
+      "action": "delete",
+      "path": "tools/smoke/run_smoke.dart",
+      "reason": "Orphaned file",
+      "size": 11302
+    },
+    {
+      "action": "delete",
+      "path": "tools/smoke/run_smoke_broken.dart",
+      "reason": "Orphaned file",
+      "size": 16546
+    },
+    {
+      "action": "delete",
+      "path": "tools/smoke/run_smoke_fixed.dart",
+      "reason": "Orphaned file",
+      "size": 11020
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/case_convert.dart",
+      "reason": "Orphaned file",
+      "size": 3717
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/clean_text.dart",
+      "reason": "Orphaned file",
+      "size": 3801
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/counters.dart",
+      "reason": "Orphaned file",
+      "size": 5692
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/json_tools.dart",
+      "reason": "Orphaned file",
+      "size": 5735
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/slugify.dart",
+      "reason": "Orphaned file",
+      "size": 4643
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/logic/uuid_gen.dart",
+      "reason": "Orphaned file",
+      "size": 2899
+    },
+    {
+      "action": "delete",
+      "path": "tools/text_tools/text_tools_screen.dart",
+      "reason": "Orphaned file",
+      "size": 17343
+    },
+    {
+      "action": "delete",
+      "path": "web/icons/Icon-192.png",
+      "reason": "Orphaned file",
+      "size": 5292
+    },
+    {
+      "action": "delete",
+      "path": "web/icons/Icon-512.png",
+      "reason": "Orphaned file",
+      "size": 8252
+    },
+    {
+      "action": "delete",
+      "path": "web/icons/Icon-maskable-192.png",
+      "reason": "Orphaned file",
+      "size": 5594
+    },
+    {
+      "action": "delete",
+      "path": "web/icons/Icon-maskable-512.png",
+      "reason": "Orphaned file",
+      "size": 20998
+    }
+  ],
+  "moveFiles": [
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/canvaskit/canvaskit.js",
+      "to": "scripts/canvaskit.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/canvaskit/chromium/canvaskit.js",
+      "to": "scripts/canvaskit.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/canvaskit/skwasm.js",
+      "to": "scripts/skwasm.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/canvaskit/skwasm_heavy.js",
+      "to": "scripts/skwasm_heavy.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/flutter.js",
+      "to": "scripts/flutter.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/flutter_bootstrap.js",
+      "to": "scripts/flutter_bootstrap.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/flutter_service_worker.js",
+      "to": "scripts/flutter_service_worker.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js",
+      "to": "scripts/main.dart.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_1.part.js",
+      "to": "scripts/main.dart.js_1.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_10.part.js",
+      "to": "scripts/main.dart.js_10.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_11.part.js",
+      "to": "scripts/main.dart.js_11.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_12.part.js",
+      "to": "scripts/main.dart.js_12.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_13.part.js",
+      "to": "scripts/main.dart.js_13.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_14.part.js",
+      "to": "scripts/main.dart.js_14.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_15.part.js",
+      "to": "scripts/main.dart.js_15.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_16.part.js",
+      "to": "scripts/main.dart.js_16.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_17.part.js",
+      "to": "scripts/main.dart.js_17.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_18.part.js",
+      "to": "scripts/main.dart.js_18.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_19.part.js",
+      "to": "scripts/main.dart.js_19.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_2.part.js",
+      "to": "scripts/main.dart.js_2.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_20.part.js",
+      "to": "scripts/main.dart.js_20.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_21.part.js",
+      "to": "scripts/main.dart.js_21.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_22.part.js",
+      "to": "scripts/main.dart.js_22.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_23.part.js",
+      "to": "scripts/main.dart.js_23.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_3.part.js",
+      "to": "scripts/main.dart.js_3.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_4.part.js",
+      "to": "scripts/main.dart.js_4.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_5.part.js",
+      "to": "scripts/main.dart.js_5.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_6.part.js",
+      "to": "scripts/main.dart.js_6.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_7.part.js",
+      "to": "scripts/main.dart.js_7.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_8.part.js",
+      "to": "scripts/main.dart.js_8.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".firebase/toolspace-beta/hosting/main.dart.js_9.part.js",
+      "to": "scripts/main.dart.js_9.part.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "to": "docs/bug_report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "to": "docs/feature_request.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".github/ISSUE_TEMPLATE/phase3-issues.md",
+      "to": "docs/phase3-issues.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".github/ISSUE_TEMPLATE/task.md",
+      "to": "docs/task.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": ".github/PULL_REQUEST_TEMPLATE.md",
+      "to": "docs/PULL_REQUEST_TEMPLATE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "AGENTS.md",
+      "to": "docs/AGENTS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "CONTRIBUTING.md",
+      "to": "docs/CONTRIBUTING.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "CRITICAL_IMPLEMENTATION_GAPS.md",
+      "to": "docs/CRITICAL_IMPLEMENTATION_GAPS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "DEPLOYMENT.md",
+      "to": "docs/DEPLOYMENT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "DEV_MANUAL.md",
+      "to": "docs/DEV_MANUAL.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "FINAL_IMPLEMENTATION_STATUS.md",
+      "to": "docs/FINAL_IMPLEMENTATION_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "FULL_APP_TEST_REPORT.md",
+      "to": "docs/FULL_APP_TEST_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "HARD_REFRESH_NEEDED.md",
+      "to": "docs/HARD_REFRESH_NEEDED.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "LOCAL_DEV_GUIDE.md",
+      "to": "docs/LOCAL_DEV_GUIDE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "LOCAL_TEST_STATUS.md",
+      "to": "docs/LOCAL_TEST_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "MONETIZATION_ROADMAP.md",
+      "to": "docs/MONETIZATION_ROADMAP.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "NEXT_STEPS.md",
+      "to": "docs/NEXT_STEPS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "PRODUCTION_CHECKLIST.md",
+      "to": "docs/PRODUCTION_CHECKLIST.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "PRODUCTION_READINESS_REPORT.md",
+      "to": "docs/PRODUCTION_READINESS_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "STATUS.md",
+      "to": "docs/STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "STRIPE_CLI_INSTALL.md",
+      "to": "docs/STRIPE_CLI_INSTALL.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/AUTH01_IMPLEMENTATION_COMPLETE.md",
+      "to": "docs/AUTH01_IMPLEMENTATION_COMPLETE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/AUTH_01_EXECUTION_SUMMARY.md",
+      "to": "docs/AUTH_01_EXECUTION_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/AUTH_EMAIL_VERIFICATION_FIX.md",
+      "to": "docs/AUTH_EMAIL_VERIFICATION_FIX.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/AUTH_SECURITY_EPIC_PLAN.md",
+      "to": "docs/AUTH_SECURITY_EPIC_PLAN.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/AUTH_SIGNIN_FIX.md",
+      "to": "docs/AUTH_SIGNIN_FIX.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/CI_REFACTOR_SUMMARY.md",
+      "to": "docs/CI_REFACTOR_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/COMPLETE_FIX_REPORT.md",
+      "to": "docs/COMPLETE_FIX_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/FIX_SUMMARY.md",
+      "to": "docs/FIX_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/IMPLEMENTATION_STATUS.md",
+      "to": "docs/IMPLEMENTATION_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/IMPLEMENTATION_SUMMARY.md",
+      "to": "docs/IMPLEMENTATION_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/LANDING_PAGE_COMPLETE.md",
+      "to": "docs/LANDING_PAGE_COMPLETE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/LANDING_PAGE_FAILURE_REPORT.md",
+      "to": "docs/LANDING_PAGE_FAILURE_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/LANDING_PAGE_START_FIX.md",
+      "to": "docs/LANDING_PAGE_START_FIX.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/NEO_DESIGN_UNIVERSAL_STATUS.md",
+      "to": "docs/NEO_DESIGN_UNIVERSAL_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/NEO_UI_COMPLETE.md",
+      "to": "docs/NEO_UI_COMPLETE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/PALETTE_EXTRACTOR_SUMMARY.md",
+      "to": "docs/PALETTE_EXTRACTOR_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/PHASE3A_PR_DESCRIPTION.md",
+      "to": "docs/PHASE3A_PR_DESCRIPTION.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/SESSION_SUMMARY.md",
+      "to": "docs/SESSION_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/SPRINT_COMPLETE.md",
+      "to": "docs/SPRINT_COMPLETE.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/SPRINT_PROGRESS.md",
+      "to": "docs/SPRINT_PROGRESS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/SPRINT_PROGRESS_REPORT.md",
+      "to": "docs/SPRINT_PROGRESS_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/SPRINT_SETUP.md",
+      "to": "docs/SPRINT_SETUP.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/TEST_FIX_STRATEGY.md",
+      "to": "docs/TEST_FIX_STRATEGY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/TEST_RESULTS_SUMMARY.md",
+      "to": "docs/TEST_RESULTS_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/TOOLSPACE_STATUS_SUMMARY.md",
+      "to": "docs/TOOLSPACE_STATUS_SUMMARY.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/WHITE_SCREEN_FIX.md",
+      "to": "docs/WHITE_SCREEN_FIX.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/issue-ci-hygiene.md",
+      "to": "docs/issue-ci-hygiene.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/issue-firebase-hosting.md",
+      "to": "docs/issue-firebase-hosting.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/issue-google-sign-in.md",
+      "to": "docs/issue-google-sign-in.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/pr-audit-comment.md",
+      "to": "docs/pr-audit-comment.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/pr-body-updated.md",
+      "to": "docs/pr-body-updated.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/temp-issue-branch-protection.md",
+      "to": "docs/temp-issue-branch-protection.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "archive/temp-issue-secrets.md",
+      "to": "docs/temp-issue-secrets.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "core/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/2025-10-phase4-local.md",
+      "to": "docs/2025-10-phase4-local.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/PHASE3_WRAPUP.md",
+      "to": "docs/PHASE3_WRAPUP.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/modular-vats-implementation-2025-10-11.md",
+      "to": "docs/modular-vats-implementation-2025-10-11.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/operations/2025-10-06-json-flatten-implementation.md",
+      "to": "docs/2025-10-06-json-flatten-implementation.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/operations/2025-10-08-ci-refactor.md",
+      "to": "docs/2025-10-08-ci-refactor.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/operations/2025-10-08-ops-localgate.md",
+      "to": "docs/2025-10-08-ops-localgate.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/operations/csv-cleaner-implementation-2025-10-06.md",
+      "to": "docs/csv-cleaner-implementation-2025-10-06.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-3-2025-10-09-invoice-lite-service.md",
+      "to": "docs/phase-3-2025-10-09-invoice-lite-service.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/E2E-TESTS.md",
+      "to": "docs/E2E-TESTS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/E2E_TESTING_COMPLETION.md",
+      "to": "docs/E2E_TESTING_COMPLETION.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/FINAL-CODE-SYNC-REPORT.md",
+      "to": "docs/FINAL-CODE-SYNC-REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/TOOL_AUDIT_FINDINGS.md",
+      "to": "docs/TOOL_AUDIT_FINDINGS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/billing-audit-report.md",
+      "to": "docs/billing-audit-report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/code-sync-report.md",
+      "to": "docs/code-sync-report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/docs-rollout-report.md",
+      "to": "docs/docs-rollout-report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/progress.md",
+      "to": "docs/progress.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/route-audit-report.md",
+      "to": "docs/route-audit-report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "dev-log/phase-4/sanitize-report.md",
+      "to": "docs/sanitize-report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/.eslintrc.js",
+      "to": "scripts/.eslintrc.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/eslint.config.js",
+      "to": "scripts/eslint.config.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/jest.config.js",
+      "to": "scripts/jest.config.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/jest.config.rules.js",
+      "to": "scripts/jest.config.rules.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/__tests__/health.test.js",
+      "to": "scripts/health.test.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/__tests__/setup.js",
+      "to": "scripts/setup.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/admin.js",
+      "to": "scripts/admin.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/api/health.js",
+      "to": "scripts/health.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/createCheckoutSession.js",
+      "to": "scripts/createCheckoutSession.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/createPortalLink.js",
+      "to": "scripts/createPortalLink.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/entitlements.js",
+      "to": "scripts/entitlements.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/index.js",
+      "to": "scripts/index.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/updateUserPlan.js",
+      "to": "scripts/updateUserPlan.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/billing/webhook.js",
+      "to": "scripts/webhook.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/config/validation.js",
+      "to": "scripts/validation.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/health.js",
+      "to": "scripts/health.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/index.js",
+      "to": "scripts/index.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/middleware/auth-validation.js",
+      "to": "scripts/auth-validation.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/middleware/auth.js",
+      "to": "scripts/auth.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/middleware/withAuth.js",
+      "to": "scripts/withAuth.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/quickUpdate.js",
+      "to": "scripts/quickUpdate.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/file_merger/__tests__/quota.test.js",
+      "to": "scripts/quota.test.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/file_merger/merge_pdfs.js",
+      "to": "scripts/merge_pdfs.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/file_merger/quota.js",
+      "to": "scripts/quota.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/image_resizer/resize_images.js",
+      "to": "scripts/resize_images.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/invoice_lite/generatePdf.js",
+      "to": "scripts/generatePdf.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/invoice_lite/paymentLink.js",
+      "to": "scripts/paymentLink.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/md_to_pdf/__tests__/themes.test.js",
+      "to": "scripts/themes.test.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/md_to_pdf/generate_pdf.js",
+      "to": "scripts/generate_pdf.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/md_to_pdf/themes.js",
+      "to": "scripts/themes.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/quota/getQuotaStatus.js",
+      "to": "scripts/getQuotaStatus.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/url-short/__tests__/url-short.test.js",
+      "to": "scripts/url-short.test.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/tools/url-short/index.js",
+      "to": "scripts/index.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/types/auth.js",
+      "to": "scripts/auth.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/types/billing.js",
+      "to": "scripts/billing.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/types/index.js",
+      "to": "scripts/index.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/util/errors.js",
+      "to": "scripts/errors.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/util/guards.js",
+      "to": "scripts/guards.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/lib/util/logger.js",
+      "to": "scripts/logger.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/security-validation.js",
+      "to": "scripts/security-validation.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "functions/test/rules.spec.js",
+      "to": "scripts/rules.spec.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/screens/account_screen.dart",
+      "to": "lib/tools/utility/account/account_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/screens/email_verification_screen.dart",
+      "to": "lib/tools/utility/email_verification/email_verification_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/screens/password_reset_screen.dart",
+      "to": "lib/tools/utility/password_reset/password_reset_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/screens/signin_screen.dart",
+      "to": "lib/tools/utility/signin/signin_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/screens/signup_screen.dart",
+      "to": "lib/tools/utility/signup/signup_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/auth/services/auth_service.dart",
+      "to": "lib/tools/utility/auth/auth_service.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/billing/billing_service.dart",
+      "to": "lib/tools/utility/billing/billing_service.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/billing/credits_service.dart",
+      "to": "lib/tools/utility/credits/credits_service.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/core/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "lib/core/services/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "lib/core/services/shared_data_service.dart",
+      "to": "lib/tools/utility/shared_data/shared_data_service.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/marketing/features_screen.dart",
+      "to": "lib/tools/utility/features/features_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/marketing/pricing_screen.dart",
+      "to": "lib/tools/utility/pricing/pricing_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/screens/billing/billing_cancel_screen.dart",
+      "to": "lib/tools/utility/billing_cancel/billing_cancel_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/screens/billing/billing_success_screen.dart",
+      "to": "lib/tools/utility/billing_success/billing_success_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/screens/home_screen.dart",
+      "to": "lib/tools/utility/home/home_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/screens/neo_home_screen.dart",
+      "to": "lib/tools/utility/neo_home/neo_home_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/shared/shared_data_service.dart",
+      "to": "lib/tools/utility/shared_data/shared_data_service.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "lib/tools/password_gen/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "lib/tools/text_tools/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "lib/tools/url_short/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "local-ci/MISSION_ACCOMPLISHED.md",
+      "to": "docs/MISSION_ACCOMPLISHED.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "local-ci/TEST_FAILURES_REPORT.md",
+      "to": "docs/TEST_FAILURES_REPORT.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "local-ci/WEB_BUILD_STATUS.md",
+      "to": "docs/WEB_BUILD_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "local-ci/ZERO_TOLERANCE_STATUS.md",
+      "to": "docs/ZERO_TOLERANCE_STATUS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "local-ci/summary.md",
+      "to": "docs/summary.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/2025-10-06-local-stabilize-billing-e2e.md",
+      "to": "docs/2025-10-06-local-stabilize-billing-e2e.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/2025-10-06-monetization-v1-prodgate.md",
+      "to": "docs/2025-10-06-monetization-v1-prodgate.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/monetization-v1-progress.md",
+      "to": "docs/monetization-v1-progress.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/monetization-v1-ui.md",
+      "to": "docs/monetization-v1-ui.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/phase3a-summary.md",
+      "to": "docs/phase3a-summary.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/phase4-neo-ui-overhaul.md",
+      "to": "docs/phase4-neo-ui-overhaul.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "operations/logs/task-roadmap-seeding.md",
+      "to": "docs/task-roadmap-seeding.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "ops/ci/notes/feat-ci-hygiene-unified-pipeline.md",
+      "to": "docs/feat-ci-hygiene-unified-pipeline.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "ops/ci/notes/fix-ci-firebase-hosting-missing-flutter.md",
+      "to": "docs/fix-ci-firebase-hosting-missing-flutter.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "ops/ci/notes/fix-ci-google-sign-in-dart-sdk-mismatch.md",
+      "to": "docs/fix-ci-google-sign-in-dart-sdk-mismatch.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "public/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "temp_update_plan.js",
+      "to": "scripts/temp_update_plan.js",
+      "reason": "Scripts should be in scripts/ directory"
+    },
+    {
+      "action": "move",
+      "from": "test/tools/json_doctor/IMPLEMENTATION_NOTES.md",
+      "to": "docs/IMPLEMENTATION_NOTES.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "test/tools/json_doctor/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "test/tools/json_doctor/TESTING.md",
+      "to": "docs/TESTING.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/file_merger/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/quick_invoice/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/smoke/fixtures/md/sample.md",
+      "to": "docs/sample.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/smoke/report/smoke_report.md",
+      "to": "docs/smoke_report.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/smoke/smoke_plan.md",
+      "to": "docs/smoke_plan.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/text_tools/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/text_tools/text_tools_screen.dart",
+      "to": "lib/tools/utility/text_tools/text_tools_screen.dart",
+      "reason": "Tool implementations should be in lib/tools/"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/CHANGELOG.md",
+      "to": "docs/CHANGELOG.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/INTEGRATION.md",
+      "to": "docs/INTEGRATION.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/LIMITS.md",
+      "to": "docs/LIMITS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/README.md",
+      "to": "docs/README.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/TESTS.md",
+      "to": "docs/TESTS.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "tools/video_converter/UX.md",
+      "to": "docs/UX.md",
+      "reason": "Documentation should be in docs/ directory"
+    },
+    {
+      "action": "move",
+      "from": "update_plan_smart.js",
+      "to": "scripts/update_plan_smart.js",
+      "reason": "Scripts should be in scripts/ directory"
+    }
+  ],
+  "createDirectories": [],
+  "createFiles": []
+}

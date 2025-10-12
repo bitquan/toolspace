@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "staging": "toolz-space-staging"
+  },
+  "targets": {
+    "toolz-space-staging": {
+      "hosting": {
+        "staging": [
+          "toolz-space-staging"
+        ]
+      }
+    }
+  }
+}

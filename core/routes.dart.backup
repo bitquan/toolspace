@@ -1,0 +1,815 @@
+import 'package:flutter/material.dart';
+import 'package:toolspace/tools/audio_converter/audio_converter_screen.dart';
+import 'package:toolspace/tools/audio_transcriber/audio_transcriber_screen.dart';
+import 'package:toolspace/tools/file_compressor/file_compressor_screen.dart';
+import 'package:toolspace/tools/image_resizer/image_resizer_screen.dart';
+import 'package:toolspace/tools/invoice_lite/invoice_lite_screen.dart';
+import 'package:toolspace/tools/subtitle_maker/subtitle_maker_screen.dart';
+import 'package:toolspace/tools/time_convert/time_convert_screen.dart';
+import 'package:toolspace/tools/video_converter/video_converter_screen.dart';
+
+// Central router for Toolspace micro-tools
+class ToolspaceRouter {
+  // Core navigation
+  static const String home = '/';
+  static const String dashboard = '/dashboard';
+
+  // Tool routes (23 tools total) - exactly matching docs/platform/routes.md
+  static const String textTools = '/tools/text-tools';
+  static const String fileMerger = '/tools/file-merger';
+  static const String jsonDoctor = '/tools/json-doctor';
+  static const String textDiff = '/tools/text-diff';
+  static const String qrMaker = '/tools/qr-maker';
+  static const String urlShort = '/tools/url-short';
+  static const String codecLab = '/tools/codec-lab';
+  static const String timeConvert = '/tools/time-convert';
+  static const String regexTester = '/tools/regex-tester';
+  static const String idGen = '/tools/id-gen';
+  static const String paletteExtractor = '/tools/palette-extractor';
+  static const String mdToPdf = '/tools/md-to-pdf';
+  static const String csvCleaner = '/tools/csv-cleaner';
+  static const String imageResizer = '/tools/image-resizer';
+  static const String passwordGen = '/tools/password-gen';
+  static const String jsonFlatten = '/tools/json-flatten';
+  static const String unitConverter = '/tools/unit-converter';
+  static const String invoiceLite = '/tools/invoice-lite';
+  static const String audioConverter = '/tools/audio-converter';
+  static const String fileCompressor = '/tools/file-compressor';
+  static const String videoConverter = '/tools/video-converter';
+  static const String audioTranscriber = '/tools/audio-transcriber';
+  static const String subtitleMaker = '/tools/subtitle-maker';
+
+  // Authentication routes
+  static const String auth = '/auth';
+  static const String authSignIn = '/auth/signin';
+  static const String authSignUp = '/auth/signup';
+  static const String authReset = '/auth/reset';
+  static const String authVerify = '/auth/verify';
+  static const String account = '/account';
+
+  // Billing routes
+  static const String billing = '/billing';
+  static const String billingSuccess = '/billing/success';
+  static const String billingCancel = '/billing/cancel';
+
+  // Marketing routes
+  static const String features = '/features';
+  static const String pricing = '/pricing';
+
+  // Development routes
+  static const String devE2ePlayground = '/dev/e2e-playground';
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      // Core navigation
+      case home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case dashboard:
+        return MaterialPageRoute(builder: (_) => const DashboardScreen());
+
+      // Tool routes - all 23 tools per documentation
+      case textTools:
+        return MaterialPageRoute(builder: (_) => const TextToolsScreen());
+      case fileMerger:
+        return MaterialPageRoute(builder: (_) => const FileMergerScreen());
+      case jsonDoctor:
+        return MaterialPageRoute(builder: (_) => const JsonDoctorScreen());
+      case textDiff:
+        return MaterialPageRoute(builder: (_) => const TextDiffScreen());
+      case qrMaker:
+        return MaterialPageRoute(builder: (_) => const QrMakerScreen());
+      case urlShort:
+        return MaterialPageRoute(builder: (_) => const UrlShortScreen());
+      case codecLab:
+        return MaterialPageRoute(builder: (_) => const CodecLabScreen());
+      case timeConvert:
+        return MaterialPageRoute(builder: (_) => const TimeConvertScreen());
+      case regexTester:
+        return MaterialPageRoute(builder: (_) => const RegexTesterScreen());
+      case idGen:
+        return MaterialPageRoute(builder: (_) => const IdGenScreen());
+      case paletteExtractor:
+        return MaterialPageRoute(builder: (_) => const PaletteExtractorScreen());
+      case mdToPdf:
+        return MaterialPageRoute(builder: (_) => const MdToPdfScreen());
+      case csvCleaner:
+        return MaterialPageRoute(builder: (_) => const CsvCleanerScreen());
+      case imageResizer:
+        return MaterialPageRoute(builder: (_) => const ImageResizerScreen());
+      case passwordGen:
+        return MaterialPageRoute(builder: (_) => const PasswordGenScreen());
+      case jsonFlatten:
+        return MaterialPageRoute(builder: (_) => const JsonFlattenScreen());
+      case unitConverter:
+        return MaterialPageRoute(builder: (_) => const UnitConverterScreen());
+      case invoiceLite:
+        return MaterialPageRoute(builder: (_) => const InvoiceLiteScreen());
+      case audioConverter:
+        return MaterialPageRoute(builder: (_) => const AudioConverterScreen());
+      case fileCompressor:
+        return MaterialPageRoute(builder: (_) => const FileCompressorScreen());
+      case videoConverter:
+        return MaterialPageRoute(builder: (_) => const VideoConverterScreen());
+      case audioTranscriber:
+        return MaterialPageRoute(builder: (_) => const AudioTranscriberScreen());
+      case subtitleMaker:
+        return MaterialPageRoute(builder: (_) => const SubtitleMakerScreen());
+
+      // Authentication routes
+      case auth:
+      case authSignIn:
+        return MaterialPageRoute(builder: (_) => const AuthSignInScreen());
+      case authSignUp:
+        return MaterialPageRoute(builder: (_) => const AuthSignUpScreen());
+      case authReset:
+        return MaterialPageRoute(builder: (_) => const AuthResetScreen());
+      case authVerify:
+        return MaterialPageRoute(builder: (_) => const AuthVerifyScreen());
+      case account:
+        return MaterialPageRoute(builder: (_) => const AccountScreen());
+
+      // Billing routes
+      case billing:
+        return MaterialPageRoute(builder: (_) => const BillingScreen());
+      case billingSuccess:
+        return MaterialPageRoute(builder: (_) => const BillingSuccessScreen());
+      case billingCancel:
+        return MaterialPageRoute(builder: (_) => const BillingCancelScreen());
+
+      // Marketing routes
+      case features:
+        return MaterialPageRoute(builder: (_) => const FeaturesScreen());
+      case pricing:
+        return MaterialPageRoute(builder: (_) => const PricingScreen());
+
+      // Development routes
+      case devE2ePlayground:
+        return MaterialPageRoute(builder: (_) => const DevE2ePlaygroundScreen());
+
+      default:
+        return MaterialPageRoute(builder: (_) => const NotFoundScreen());
+    }
+  }
+}
+
+// Placeholder screens - will be implemented in respective tool directories
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Toolspace')),
+      body: const Center(child: Text('Welcome to Toolspace — micro tools coming soon.')),
+    );
+  }
+}
+
+class QuickInvoiceScreen extends StatelessWidget {
+  const QuickInvoiceScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Quick Invoice')),
+      body: const Center(child: Text('Quick Invoice tool — coming soon')),
+    );
+  }
+}
+
+class TextToolsScreen extends StatelessWidget {
+  const TextToolsScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Text Tools')),
+      body: const Center(child: Text('Text Tools — coming soon')),
+    );
+  }
+}
+
+class FileMergerScreen extends StatelessWidget {
+  const FileMergerScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('File Merger')),
+      body: const Center(child: Text('File Merger tool — coming soon')),
+    );
+  }
+}
+
+class AuthScreen extends StatelessWidget {
+  const AuthScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Authentication')),
+      body: const Center(child: Text('Authentication — coming soon')),
+    );
+  }
+}
+
+class BillingScreen extends StatelessWidget {
+  const BillingScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Billing')),
+      body: const Center(child: Text('Billing management — coming soon')),
+    );
+  }
+}
+
+// Core screens
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Toolspace')),
+      body: const Center(child: Text('Welcome to Toolspace — micro tools coming soon.')),
+    );
+  }
+}
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Dashboard')),
+      body: const Center(child: Text('Dashboard — redirects to home')),
+    );
+  }
+}
+
+// Authentication Screens
+class AuthSignInScreen extends StatelessWidget {
+  const AuthSignInScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign In')),
+      body: const Center(child: Text('Sign In — implementation needed')),
+    );
+  }
+}
+
+class AuthSignUpScreen extends StatelessWidget {
+  const AuthSignUpScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign Up')),
+      body: const Center(child: Text('Sign Up — implementation needed')),
+    );
+  }
+}
+
+class AuthResetScreen extends StatelessWidget {
+  const AuthResetScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Reset Password')),
+      body: const Center(child: Text('Password Reset — implementation needed')),
+    );
+  }
+}
+
+class AuthVerifyScreen extends StatelessWidget {
+  const AuthVerifyScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Verify Email')),
+      body: const Center(child: Text('Email Verification — implementation needed')),
+    );
+  }
+}
+
+class AccountScreen extends StatelessWidget {
+  const AccountScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Account')),
+      body: const Center(child: Text('Account Management — implementation needed')),
+    );
+  }
+}
+
+// Billing Screens
+class BillingScreen extends StatelessWidget {
+  const BillingScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Billing')),
+      body: const Center(child: Text('Billing management — implementation needed')),
+    );
+  }
+}
+
+class BillingSuccessScreen extends StatelessWidget {
+  const BillingSuccessScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Payment Success')),
+      body: const Center(child: Text('Payment completed successfully!')),
+    );
+  }
+}
+
+class BillingCancelScreen extends StatelessWidget {
+  const BillingCancelScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Payment Cancelled')),
+      body: const Center(child: Text('Payment was cancelled.')),
+    );
+  }
+}
+
+// Marketing Screens
+class FeaturesScreen extends StatelessWidget {
+  const FeaturesScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Features')),
+      body: const Center(child: Text('Features overview — implementation needed')),
+    );
+  }
+}
+
+class PricingScreen extends StatelessWidget {
+  const PricingScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pricing')),
+      body: const Center(child: Text('Pricing plans — implementation needed')),
+    );
+  }
+}
+
+// Development Screens
+class DevE2ePlaygroundScreen extends StatelessWidget {
+  const DevE2ePlaygroundScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('E2E Playground')),
+      body: const Center(child: Text('E2E Testing Playground — development only')),
+    );
+  }
+}
+
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Page Not Found')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('404 - Page Not Found'),
+            SizedBox(height: 16),
+            Text('The requested page does not exist.'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Authentication Screens
+class AuthSignInScreen extends StatelessWidget {
+  const AuthSignInScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign In')),
+      body: const Center(child: Text('Sign In — implementation needed')),
+    );
+  }
+}
+
+class AuthSignUpScreen extends StatelessWidget {
+  const AuthSignUpScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign Up')),
+      body: const Center(child: Text('Sign Up — implementation needed')),
+    );
+  }
+}
+
+class AuthResetScreen extends StatelessWidget {
+  const AuthResetScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Reset Password')),
+      body: const Center(child: Text('Password Reset — implementation needed')),
+    );
+  }
+}
+
+class AuthVerifyScreen extends StatelessWidget {
+  const AuthVerifyScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Verify Email')),
+      body: const Center(child: Text('Email Verification — implementation needed')),
+    );
+  }
+}
+
+class AccountScreen extends StatelessWidget {
+  const AccountScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Account')),
+      body: const Center(child: Text('Account Management — implementation needed')),
+    );
+  }
+}
+
+// Billing Screens
+class BillingSuccessScreen extends StatelessWidget {
+  const BillingSuccessScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Payment Success')),
+      body: const Center(child: Text('Payment completed successfully!')),
+    );
+  }
+}
+
+class BillingCancelScreen extends StatelessWidget {
+  const BillingCancelScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Payment Cancelled')),
+      body: const Center(child: Text('Payment was cancelled.')),
+    );
+  }
+}
+
+// Marketing Screens
+class FeaturesScreen extends StatelessWidget {
+  const FeaturesScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Features')),
+      body: const Center(child: Text('Features overview — implementation needed')),
+    );
+  }
+}
+
+class PricingScreen extends StatelessWidget {
+  const PricingScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pricing')),
+      body: const Center(child: Text('Pricing plans — implementation needed')),
+    );
+  }
+}
+
+// Development Screens
+class DevE2ePlaygroundScreen extends StatelessWidget {
+  const DevE2ePlaygroundScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('E2E Playground')),
+      body: const Center(child: Text('E2E Testing Playground — development only')),
+    );
+  }
+}
+
+// Previously existing tool screens (keeping existing implementations)
+// Note: TextToolsScreen is imported from lib/tools/text_tools/text_tools_screen.dart
+
+class FileMergerScreen extends StatelessWidget {
+  const FileMergerScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('File Merger')),
+      body: const Center(child: Text('File Merger tool — implementation needed')),
+    );
+  }
+}
+
+class CodecLabScreen extends StatelessWidget {
+  const CodecLabScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Codec Lab')),
+      body: const Center(child: Text('Codec Lab tool — implementation needed')),
+    );
+  }
+}
+
+class CsvCleanerScreen extends StatelessWidget {
+  const CsvCleanerScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('CSV Cleaner')),
+      body: const Center(child: Text('CSV Cleaner tool — implementation needed')),
+    );
+  }
+}
+
+class IdGenScreen extends StatelessWidget {
+  const IdGenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ID Generator')),
+      body: const Center(child: Text('ID Generator tool — implementation needed')),
+    );
+  }
+}
+
+class JsonFlattenScreen extends StatelessWidget {
+  const JsonFlattenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('JSON Flatten')),
+      body: const Center(child: Text('JSON Flatten tool — implementation needed')),
+    );
+  }
+}
+
+class MdToPdfScreen extends StatelessWidget {
+  const MdToPdfScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('MD to PDF')),
+      body: const Center(child: Text('Markdown to PDF tool — implementation needed')),
+    );
+  }
+}
+
+class PaletteExtractorScreen extends StatelessWidget {
+  const PaletteExtractorScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Palette Extractor')),
+      body: const Center(child: Text('Palette Extractor tool — implementation needed')),
+    );
+  }
+}
+
+class PasswordGenScreen extends StatelessWidget {
+  const PasswordGenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Password Generator')),
+      body: const Center(child: Text('Password Generator tool — implementation needed')),
+    );
+  }
+}
+
+class RegexTesterScreen extends StatelessWidget {
+  const RegexTesterScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Regex Tester')),
+      body: const Center(child: Text('Regex Tester tool — implementation needed')),
+    );
+  }
+}
+
+// Note: JsonDoctorScreen is imported from lib/tools/json_doctor/json_doctor_screen.dart
+
+class TextDiffScreen extends StatelessWidget {
+  const TextDiffScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Text Diff')),
+      body: const Center(child: Text('Text Diff tool — implementation needed')),
+    );
+  }
+}
+
+// Note: QrMakerScreen is imported from lib/tools/qr_maker/qr_maker_screen.dart
+
+class UnitConverterScreen extends StatelessWidget {
+  const UnitConverterScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Unit Converter')),
+      body: const Center(child: Text('Unit Converter tool — implementation needed')),
+    );
+  }
+}
+
+class UrlShortScreen extends StatelessWidget {
+  const UrlShortScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('URL Shortener')),
+      body: const Center(child: Text('URL Shortener tool — implementation needed')),
+    );
+  }
+}
+
+class BillingScreen extends StatelessWidget {
+  const BillingScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Billing')),
+      body: const Center(child: Text('Billing management — implementation needed')),
+    );
+  }
+}
+
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Page Not Found')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('404 - Page Not Found'),
+            SizedBox(height: 16),
+            Text('The requested page does not exist.'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Placeholder screens for documented tools
+class CodecLabScreen extends StatelessWidget {
+  const CodecLabScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Codec Lab')),
+      body: const Center(child: Text('Codec Lab tool — coming soon')),
+    );
+  }
+}
+
+class CsvCleanerScreen extends StatelessWidget {
+  const CsvCleanerScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('CSV Cleaner')),
+      body: const Center(child: Text('CSV Cleaner tool — coming soon')),
+    );
+  }
+}
+
+class IdGenScreen extends StatelessWidget {
+  const IdGenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('ID Generator')),
+      body: const Center(child: Text('ID Generator tool — coming soon')),
+    );
+  }
+}
+
+class JsonFlattenScreen extends StatelessWidget {
+  const JsonFlattenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('JSON Flatten')),
+      body: const Center(child: Text('JSON Flatten tool — coming soon')),
+    );
+  }
+}
+
+class MdToPdfScreen extends StatelessWidget {
+  const MdToPdfScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('MD to PDF')),
+      body: const Center(child: Text('Markdown to PDF tool — coming soon')),
+    );
+  }
+}
+
+class PaletteExtractorScreen extends StatelessWidget {
+  const PaletteExtractorScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Palette Extractor')),
+      body: const Center(child: Text('Palette Extractor tool — coming soon')),
+    );
+  }
+}
+
+class PasswordGenScreen extends StatelessWidget {
+  const PasswordGenScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Password Generator')),
+      body: const Center(child: Text('Password Generator tool — coming soon')),
+    );
+  }
+}
+
+class RegexTesterScreen extends StatelessWidget {
+  const RegexTesterScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Regex Tester')),
+      body: const Center(child: Text('Regex Tester tool — coming soon')),
+    );
+  }
+}
+
+class JsonDoctorScreen extends StatelessWidget {
+  const JsonDoctorScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('JSON Doctor')),
+      body: const Center(child: Text('JSON Doctor tool — coming soon')),
+    );
+  }
+}
+
+class TextDiffScreen extends StatelessWidget {
+  const TextDiffScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Text Diff')),
+      body: const Center(child: Text('Text Diff tool — coming soon')),
+    );
+  }
+}
+
+class QrMakerScreen extends StatelessWidget {
+  const QrMakerScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('QR Maker')),
+      body: const Center(child: Text('QR Code Maker tool — coming soon')),
+    );
+  }
+}
+
+class UnitConverterScreen extends StatelessWidget {
+  const UnitConverterScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Unit Converter')),
+      body: const Center(child: Text('Unit Converter tool — coming soon')),
+    );
+  }
+}
+
+class UrlShortScreen extends StatelessWidget {
+  const UrlShortScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('URL Shortener')),
+      body: const Center(child: Text('URL Shortener tool — coming soon')),
+    );
+  }
+}

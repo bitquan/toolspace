@@ -1,0 +1,40 @@
+ M .vscode/tasks.json
+ M docs/DOCUMENTATION_SUMMARY.md
+ M functions/src/config/pricing.json
+ M functions/src/index.ts
+ M lib/tools/qr_maker/qr_maker_screen.dart
+ M package.json
+ M pubspec.lock
+ M pubspec.yaml
+?? LOCAL_TEST_STATUS.md
+?? dev-log/phase-4/
+?? docs/QA_SMOKE_README.md
+?? docs/platform/
+?? docs/tools/audio_converter/
+?? docs/tools/audio_transcriber/
+?? docs/tools/codec_lab/
+?? docs/tools/csv_cleaner/
+?? docs/tools/file_compressor/
+?? docs/tools/file_merger/
+?? docs/tools/id_gen/
+?? docs/tools/image_resizer/
+?? docs/tools/invoice_lite/
+?? docs/tools/json_doctor/
+?? docs/tools/json_flatten/
+?? docs/tools/md_to_pdf/
+?? docs/tools/palette_extractor/
+?? docs/tools/password_gen/
+?? docs/tools/qr_maker/
+?? docs/tools/regex_tester/
+?? docs/tools/subtitle_maker/
+?? docs/tools/text_diff/
+?? docs/tools/text_tools/
+?? docs/tools/time_convert/
+?? docs/tools/unit_converter/
+?? docs/tools/url_short/
+?? functions/src/health.ts
+?? functions/src/tools/file_merger/__tests__/merge_pdfs_enhanced.test.ts
+?? functions/src/tools/file_merger/merge_pdfs_enhanced.ts
+?? scripts/docs-validate.mjs
+?? tools/smoke/
+?? tools/video_converter/

@@ -42,7 +42,7 @@
           "audio_converter",
           "file_compressor"
         ],
-        "requiresUpgrade": true
+         "requiresUpgrade": true
       }
     },
     "pro": {

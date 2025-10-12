@@ -1,0 +1,48 @@
+{
+  "staging_meta": {
+    "title_suffix": " - STAGING",
+    "noindex": true,
+    "nofollow": true,
+    "description_prefix": "[STAGING] "
+  },
+  "analytics": {
+    "google_analytics": {
+      "enabled": true,
+      "tracking_id": "G-STAGING123",
+      "test_mode": true,
+      "debug": true
+    },
+    "google_tag_manager": {
+      "enabled": false,
+      "test_mode": true
+    },
+    "facebook_pixel": {
+      "enabled": false
+    },
+    "hotjar": {
+      "enabled": false
+    }
+  },
+  "seo": {
+    "sitemap_enabled": false,
+    "schema_markup": {
+      "enabled": true,
+      "test_mode": true
+    },
+    "open_graph": {
+      "enabled": true,
+      "staging_prefix": "[STAGING] "
+    }
+  },
+  "performance": {
+    "lighthouse_ci": {
+      "enabled": true,
+      "thresholds": {
+        "performance": 70,
+        "accessibility": 90,
+        "best_practices": 80,
+        "seo": 80
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Test User",
+  "age": 25,
+  "email": "test@example.com",
+  "missing_comma": true,
+  "invalid": true
+}

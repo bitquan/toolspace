@@ -41,10 +41,26 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // PRODUCTION MODE: Using production Firebase services only
-    DebugLogger.info('🌐 Using production Firebase services');
+    // Check if we should use Firebase emulators for E2E testing
+    const useEmulator = String.fromEnvironment('USE_FIREBASE_EMULATOR') == 'true';
 
-    // Ensure we're NOT using any emulators - completely disabled
+    if (useEmulator && kDebugMode) {
+      // E2E TESTING MODE: Using Firebase emulators
+      DebugLogger.info('🧪 Using Firebase emulators for E2E testing');
+
+      // Configure Auth emulator
+      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+
+      // Configure Firestore emulator
+      // Note: Firestore emulator connection is typically handled by firebase-js-sdk in web
+      DebugLogger.info('🔥 Auth emulator: localhost:9099');
+      DebugLogger.info('🔥 Firestore emulator: localhost:8081');
+    } else {
+      // PRODUCTION MODE: Using production Firebase services only
+      DebugLogger.info('🌐 Using production Firebase services');
+    }
+
+    // Ensure we're NOT using any emulators in production - completely disabled
     // No emulator configuration at all
 
     // 🚫 DO NOT sign in anonymously here in production

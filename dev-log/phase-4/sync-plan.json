@@ -1,0 +1,109 @@
+{
+  "createFiles": [
+    {
+      "action": "create",
+      "path": "lib/tools/tools/IMPLEMENTATION_SUMMARY/IMPLEMENTATION_SUMMARY_screen.dart",
+      "template": "tool_screen",
+      "tool": "IMPLEMENTATION_SUMMARY",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/IMPLEMENTATION_SUMMARY/IMPLEMENTATION_SUMMARY_service.dart",
+      "template": "tool_service",
+      "tool": "IMPLEMENTATION_SUMMARY",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/cross_tool_data_sharing/cross_tool_data_sharing_screen.dart",
+      "template": "tool_screen",
+      "tool": "cross_tool_data_sharing",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/cross_tool_data_sharing/cross_tool_data_sharing_service.dart",
+      "template": "tool_service",
+      "tool": "cross_tool_data_sharing",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/palette_extractor_ui_guide/palette_extractor_ui_guide_screen.dart",
+      "template": "tool_screen",
+      "tool": "palette_extractor_ui_guide",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/palette_extractor_ui_guide/palette_extractor_ui_guide_service.dart",
+      "template": "tool_service",
+      "tool": "palette_extractor_ui_guide",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/quick_invoice/quick_invoice_screen.dart",
+      "template": "tool_screen",
+      "tool": "quick_invoice",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/quick_invoice/quick_invoice_service.dart",
+      "template": "tool_service",
+      "tool": "quick_invoice",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/t_toolspack_v2/t_toolspack_v2_screen.dart",
+      "template": "tool_screen",
+      "tool": "t_toolspack_v2",
+      "category": "tools"
+    },
+    {
+      "action": "create",
+      "path": "lib/tools/tools/t_toolspack_v2/t_toolspack_v2_service.dart",
+      "template": "tool_service",
+      "tool": "t_toolspack_v2",
+      "category": "tools"
+    }
+  ],
+  "updateFiles": [],
+  "removeFiles": [],
+  "addDependencies": [],
+  "createTests": [
+    {
+      "action": "create_test",
+      "path": "test/core/services/shared_data_service_test.dart",
+      "tool": "IMPLEMENTATION_SUMMARY"
+    },
+    {
+      "action": "create_test",
+      "path": "test/core/services/shared_data_service_test.dart",
+      "tool": "IMPLEMENTATION_SUMMARY"
+    },
+    {
+      "action": "create_test",
+      "path": "test/core/services/shared_data_service_test.dart",
+      "tool": "cross_tool_data_sharing"
+    },
+    {
+      "action": "create_test",
+      "path": "test/core/services/shared_data_service_test.dart",
+      "tool": "cross_tool_data_sharing"
+    },
+    {
+      "action": "create_test",
+      "path": "test/tools/json_doctor_test.dart",
+      "tool": "t_toolspack_v2"
+    },
+    {
+      "action": "create_test",
+      "path": "test/tools/text_diff_logic_test.dart",
+      "tool": "t_toolspack_v2"
+    }
+  ]
+}

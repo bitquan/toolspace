@@ -12,12 +12,17 @@
 
 import * as functions from "firebase-functions/v1";
 import Stripe from "stripe";
+import { db } from "../admin";
 import {
   BillingEvent,
   BillingProfile,
   StripeWebhookEventType,
 } from "../types/billing";
-import { db } from "../admin";
+
+// Environment detection
+const isStaging =
+  process.env.FIREBASE_CONFIG?.includes("toolz-space-staging") ||
+  process.env.FIREBASE_PROJECT_ID === "toolz-space-staging";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY ||
@@ -35,7 +40,20 @@ const webhookSecret =
   functions.config().stripe?.webhook_secret ||
   "";
 
+// Log environment on cold start
+console.log(
+  `🔧 Stripe webhook initialized: ${isStaging ? "STAGING" : "PRODUCTION"} mode`
+);
+console.log(`🔑 Using ${isStaging ? "TEST" : "LIVE"} Stripe keys`);
+console.log(`🪝 Webhook secret configured: ${webhookSecret ? "YES" : "NO"}`);
+
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
+  // Log request details for staging debugging
+  if (isStaging) {
+    console.log("🧪 STAGING: Webhook request received");
+    console.log("📝 Headers:", JSON.stringify(req.headers, null, 2));
+  }
+
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
@@ -54,7 +72,15 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
     body = JSON.stringify(req.body);
   }
 
+  if (isStaging) {
+    console.log("🧪 STAGING: Webhook signature verification");
+    console.log("🔍 Body type:", typeof body);
+    console.log("📏 Body length:", body.length);
+    console.log("🔑 Webhook secret present:", !!webhookSecret);
+  }
+
   functions.logger.info("Webhook signature verification attempt", {
+    environment: isStaging ? "staging" : "production",
     hasSignature: !!sig,
     hasWebhookSecret: !!webhookSecret,
     bodyType: typeof body,
@@ -75,7 +101,17 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
     const signature =
       typeof sig === "string" ? sig : Array.isArray(sig) ? sig[0] : "";
 
+    if (isStaging) {
+      console.log("🧪 STAGING: Constructing webhook event");
+      console.log("✅ Signature length:", signature.length);
+      console.log(
+        "✅ Using webhook secret:",
+        webhookSecret.substring(0, 10) + "..."
+      );
+    }
+
     functions.logger.info("Attempting webhook construction", {
+      environment: isStaging ? "staging" : "production",
       signatureLength: signature.length,
       bodyLength: body.length,
       webhookSecretPresent: !!webhookSecret,
@@ -83,12 +119,30 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
 
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
+    if (isStaging) {
+      console.log("✅ STAGING: Webhook event constructed successfully");
+      console.log("🎯 Event type:", event.type);
+      console.log("🆔 Event ID:", event.id);
+    }
+
     functions.logger.info("Webhook signature verification successful", {
+      environment: isStaging ? "staging" : "production",
       eventType: event.type,
       eventId: event.id,
     });
   } catch (err: any) {
+    if (isStaging) {
+      console.error("❌ STAGING: Webhook signature verification failed");
+      console.error("🚨 Error:", err.message);
+      console.error("🔍 Debug info:", {
+        hasSignature: !!sig,
+        hasWebhookSecret: !!webhookSecret,
+        webhookSecretPreview: webhookSecret.substring(0, 10) + "...",
+      });
+    }
+
     functions.logger.error("Webhook signature verification failed", {
+      environment: isStaging ? "staging" : "production",
       error: err.message,
       hasSignature: !!sig,
       hasWebhookSecret: !!webhookSecret,
@@ -101,42 +155,82 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
     return;
   }
 
+  if (isStaging) {
+    console.log("🎉 STAGING: Processing webhook event");
+    console.log("📋 Event details:", {
+      type: event.type,
+      id: event.id,
+      livemode: event.livemode,
+      created: new Date(event.created * 1000).toISOString(),
+    });
+  }
+
   functions.logger.info("Webhook received", {
+    environment: isStaging ? "staging" : "production",
     type: event.type,
     id: event.id,
+    livemode: event.livemode,
   });
 
   try {
     // Route to appropriate handler
     switch (event.type) {
       case "checkout.session.completed":
+        if (isStaging)
+          console.log("🛒 STAGING: Handling checkout.session.completed");
         await handleCheckoutCompleted(event);
         break;
 
       case "customer.subscription.created":
       case "customer.subscription.updated":
+        if (isStaging)
+          console.log("📋 STAGING: Handling subscription event:", event.type);
         await handleSubscriptionUpdated(event);
         break;
 
       case "customer.subscription.deleted":
+        if (isStaging) console.log("🗑️ STAGING: Handling subscription.deleted");
         await handleSubscriptionDeleted(event);
         break;
 
       case "invoice.paid":
+        if (isStaging) console.log("💰 STAGING: Handling invoice.paid");
         await handleInvoicePaid(event);
         break;
 
       case "invoice.payment_failed":
+        if (isStaging)
+          console.log("💸 STAGING: Handling invoice.payment_failed");
         await handleInvoicePaymentFailed(event);
         break;
 
       default:
-        functions.logger.info("Unhandled event type", { type: event.type });
+        if (isStaging) {
+          console.log("❓ STAGING: Unhandled event type:", event.type);
+        }
+        functions.logger.info("Unhandled event type", {
+          environment: isStaging ? "staging" : "production",
+          type: event.type,
+        });
+    }
+
+    if (isStaging) {
+      console.log("✅ STAGING: Webhook processing completed successfully");
     }
 
     res.json({ received: true });
   } catch (error: any) {
+    if (isStaging) {
+      console.error("💥 STAGING: Webhook processing error");
+      console.error("🚨 Error details:", {
+        message: error.message,
+        stack: error.stack,
+        eventType: event.type,
+        eventId: event.id,
+      });
+    }
     functions.logger.error("Webhook processing failed", {
+      environment: isStaging ? "staging" : "production",
       type: event.type,
       id: event.id,
       error: error.message,
@@ -152,7 +246,10 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       planId: null,
       status: null,
       timestamp: Date.now(),
-      metadata: { error: error.message },
+      metadata: {
+        error: error.message,
+        environment: isStaging ? "staging" : "production",
+      },
       processed: false,
       error: error.message,
     });

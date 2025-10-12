@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../billing/billing_service.dart';
 import '../../billing/widgets/paywall_guard.dart';
@@ -15,8 +16,7 @@ class QrMakerScreen extends StatefulWidget {
   State<QrMakerScreen> createState() => _QrMakerScreenState();
 }
 
-class _QrMakerScreenState extends State<QrMakerScreen>
-    with TickerProviderStateMixin {
+class _QrMakerScreenState extends State<QrMakerScreen> with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _batchTextController = TextEditingController();
   final BillingService _billingService = BillingService();
@@ -116,8 +116,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
       return;
     }
 
-    final items =
-        input.split('\n').where((line) => line.trim().isNotEmpty).toList();
+    final items = input.split('\n').where((line) => line.trim().isNotEmpty).toList();
 
     setState(() {
       _batchItems = items;
@@ -240,12 +239,9 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                 tooltip: 'Copy Data',
               ),
             IconButton(
-              onPressed: _tabController.index == 0
-                  ? _downloadQr
-                  : _downloadAllBatchQrs,
+              onPressed: _tabController.index == 0 ? _downloadQr : _downloadAllBatchQrs,
               icon: const Icon(Icons.download),
-              tooltip:
-                  _tabController.index == 0 ? 'Download QR' : 'Download All',
+              tooltip: _tabController.index == 0 ? 'Download QR' : 'Download All',
             ),
           ],
           bottom: TabBar(
@@ -310,8 +306,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                             _useQuickTemplate(_getQuickTemplate(type));
                           }
                         },
-                        selectedColor:
-                            const Color(0xFFFF5722).withValues(alpha: 0.2),
+                        selectedColor: const Color(0xFFFF5722).withValues(alpha: 0.2),
                         checkmarkColor: const Color(0xFFFF5722),
                       );
                     }).toList(),
@@ -360,13 +355,11 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () => _useQuickTemplate(
-                                _getQuickTemplate(_selectedType)),
+                            onPressed: () => _useQuickTemplate(_getQuickTemplate(_selectedType)),
                             icon: const Icon(Icons.auto_fix_high),
                             label: const Text('Template'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5722)
-                                  .withValues(alpha: 0.1),
+                              backgroundColor: const Color(0xFFFF5722).withValues(alpha: 0.1),
                               foregroundColor: const Color(0xFFFF5722),
                             ),
                           ),
@@ -510,8 +503,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.5),
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -633,8 +625,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle,
-                              color: Colors.green, size: 20),
+                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             'Generated $_generatedCount QR codes',
@@ -677,15 +668,13 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                           Icon(
                             Icons.qr_code_scanner,
                             size: 80,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No QR codes generated yet',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                             ),
                           ),
                         ],
@@ -695,8 +684,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                 else
                   Expanded(
                     child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -722,9 +710,7 @@ class _QrMakerScreenState extends State<QrMakerScreen>
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  item.length > 30
-                                      ? '${item.substring(0, 30)}...'
-                                      : item,
+                                  item.length > 30 ? '${item.substring(0, 30)}...' : item,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     fontFamily: 'monospace',
                                   ),
@@ -810,38 +796,53 @@ class _QrCodePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This is a placeholder - in real implementation, use qr_flutter package
+    if (data.isEmpty) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border.all(color: foregroundColor.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.qr_code,
+              size: size * 0.6,
+              color: foregroundColor.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Enter text to generate QR',
+              style: TextStyle(
+                fontSize: size * 0.05,
+                color: foregroundColor.withValues(alpha: 0.3),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Real QR code generation using qr_flutter package
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: backgroundColor,
-        border: Border.all(color: foregroundColor.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.qr_code,
-            size: size * 0.6,
-            color: foregroundColor,
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              data.length > 20 ? '${data.substring(0, 20)}...' : data,
-              style: TextStyle(
-                fontSize: size * 0.04,
-                color: foregroundColor,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      child: QrImageView(
+        data: data,
+        version: QrVersions.auto,
+        size: size,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        padding: const EdgeInsets.all(8),
+        errorCorrectionLevel: QrErrorCorrectLevel.M,
       ),
     );
   }

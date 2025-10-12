@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2025-10-12T14:48:29.600Z",
+  "docsSummaryExists": true,
+  "toolIndexExists": false,
+  "counts": {
+    "docsTools": 22,
+    "codeTools": 24,
+    "routeSlugs": 23
+  },
+  "tools_in_docs_only": [],
+  "tools_in_code_only": [
+    "vats",
+    "video_converter"
+  ],
+  "mismatched_routes": [
+    {
+      "toolId": "vats",
+      "expectedRouteSlug": "vats",
+      "present": []
+    }
+  ],
+  "missing_docs": [
+    "vats",
+    "video_converter"
+  ],
+  "billing_mismatches": [
+    {
+      "toolId": "audio_transcriber",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "id_gen",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "password_gen",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "subtitle_maker",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "time_convert",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "url_short",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "vats",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "video_converter",
+      "issue": "missing_pricing_entry"
+    },
+    {
+      "toolId": "audio_transcriber",
+      "issue": "doc_tool_missing_pricing_entry"
+    },
+    {
+      "toolId": "id_gen",
+      "issue": "doc_tool_missing_pricing_entry"
+    },
+    {
+      "toolId": "password_gen",
+      "issue": "doc_tool_missing_pricing_entry"
+    },
+    {
+      "toolId": "subtitle_maker",
+      "issue": "doc_tool_missing_pricing_entry"
+    },
+    {
+      "toolId": "time_convert",
+      "issue": "doc_tool_missing_pricing_entry"
+    },
+    {
+      "toolId": "url_short",
+      "issue": "doc_tool_missing_pricing_entry"
+    }
+  ],
+  "pricing_tools_count": 24
+}

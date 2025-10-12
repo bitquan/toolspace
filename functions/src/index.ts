@@ -10,17 +10,32 @@
 import * as dotenv from "dotenv";
 import { setGlobalOptions } from "firebase-functions";
 import {
-  validateProductionConfig,
   getConfigSummary,
+  validateProductionConfig,
 } from "./config/validation";
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables based on environment
+const isStaging =
+  process.env.FIREBASE_CONFIG?.includes("toolz-space-staging") ||
+  process.env.FIREBASE_PROJECT_ID === "toolz-space-staging";
 
-// Validate production configuration on startup
-console.log("🔍 Validating production configuration...");
-console.log("📊 Configuration summary:", getConfigSummary());
-validateProductionConfig();
+if (isStaging) {
+  dotenv.config({ path: ".env.staging" });
+  console.log("🔧 STAGING MODE: Loaded .env.staging configuration");
+  console.log("🧪 Using TEST Stripe keys and staging Firebase project");
+} else {
+  dotenv.config();
+}
+
+// Log configuration summary (without sensitive values)
+console.log("� Configuration summary:", getConfigSummary());
+
+// Only validate production config if not in staging
+if (!isStaging) {
+  validateProductionConfig();
+} else {
+  console.log("⚠️ STAGING: Skipping production config validation");
+}
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -38,10 +53,16 @@ validateProductionConfig();
 setGlobalOptions({ maxInstances: 10 });
 
 // Export billing functions
-export { createCheckoutSession } from "./billing/createCheckoutSession";
+export {
+  createCheckoutSession,
+  createCheckoutSessionHttp,
+} from "./billing/createCheckoutSession";
 export { createPortalLink } from "./billing/createPortalLink";
-export { stripeWebhook } from "./billing/webhook";
 export { updateUserPlan } from "./billing/updateUserPlan"; // Temporary function for testing
+export { stripeWebhook } from "./billing/webhook";
+
+// Export health check
+export { health } from "./health";
 
 // Export legacy quota function (deprecated - for backward compatibility)
 export { getQuotaStatus } from "./tools/quota/getQuotaStatus";

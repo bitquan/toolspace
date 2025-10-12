@@ -2,44 +2,48 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Preflight: All checks (local == CI)",
+      "label": "Docs: Build Index",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "preflight"],
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
+      "args": ["run", "docs:summary"],
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [],
-      "detail": "🔒 OPS-LocalGate: Run full preflight checks before push"
+            "echo '🚀 Building & Deploying to staging...' && flutter build web --release --dart-define-from-file=env/staging.json && firebase deploy --only hosting:staging,functions --project toolz-space-staging --config firebase.staging.json"
     },
     {
-      "label": "Preflight (quick)",
+      "label": "Docs: Validate (strict)",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "preflight:quick"],
-      "group": "test",
+      "args": ["run", "docs:validate"],
+      "group": "build",
       "presentation": {
         "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
+            "cwd": "${workspaceFolder}",
+            "env": {
+              "NODE_ENV": "staging",
+              "FIREBASE_PROJECT_ID": "toolz-space-staging"
+            }
+        "clear": false
+          "detail": "🚀 Build Flutter web and deploy Hosting+Functions to staging Firebase project"
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [],
-      "detail": "⚡ OPS-LocalGate: Quick preflight (skip Playwright + web build)"
+      "detail": "Runs strict validation of all documentation files"
     },
     {
-      "label": "Assign Issue to Copilot",
+            "echo '🧪 Running full staging validation...' && node scripts/e2e/billing-checkout.mjs && node scripts/e2e/webhook-ack.mjs && node scripts/e2e/smoke-suite.mjs && node scripts/staging-readiness-report.mjs"
       "type": "shell",
       "command": "node",
       "args": ["scripts/assign-to-copilot.mjs", "${input:issueNumber}"],
@@ -377,6 +381,87 @@
       "detail": "🔥💥 NUCLEAR: Immediately delete EVERYTHING (maximum destruction!)"
     },
     {
+      "label": "🔥 Emulators (staging)",
+      "type": "shell",
+      "command": "firebase",
+      "args": [
+        "emulators:start",
+        "--only",
+        "auth,firestore,functions,storage",
+        "--project",
+        "toolz-space-staging"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "FIREBASE_PROJECT_ID": "toolz-space-staging"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Start Firebase emulators (auth, firestore, functions, storage) for staging"
+    },
+    {
+      "label": "💳 Stripe webhook (staging)",
+      "type": "shell",
+      "command": "stripe",
+      "args": [
+        "listen",
+        "--forward-to",
+        "http://localhost:5001/toolz-space-staging/us-central1/stripeWebhook"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Forward Stripe events to local functions emulator for staging"
+    },
+    {
+      "label": "🌐 Flutter Web (staging)",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "run",
+        "-d",
+        "chrome",
+        "--dart-define-from-file=env/staging.json"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Run Flutter web app with staging configuration"
+    },
+    {
       "label": "🧹 Cleanup Helper (PowerShell)",
       "type": "shell",
       "command": "powershell",
@@ -404,15 +489,382 @@
       "detail": "Interactive PowerShell cleanup helper with confirmation prompts"
     },
     {
-      "label": "Flutter Run (Chrome)",
+      "label": "🚀 Build for Staging",
+      "type": "shell",
+      "command": "flutter",
+      "args": [
+        "build",
+        "web",
+        "--dart-define-from-file=env/staging.json",
+        "--web-renderer=html"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Build Flutter web app with staging configuration"
+    },
+    {
+      "label": "🌐 Deploy Staging (Hosting Only)",
+      "type": "shell",
+      "command": "firebase",
+      "args": [
+        "deploy",
+        "--only",
+        "hosting:staging",
+        "--config",
+        "firebase.staging.json",
+        "--project",
+        "toolz-space-staging"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Deploy web app to staging hosting (no functions)",
+      "dependsOn": "🚀 Build for Staging"
+    },
+    {
+      "label": "⚡ Deploy Staging (Functions Only)",
+      "type": "shell",
+      "command": "firebase",
+      "args": [
+        "deploy",
+        "--only",
+        "functions",
+        "--config",
+        "firebase.staging.json",
+        "--project",
+        "toolz-space-staging"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Deploy functions to staging with enhanced logging"
+    },
+    {
+      "label": "🎯 Full Staging Deploy",
+      "type": "shell",
+      "command": "firebase",
+      "args": [
+        "deploy",
+        "--config",
+        "firebase.staging.json",
+        "--project",
+        "toolz-space-staging"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Full staging deployment (hosting + functions + rules)",
+      "dependsOn": "🚀 Build for Staging"
+    },
+    {
+      "label": "🧹 Flutter Clean",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["clean"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Clean Flutter build artifacts"
+    },
+    {
+      "label": "📦 Flutter Pub Get",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "get"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Get Flutter dependencies"
+    },
+    {
+      "label": "🔧 Flutter Clean & Get",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["clean"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Clean and get Flutter dependencies",
+      "dependsOn": ["🧹 Flutter Clean"],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "🔍 Flutter Analyze",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["analyze"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$dart-build_runner"],
+      "detail": "Run Flutter static analysis"
+    },
+    {
+      "label": "🧪 Flutter Test",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["test"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$dart-flutter"],
+      "detail": "Run all Flutter tests"
+    },
+    {
+      "label": "🏃 Flutter Run (Chrome)",
       "type": "shell",
       "command": "flutter",
       "args": ["run", "-d", "chrome"],
       "isBackground": true,
-      "group": {
-        "kind": "build",
-        "isDefault": true
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
       },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Run Flutter app in Chrome browser"
+    },
+    {
+      "label": "🖥️ Flutter Run (macOS)",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["run", "-d", "macos"],
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Run Flutter app on macOS desktop"
+    },
+    {
+      "label": "📱 Flutter Devices",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["devices"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "List all available Flutter devices"
+    },
+    {
+      "label": "🚀 Flutter Doctor",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["doctor", "-v"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Check Flutter environment setup"
+    },
+    {
+      "label": "📊 Flutter Build Web",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["build", "web"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$dart-flutter"],
+      "detail": "Build Flutter web application"
+    },
+    {
+      "label": "🔥 Start Firebase Emulators",
+      "type": "shell",
+      "command": "firebase",
+      "args": ["emulators:start"],
+      "isBackground": true,
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting emulators",
+          "endsPattern": "All emulators ready"
+        }
+      },
+      "detail": "Start Firebase emulators (Auth:9099, Firestore:8080, Functions:5001, Hosting:5000, UI:4000)"
+    },
+    {
+      "label": "💳 Start Stripe CLI Webhook",
+      "type": "shell",
+      "command": "stripe",
+      "args": [
+        "listen",
+        "--forward-to",
+        "localhost:5001/toolspace-beta/us-central1/stripeWebhook"
+      ],
+      "isBackground": true,
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Getting ready",
+          "endsPattern": "Ready!"
+        }
+      },
+      "detail": "Start Stripe CLI webhook forwarding to local functions"
+    },
+    {
+      "label": "🚀 Start Development Environment",
+      "dependsOn": [
+        "🔥 Start Firebase Emulators",
+        "💳 Start Stripe CLI Webhook"
+      ],
+      "dependsOrder": "parallel",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "detail": "Start both Firebase emulators and Stripe CLI webhook forwarding"
+    },
+    {
+      "label": "🧪 Run Smoke Tests",
+      "type": "shell",
+      "command": "dart",
+      "args": ["run", "tools/smoke/run_smoke.dart"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [],
+      "detail": "🧪 Execute comprehensive smoke tests for all tools"
+    },
+    {
+      "label": "🧾 Run Functions Tests",
+      "type": "shell",
+      "command": "npm",
+      "args": ["test"],
+      "options": {
+        "cwd": "${workspaceFolder}/functions"
+      },
+      "group": "test",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -421,37 +873,171 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [],
-      "detail": "Run Flutter app in Chrome browser with hot reload"
+      "problemMatcher": ["$eslint-stylish"],
+      "detail": "🧾 Run Firebase Functions unit tests"
     },
     {
-      "label": "Firebase Emulators",
+      "label": "🚀 Start Flutter Web App",
       "type": "shell",
-      "command": "powershell",
-      "args": [
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "scripts/firebase-dev.ps1",
-        "-AutoClose"
-      ],
-      "isBackground": true,
+      "command": "flutter",
+      "args": ["run", "-d", "chrome", "--web-port", "3000"],
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
         "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
-        "clear": true,
-        "close": true
+        "clear": true
+      },
+      "problemMatcher": [],
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "detail": "🚀 Start Flutter web development server on port 3000"
+    },
+    {
+      "label": "🔍 Check Emulators Status",
+      "type": "shell",
+      "command": "curl",
+      "args": ["-f", "-s", "http://localhost:4000"],
+      "group": "test",
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false
+      },
+      "problemMatcher": [],
+      "detail": "🔍 Verify Firebase emulators are running"
+    },
+    {
+      "label": "🛑 Stop All Development Services",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "pkill -f 'firebase.*emulators' || true; pkill -f 'stripe.*listen' || true; pkill -f 'flutter.*run' || true"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "detail": "🛑 Stop Firebase emulators, Stripe CLI, and Flutter dev server"
+    },
+    {
+      "label": "🎭 Run E2E Billing Test",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/e2e/billing-checkout.mjs"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
       },
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "problemMatcher": []
+      "detail": "🎭 Run comprehensive billing checkout E2E test"
+    },
+    {
+      "label": "🔗 Run E2E Webhook Test",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/e2e/webhook-ack.mjs"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "detail": "🔗 Run webhook acknowledgment E2E test"
+    },
+    {
+      "label": "💨 Run Smoke Test Suite",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/e2e/smoke-suite.mjs"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "detail": "💨 Run 10-path smoke test suite"
+    },
+    {
+      "label": "📊 Generate Staging Readiness Report",
+      "type": "shell",
+      "command": "node",
+      "args": ["scripts/staging-readiness-report.mjs"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "detail": "📊 Generate comprehensive staging readiness report"
+    },
+    {
+      "label": "🚀 Deploy to Staging",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "echo '🚀 Deploying to staging...' && firebase use toolz-space-staging && firebase deploy --project toolz-space-staging"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "NODE_ENV": "staging"
+        }
+      },
+      "detail": "🚀 Deploy Functions and Hosting to staging Firebase project"
+    },
+    {
+      "label": "🧪 Full Staging Validation",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "echo '🧪 Running full staging validation...' && node scripts/e2e/billing-checkout.mjs && node scripts/e2e/webhook-ack.mjs && node scripts/e2e/smoke-suite.mjs && node scripts/staging-readiness-report.mjs"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "detail": "🧪 Run complete staging validation: E2E tests + smoke suite + report"
     }
   ],
   "inputs": [

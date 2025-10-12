@@ -7,10 +7,10 @@
  * 3. Subscription lifecycle events are handled
  */
 
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import * as http from "http";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:51268";
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 const FUNCTIONS_URL = process.env.FUNCTIONS_URL || "http://localhost:5001";
 
 // Stripe webhook test fixtures

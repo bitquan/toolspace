@@ -1,86 +1,100 @@
-# Documentation Summary
+# Toolspace Documentation Summary
 
-This directory contains all documentation for the Toolspace project.
+**Generated:** 2025-10-11T22:01:34.229Z  
+**Validator Version:** 1.0.0  
+**Status:** ✅ VALIDATED
 
-## Structure
+## Overview
 
-### Strategy Documentation
+This documentation serves as the single source of truth for all Toolspace tools and platform components. Every feature, API, and behavior documented here must match the actual implementation.
 
-- `strategies/guest-usage-strategy.md` - Freemium strategy with 5 uses per month for guests
-- `billing-paywall-system.md` - Comprehensive billing and paywall system documentation
+## Documentation Structure
 
-### Quality Documentation
+```
+docs/
+├── tools/                    # Individual tool documentation
+│   ├── <tool-id>/
+│   │   ├── README.md        # Complete tool specification
+│   │   ├── UX.md           # User experience flows
+│   │   ├── INTEGRATION.md  # Cross-tool integrations
+│   │   ├── TESTS.md        # Test specifications
+│   │   ├── LIMITS.md       # Quotas and limitations
+│   │   └── CHANGELOG.md    # Version history
+├── platform/               # Platform-wide documentation
+│   ├── billing.md         # Billing and subscriptions
+│   ├── cross-tool.md      # Tool-to-tool communication
+│   ├── routes.md          # Application routing
+│   ├── storage.md         # Data storage patterns
+│   ├── functions.md       # Cloud Functions
+│   └── qa-e2e.md          # End-to-end testing
+├── style/                 # Design system documentation
+│   ├── ux-theme.md       # UI theme and components
+│   └── copy.md           # Writing style guide
+└── DOCUMENTATION_SUMMARY.md  # This file
+```
 
-- `quality/testing.md` - Testing strategies and requirements
-- `quality/triage.md` - Issue triage and priority guidelines
+## Tools Documentation
 
-### Policy Documentation
+| Tool | Route | Category | Billing | Status |
+|------|-------|----------|---------|--------|
+| Audio Converter | `/tools/audio-converter` | - | - | ✅ |
+| Audio Transcriber | `/tools/audio-transcriber` | - | - | ✅ |
+| Codec Lab | `/tools/codec-lab` | - | - | ✅ |
+| Csv Cleaner | `/tools/csv-cleaner` | - | - | ✅ |
+| File Compressor | `/tools/file-compressor` | - | - | ✅ |
+| File Merger | `/tools/file-merger` | - | - | ✅ |
+| Id Gen | `/tools/id-gen` | - | - | ✅ |
+| Image Resizer | `/tools/image-resizer` | - | - | ✅ |
+| Invoice Lite | `/tools/invoice-lite` | - | - | ✅ |
+| Json Doctor | `/tools/json-doctor` | - | - | ✅ |
+| Json Flatten | `/tools/json-flatten` | - | - | ✅ |
+| Md To_pdf | `/tools/md-to_pdf` | - | - | ✅ |
+| Palette Extractor | `/tools/palette-extractor` | - | - | ❌ |
+| Password Gen | `/tools/password-gen` | - | - | ✅ |
+| Qr Maker | `/tools/qr-maker` | - | - | ✅ |
+| Regex Tester | `/tools/regex-tester` | - | - | ❌ |
+| Subtitle Maker | `/tools/subtitle-maker` | - | - | ❌ |
+| Text Diff | `/tools/text-diff` | - | - | ❌ |
+| Text Tools | `/tools/text-tools` | - | - | ✅ |
+| Time Convert | `/tools/time-convert` | - | - | ❌ |
+| Unit Converter | `/tools/unit-converter` | - | - | ❌ |
+| Url Short | `/tools/url-short` | - | - | ❌ |
+| Video Converter | `/tools/video-converter` | - | - | ❌ |
 
-- `policies/testing.md` - Always-on testing policies and procedures
 
-### Backend Documentation
+## Platform Documentation Status
 
-- `backend/README.md` - Backend architecture overview
-- `backend/API.md` - API documentation and endpoints
-- `backend/SETUP.md` - Backend setup and deployment guide
+| Component | File | Status |
+|-----------|------|--------|
+| Billing & Subscriptions | platform/billing.md | ✅ |
+| Cross-Tool Communication | platform/cross-tool.md | ✅ |
+| Application Routing | platform/routes.md | ✅ |
+| Data Storage | platform/storage.md | ❌ |
+| Cloud Functions | platform/functions.md | ❌ |
+| End-to-End Testing | platform/qa-e2e.md | ❌ |
 
-### Tool Documentation
+## Style Documentation Status
 
-- `tools/quick_invoice.md` - Quick Invoice tool documentation
-- `tools/text_tools.md` - Text Tools documentation
-- `tools/file_merger.md` - File Merger tool documentation
-- `tools/invoice-lite.md` - Invoice Lite tool documentation
-- `tools/video-converter.md` - Video Converter tool documentation
-- `tools/audio-transcriber.md` - Audio Transcriber tool documentation
-- `tools/subtitle-maker.md` - Subtitle Maker tool documentation
+| Component | File | Status |
+|-----------|------|--------|
+| UX Theme & Components | style/ux-theme.md | ❌ |
+| Copy & Style Guide | style/copy.md | ❌ |
 
-### Epic Documentation
+## Validation Summary
 
-- `epics/modular-vats-architecture.md` - Complete implementation summary of modular media processing
+- **Total Tools:** 23
+- **Documentation Errors:** 0
+- **Documentation Warnings:** 0
+- **Routes Validated:** 38
+- **Billing Plans:** 3
 
-### Setup Documentation
+## Quality Standards
 
-- `setup/FIREBASE_SETUP.md` - Complete Firebase project setup guide
-- `development/coding-standards.md` - Comprehensive coding standards and style guide
+All documentation must:
+- ✅ Be complete with no placeholders or TODO items
+- ✅ Match the actual implementation exactly
+- ✅ Include working code examples and file paths
+- ✅ Provide comprehensive test coverage specifications
+- ✅ Document all billing and quota restrictions accurately
 
-### Roadmap and Planning
-
-- `roadmap/README.md` - Roadmap system documentation and usage guide
-- `roadmap/phase-1.md` - Current phase roadmap with auto-issue generation
-- `roadmap/post-prod-upgrades.md` - Post-production upgrade backlog
-
-### Development Logs
-
-- `dev-log/features/` - Individual feature implementation logs
-- `dev-log/modular-vats-implementation-2025-10-11.md` - Modular VATS implementation timeline
-
-## Recent Updates (October 11, 2025)
-
-### Freemium Strategy Implementation
-
-- **Guest Usage Model**: 5 uses per month for 12 free tools without signup
-- **Landing Page**: Redesigned with powerful tools showcase
-- **Tool Classification**: Clear separation between free and Pro tools
-- **User Journey**: Try-before-signup conversion optimization
-
-### Modular Media Processing Pipeline
-
-- **Video Converter**: Extract audio from video files
-- **Audio Transcriber**: Convert audio to text transcripts
-- **Subtitle Maker**: Create SRT/VTT subtitle files
-- **Complete Workflow**: Video → Audio → Transcript → Subtitles
-
-## Contributing to Documentation
-
-- Keep documentation up-to-date with code changes
-- Use clear, concise language
-- Include code examples where appropriate
-- Update this summary when adding new documentation
-
-## Documentation Standards
-
-- Use Markdown format (.md files)
-- Include table of contents for longer documents
-- Use consistent heading hierarchy
-- Add links between related documents
-- Include screenshots/diagrams where helpful
+*This summary is automatically generated by `scripts/docs-validate.mjs`. Do not edit manually.*
