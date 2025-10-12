@@ -13,7 +13,7 @@ import { test, expect, Page } from "@playwright/test";
 
 const TEST_EMAIL = `test-${Date.now()}@toolspace-test.com`;
 const TEST_PASSWORD = "TestPassword123!";
-const BASE_URL = process.env.BASE_URL || "http://localhost:51268";
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 
 test.describe("🔐 Auth E2E Flow", () => {
   let page: Page;

@@ -9,7 +9,7 @@
 
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:51268";
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 
 const HEAVY_TOOLS = [
   { path: "/tools/file-merger", name: "File Merger" },

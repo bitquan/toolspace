@@ -11,7 +11,7 @@
 
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:51268";
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 
 test.describe("🔗 Anonymous User Linking", () => {
   test("🔴 FAILING: Anonymous → Signed Up User Flow with Data Persistence", async ({
